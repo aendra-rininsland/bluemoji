@@ -1,0 +1,17 @@
+{
+  "name": "bsky-mfm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@atproto/api": "^0.12.22",
+    "@atproto/lexicon": "^0.4.0",
+    "mfm-js": "^0.24.0"
+  }
+}
