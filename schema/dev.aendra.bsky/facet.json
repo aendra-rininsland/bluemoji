@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.aendra.bsky.richtext.facet",
+  "id": "dev.aendra.bsky.facet",
   "defs": {
     "main": {
       "type": "object",
@@ -16,20 +16,19 @@
               "app.bsky.richtext.facet#mention",
               "app.bsky.richtext.facet#link",
               "app.bsky.richtext.facet#tag",
-              "#blumogi"
+              "#bluemoji"
             ]
           }
         }
       }
     },
-    "blumogi": {
+    "bluemoji": {
       "type": "object",
-      "description": "A custom Bluesky Emoji",
-      "required": ["type", "props"],
+      "required": ["name", "did", "rkey"],
       "properties": {
-        "type": { "type": "string" },
-        "props": { "type": "union", "refs": ["#mfmFnProps"] },
-        "children": { "type": "ref", "ref": "#mfmChildren" }
+        "name": { "type": "string" },
+        "did": { "type": "string", "format": "did" },
+        "rkey": { "type": "string" }
       }
     }
   }

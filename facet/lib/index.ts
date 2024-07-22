@@ -1,15 +1,15 @@
 import AtpAgent, { RichTextSegment, RichText, Facet } from "@atproto/api";
 import { detectFacets as detectFacetsOriginal } from "@atproto/api/src/rich-text/detection";
 import { UnicodeString } from "@atproto/api/src/rich-text/unicode";
-import * as DevAendraBskyRichtext from "./DevAendraBskyRichtext";
-import * as DevAendraBskyBluemoji from "./DevAendraBskyBluemoji";
+import * as DevAendraBskyFacet from "./lexicon/types/dev/aendra/bsky/facet";
+import * as DevAendraBskyBluemoji from "./lexicon/types/dev/aendra/bsky/bluemoji";
 
 export const BLUEMOJI_REGEX = /:((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):/gim;
 
 export class BluemojiEnabledRichTextSegment extends RichTextSegment {
   get bluemoji(): FacetBluemoji | undefined {
-    const fn = this.facet?.features.find(DevAendraBskyRichtext.isBluemojiFacet);
-    if (DevAendraBskyRichtext.isBluemojiFacet(fn)) {
+    const fn = this.facet?.features.find(DevAendraBskyFacet.isBluemoji);
+    if (DevAendraBskyFacet.isBluemoji(fn)) {
       return fn;
     }
     return undefined;
@@ -29,17 +29,17 @@ export function detectFacets(text: UnicodeString): Facet[] | undefined {
     while ((match = re.exec(text.utf16))) {
       const start = text.utf16.indexOf(match[0], match.index) - 1;
       facets.push({
-        $type: "dev.aendra.bsky.richtext.facet",
+        $type: "dev.aendra.bsky.facet",
         index: {
           byteStart: text.utf16IndexToUtf8Index(start),
-          byteEnd: text.utf16IndexToUtf8Index(start + match[0].length + 1),
+          byteEnd: text.utf16IndexToUtf8Index(start + match[0].length + 1)
         },
         features: [
           {
             $type: "dev.aendra.bsky.richtext.facet#bluemoji",
-            name: match[0],
-          },
-        ],
+            name: match[0]
+          }
+        ]
       });
     }
   }
@@ -51,14 +51,12 @@ const facetSort = (a: Facet, b: Facet) => a.index.byteStart - b.index.byteStart;
 export default () => {
   Object.defineProperty(RichTextSegment, "bluemoji", {
     get(): FacetBluemoji | undefined {
-      const bluemoji = this.facet?.features.find(
-        DevAendraBskyRichtext.isBluemojiFacet
-      );
-      if (DevAendraBskyRichtext.isBluemojiFacet(bluemoji)) {
+      const bluemoji = this.facet?.features.find(DevAendraBskyFacet.isBluemoji);
+      if (DevAendraBskyFacet.isBluemoji(bluemoji)) {
         return bluemoji;
       }
       return undefined;
-    },
+    }
   });
 
   (RichTextSegment as unknown as BluemojiEnabledRichTextSegment).isBluemoji =
@@ -71,7 +69,7 @@ export default () => {
     if (this.facets) {
       for (const facet of this.facets) {
         for (const feature of facet.features) {
-          if (DevAendraBskyRichtext.isBluemojiFacet(feature)) {
+          if (DevAendraBskyFacet.isBluemoji(feature)) {
             const repo =
               feature.did ||
               agent.session?.did ||
@@ -82,13 +80,12 @@ export default () => {
               await agent.com.atproto.repo.listRecords({
                 repo,
                 limit: 100, // @TODO loop through whole collection
-                collection: "dev.aendra.bsky.bluemoji",
+                collection: "dev.aendra.bsky.bluemoji"
               });
 
             const bluemoji = bluemojiList.records.find(
               (d) =>
-                (d.value as DevAendraBskyBluemoji.OutputSchema).name ===
-                feature.name
+                (d.value as DevAendraBskyBluemoji.Record).name === feature.name
             );
 
             if (!bluemoji) return;

@@ -6,5 +6,8 @@
   "description": "Monorepo for the Bluemoji project",
   "workspaces": [
     "facet"
-  ]
+  ],
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
 }

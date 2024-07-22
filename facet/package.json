@@ -2,7 +2,7 @@
   "name": "@aendra/bluemoji",
   "version": "1.0.0",
   "scripts": {
-    "codegen": "echo \"Error: no test specified\" && exit 1"
+    "codegen": "lex gen-server ./lib/lexicon  ../schema/dev.aendra.bsky/* ../../atproto/lexicons/app/bsky/*/*"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,6 @@
     "@atproto/lexicon": "^0.4.0"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "^0.4.0"
+    "@atproto/lex-cli": "^0.3.2"
   }
 }
