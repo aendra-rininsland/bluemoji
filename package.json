@@ -1,0 +1,10 @@
+{
+  "name": "bluemoji",
+  "version": "1.0.0",
+  "author": "Ændra Rininsland",
+  "license": "ISC",
+  "description": "Monorepo for the Bluemoji project",
+  "workspaces": [
+    "facet"
+  ]
+}

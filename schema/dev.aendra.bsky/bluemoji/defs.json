@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "dev.aendra.bsky.bluemoji",
+  "defs": {
+    "main": {
+      "name": { "type": "string" },
+      "alt": { "type": "string" },
+      "createdAt": { "type": "string", "format": "datetime" },
+      "images": {
+        "type": "object",
+        "required": ["original", "sizes"],
+        "properties": {
+          "original": {
+            "type": "blob"
+          },
+          "sizes": {
+            "type": "object",
+            "required": ["16px", "32px", "64px", "128px", "256px"],
+            "properties": {
+              "16px": { "type": "string", "format": "uri" },
+              "32px": { "type": "string", "format": "uri" },
+              "64px": { "type": "string", "format": "uri" },
+              "128px": { "type": "string", "format": "uri" },
+              "256px": { "type": "string", "format": "uri" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
