@@ -2,8 +2,11 @@
   "name": "@aendra/bluemoji",
   "version": "1.0.0",
   "scripts": {
-    "codegen": "lex gen-server ./lib/lexicon  ../schema/dev.aendra.bsky/* ../../atproto/lexicons/app/bsky/*/*"
+    "codegen": "lex gen-server ./lib/lexicon  ../schema/dev.aendra.bsky/* ../../atproto/lexicons/app/bsky/*/*",
+    "test": "tsx lib/bluemoji.test.ts",
+    "build": "tsc"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -13,6 +16,10 @@
     "@atproto/lexicon": "^0.4.0"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "^0.3.2"
+    "@atproto/lex-cli": "^0.3.2",
+    "@atproto/xrpc-server": "^0.5.3",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.11",
+    "typescript": "^5.5.3"
   }
 }

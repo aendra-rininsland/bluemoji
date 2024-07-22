@@ -102,7 +102,7 @@ export const schemaDict = {
       },
       bluemoji: {
         type: 'object',
-        required: ['name', 'did', 'rkey'],
+        required: ['name', 'did', 'cid'],
         properties: {
           name: {
             type: 'string',
@@ -111,8 +111,9 @@ export const schemaDict = {
             type: 'string',
             format: 'did',
           },
-          rkey: {
+          cid: {
             type: 'string',
+            format: 'cid',
           },
         },
       },

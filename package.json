@@ -8,6 +8,7 @@
     "facet"
   ],
   "devDependencies": {
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "tsx": "^4.16.2"
   }
 }

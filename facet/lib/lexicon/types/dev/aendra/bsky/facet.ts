@@ -36,7 +36,7 @@ export function validateMain(v: unknown): ValidationResult {
 export interface Bluemoji {
   name: string
   did: string
-  rkey: string
+  cid: string
   [k: string]: unknown
 }
 

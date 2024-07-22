@@ -24,11 +24,11 @@
     },
     "bluemoji": {
       "type": "object",
-      "required": ["name", "did", "rkey"],
+      "required": ["name", "did", "cid"],
       "properties": {
         "name": { "type": "string" },
         "did": { "type": "string", "format": "did" },
-        "rkey": { "type": "string" }
+        "cid": { "type": "string", "format": "cid" }
       }
     }
   }
