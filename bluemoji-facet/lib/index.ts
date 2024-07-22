@@ -1,75 +1,69 @@
-import AtpAgent, {
-  RichTextProps,
-  RichTextSegment,
-  RichText,
-  Facet,
-  TRAILING_PUNCTUATION_REGEX,
-} from "@atproto/api";
+import AtpAgent, { RichTextSegment, RichText, Facet } from "@atproto/api";
 import { detectFacets as detectFacetsOriginal } from "@atproto/api/src/rich-text/detection";
 import { UnicodeString } from "@atproto/api/src/rich-text/unicode";
 import * as DevAendraBskyRichtext from "./DevAendraBskyRichtext";
-import mfm from "mfm-js";
+import * as DevAendraBskyBluemoji from "./DevAendraBskyBluemoji";
 
-export class MFMEnabledRichTextSegment extends RichTextSegment {
-  get mfm(): FacetMFM | undefined {
-    const fn = this.facet?.features.find(DevAendraBskyRichtext.isMFM);
-    if (DevAendraBskyRichtext.isMFM(fn)) {
+export const BLUEMOJI_REGEX = /:((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):/gim;
+
+export class BluemojiEnabledRichTextSegment extends RichTextSegment {
+  get bluemoji(): FacetBluemoji | undefined {
+    const fn = this.facet?.features.find(DevAendraBskyRichtext.isBluemojiFacet);
+    if (DevAendraBskyRichtext.isBluemojiFacet(fn)) {
       return fn;
     }
     return undefined;
   }
-  isMFM() {
-    return !!this.mfm;
+  isBluemoji() {
+    return !!this.bluemoji;
   }
 }
 
-interface FacetMFM {}
+interface FacetBluemoji {}
 
 export function detectFacets(text: UnicodeString): Facet[] | undefined {
-  const facets = detectFacetsOriginal(text) || [];
-  const parsedMfm = mfm.parse(text.toString());
-  for (const tag of parsedMfm) {
-    // while ((match = re.exec(text.utf16))) {
-    //   const leading = match[1]
-    //   let tag = match[2]
-    //   if (!tag) continue
-    //   // strip ending punctuation and any spaces
-    //   tag = tag.trim().replace(TRAILING_PUNCTUATION_REGEX, '')
-    //   if (tag.length === 0 || tag.length > 64) continue
-    //   const index = match.index + leading.length
-    //   facets.push({
-    //     index: {
-    //       byteStart: text.utf16IndexToUtf8Index(index),
-    //       byteEnd: text.utf16IndexToUtf8Index(index + 1 + tag.length),
-    //     },
-    //     features: [
-    //       {
-    //         $type: 'app.bsky.richtext.facet#tag',
-    //         tag: tag,
-    //       },
-    //     ],
-    //   })
-    // }
+  let match: any;
+  const facets: Facet[] = detectFacetsOriginal(text) || [];
+  {
+    const re = BLUEMOJI_REGEX;
+    while ((match = re.exec(text.utf16))) {
+      const start = text.utf16.indexOf(match[0], match.index) - 1;
+      facets.push({
+        $type: "dev.aendra.bsky.richtext.facet",
+        index: {
+          byteStart: text.utf16IndexToUtf8Index(start),
+          byteEnd: text.utf16IndexToUtf8Index(start + match[0].length + 1),
+        },
+        features: [
+          {
+            $type: "dev.aendra.bsky.richtext.facet#bluemoji",
+            name: match[0],
+          },
+        ],
+      });
+    }
   }
-
-  return facets.length ? facets : undefined;
+  return facets.length > 0 ? facets : undefined;
 }
+
 const facetSort = (a: Facet, b: Facet) => a.index.byteStart - b.index.byteStart;
 
 export default () => {
-  Object.defineProperty(RichTextSegment, "mfm", {
-    get(): FacetMFM | undefined {
-      const fn = this.facet?.features.find(DevAendraBskyRichtext.isMFM);
-      if (DevAendraBskyRichtext.isMFM(fn)) {
-        return fn;
+  Object.defineProperty(RichTextSegment, "bluemoji", {
+    get(): FacetBluemoji | undefined {
+      const bluemoji = this.facet?.features.find(
+        DevAendraBskyRichtext.isBluemojiFacet
+      );
+      if (DevAendraBskyRichtext.isBluemojiFacet(bluemoji)) {
+        return bluemoji;
       }
       return undefined;
     },
   });
 
-  (RichTextSegment as unknown as MFMEnabledRichTextSegment).isMFM =
+  (RichTextSegment as unknown as BluemojiEnabledRichTextSegment).isBluemoji =
     function () {
-      return !!this.mfm;
+      return !!this.bluemoji;
     };
 
   RichText.prototype.detectFacets = async function (agent: AtpAgent) {
@@ -77,16 +71,35 @@ export default () => {
     if (this.facets) {
       for (const facet of this.facets) {
         for (const feature of facet.features) {
-          if (DevAendraBskyRichtext.isMFM(feature)) {
-            // const did = await agent
-            //   .resolveHandle({ handle: feature.did })
-            //   .catch((_) => undefined)
-            //   .then((res) => res?.data.did)
-            // feature.did = did || ''
+          if (DevAendraBskyRichtext.isBluemojiFacet(feature)) {
+            const repo =
+              feature.did ||
+              agent.session?.did ||
+              "did:plc:kkf4naxqmweop7dv4l2iqqf5";
+            if (!repo) return;
+
+            const { data: bluemojiList } =
+              await agent.com.atproto.repo.listRecords({
+                repo,
+                limit: 100, // @TODO loop through whole collection
+                collection: "dev.aendra.bsky.bluemoji",
+              });
+
+            const bluemoji = bluemojiList.records.find(
+              (d) =>
+                (d.value as DevAendraBskyBluemoji.OutputSchema).name ===
+                feature.name
+            );
+
+            if (!bluemoji) return;
+
+            feature.uri = bluemoji.uri;
           }
         }
       }
       this.facets.sort(facetSort);
     }
   };
+
+  return RichText;
 };

@@ -1,11 +1,9 @@
 import { hasProp, isObj, ValidationResult, Lexicons } from "@atproto/lexicon";
+import { lexicons } from "./lexicon";
 
-// create your lexicons collection
-export const lexicons = new Lexicons();
-
-lexicons.add({
+export const DevAendraBskyRichtextFacet = {
   lexicon: 1,
-  id: "dev.aendra.bsky.richtext.facet#blumogi",
+  id: "dev.aendra.bsky.richtext.facet",
   defs: {
     main: {
       type: "object",
@@ -21,38 +19,38 @@ lexicons.add({
               "app.bsky.richtext.facet#mention",
               "app.bsky.richtext.facet#link",
               "app.bsky.richtext.facet#tag",
-              "#blumogi",
+              "#bluemogi",
             ],
           },
         },
       },
     },
-    blumogi: {
+    bluemogi: {
       type: "object",
       description: "A custom Bluesky Emoji",
       required: ["type", "props"],
       properties: {
-        type: { type: "string" },
-        props: { type: "union", refs: ["#mfmFnProps"] },
-        children: { type: "ref", ref: "#mfmChildren" },
+        name: { type: "string", maxLength: 20 },
+        did: { type: "string", format: "did" },
       },
     },
   },
-});
+};
 
-export interface Blumoji {
+export interface BluemojiFacet {
   symbol: string;
+  did: string;
   [k: string]: unknown;
 }
 
-export function isBlumoji(v: unknown): v is Blumoji {
+export function isBluemojiFacet(v: unknown): v is BluemojiFacet {
   return (
     isObj(v) &&
     hasProp(v, "$type") &&
-    v.$type === "dev.aendra.bsky.richtext.facet#blumogi"
+    v.$type === "dev.aendra.bsky.richtext.facet#bluemoji"
   );
 }
 
-export function validateBlumoji(v: unknown): ValidationResult {
-  return lexicons.validate("dev.aendra.bsky.richtext.facet#blumogi", v);
+export function validateBluemojiFacet(v: unknown): ValidationResult {
+  return lexicons.validate("dev.aendra.bsky.richtext.facet#bluemoji", v);
 }
