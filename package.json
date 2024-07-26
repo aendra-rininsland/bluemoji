@@ -5,7 +5,10 @@
   "license": "ISC",
   "description": "Monorepo for the Bluemoji project",
   "workspaces": [
-    "facet"
+    "facet",
+    "webapp",
+    "bot",
+    "social-app"
   ],
   "devDependencies": {
     "prettier": "^3.3.3",

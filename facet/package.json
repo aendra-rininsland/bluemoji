@@ -2,7 +2,7 @@
   "name": "@aendra/bluemoji",
   "version": "1.0.0",
   "scripts": {
-    "codegen": "lex gen-server ./lib/lexicon  ../schema/dev.aendra.bsky/* ../../atproto/lexicons/app/bsky/*/*",
+    "codegen": "lex gen-server ./lib/lexicon  ../schema/dev.aendra/**/* ../../atproto/lexicons/app/bsky/*/*",
     "test": "tsx lib/bluemoji.test.ts",
     "build": "swc lib --out-dir dist"
   },

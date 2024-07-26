@@ -1,9 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { BskyAgent, RichText } from "@atproto/api";
-import "./register";
+import { register } from "./bluemoji";
 
-describe("dev.aendra.bsky.facet", () => {
+register("did:plc:kkf4naxqmweop7dv4l2iqqf5"); // @TODO This feels wrong...
+
+describe("dev.aendra.richtext.facet", () => {
   const text =
     "Hello @aendra.com, check out this link: https://example.com :party-heart:";
 
@@ -46,7 +48,7 @@ describe("dev.aendra.bsky.facet", () => {
       const [bluemojiFeature] = bluemoji.features;
       assert.strictEqual(
         bluemojiFeature.$type,
-        "dev.aendra.bsky.facet#bluemoji"
+        "dev.aendra.richtext.facet#bluemoji"
       );
       assert.strictEqual(
         bluemojiFeature.did,

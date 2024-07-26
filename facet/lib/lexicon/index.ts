@@ -112,15 +112,15 @@ export class DevNS {
 
 export class DevAendraNS {
   _server: Server
-  bsky: DevAendraBskyNS
+  richtext: DevAendraRichtextNS
 
   constructor(server: Server) {
     this._server = server
-    this.bsky = new DevAendraBskyNS(server)
+    this.richtext = new DevAendraRichtextNS(server)
   }
 }
 
-export class DevAendraBskyNS {
+export class DevAendraRichtextNS {
   _server: Server
 
   constructor(server: Server) {

@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.aendra.bsky.facet",
+  "id": "dev.aendra.richtext.facet",
   "defs": {
     "main": {
       "type": "object",
@@ -24,11 +24,15 @@
     },
     "bluemoji": {
       "type": "object",
-      "required": ["name", "did", "cid"],
+      "required": ["name", "did", "alt", "images"],
       "properties": {
         "name": { "type": "string" },
         "did": { "type": "string", "format": "did" },
-        "cid": { "type": "string", "format": "cid" }
+        "alt": { "type": "string" },
+        "images": {
+          "type": "ref",
+          "ref": "dev.aendra.richtext.bluemoji#images"
+        }
       }
     }
   }

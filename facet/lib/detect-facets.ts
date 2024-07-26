@@ -11,14 +11,14 @@ export function detectFacets(text: UnicodeString): Facet[] | undefined {
     while ((match = re.exec(text.utf16))) {
       const start = text.utf16.indexOf(match[0], match.index) - 1;
       facets.push({
-        $type: "dev.aendra.bsky.facet",
+        $type: "dev.aendra.richtext.facet",
         index: {
           byteStart: text.utf16IndexToUtf8Index(start),
           byteEnd: text.utf16IndexToUtf8Index(start + match[0].length + 1)
         },
         features: [
           {
-            $type: "dev.aendra.bsky.facet#bluemoji",
+            $type: "dev.aendra.richtext.facet#bluemoji",
             name: match[0]
           }
         ]

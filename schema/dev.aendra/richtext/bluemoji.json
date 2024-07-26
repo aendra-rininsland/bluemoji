@@ -1,11 +1,11 @@
 {
   "lexicon": 1,
-  "id": "dev.aendra.bsky.bluemoji",
+  "id": "dev.aendra.richtext.bluemoji",
   "defs": {
     "main": {
       "type": "record",
       "description": "A custom Bluesky emoji",
-      "key": "tid",
+      "key": "any",
       "record": {
         "type": "object",
         "properties": {
@@ -18,7 +18,7 @@
     },
     "images": {
       "type": "object",
-      "required": ["original", "sizes"],
+      "required": ["original"],
       "properties": {
         "original": {
           "type": "blob"

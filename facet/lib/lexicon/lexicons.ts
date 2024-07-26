@@ -4,14 +4,14 @@
 import { LexiconDoc, Lexicons } from '@atproto/lexicon'
 
 export const schemaDict = {
-  DevAendraBskyBluemoji: {
+  DevAendraRichtextBluemoji: {
     lexicon: 1,
-    id: 'dev.aendra.bsky.bluemoji',
+    id: 'dev.aendra.richtext.bluemoji',
     defs: {
       main: {
         type: 'record',
         description: 'A custom Bluesky emoji',
-        key: 'tid',
+        key: 'any',
         record: {
           type: 'object',
           properties: {
@@ -27,21 +27,21 @@ export const schemaDict = {
             },
             images: {
               type: 'ref',
-              ref: 'lex:dev.aendra.bsky.bluemoji#images',
+              ref: 'lex:dev.aendra.richtext.bluemoji#images',
             },
           },
         },
       },
       images: {
         type: 'object',
-        required: ['original', 'sizes'],
+        required: ['original'],
         properties: {
           original: {
             type: 'blob',
           },
           sizes: {
             type: 'ref',
-            ref: 'lex:dev.aendra.bsky.bluemoji#sizes',
+            ref: 'lex:dev.aendra.richtext.bluemoji#sizes',
           },
         },
       },
@@ -73,9 +73,9 @@ export const schemaDict = {
       },
     },
   },
-  DevAendraBskyFacet: {
+  DevAendraRichtextFacet: {
     lexicon: 1,
-    id: 'dev.aendra.bsky.facet',
+    id: 'dev.aendra.richtext.facet',
     defs: {
       main: {
         type: 'object',
@@ -94,7 +94,7 @@ export const schemaDict = {
                 'lex:app.bsky.richtext.facet#mention',
                 'lex:app.bsky.richtext.facet#link',
                 'lex:app.bsky.richtext.facet#tag',
-                'lex:dev.aendra.bsky.facet#bluemoji',
+                'lex:dev.aendra.richtext.facet#bluemoji',
               ],
             },
           },
@@ -102,7 +102,7 @@ export const schemaDict = {
       },
       bluemoji: {
         type: 'object',
-        required: ['name', 'did', 'cid'],
+        required: ['name', 'did', 'alt', 'images'],
         properties: {
           name: {
             type: 'string',
@@ -111,9 +111,12 @@ export const schemaDict = {
             type: 'string',
             format: 'did',
           },
-          cid: {
+          alt: {
             type: 'string',
-            format: 'cid',
+          },
+          images: {
+            type: 'ref',
+            ref: 'lex:dev.aendra.richtext.bluemoji#images',
           },
         },
       },
@@ -5207,8 +5210,8 @@ export const schemaDict = {
 export const schemas: LexiconDoc[] = Object.values(schemaDict) as LexiconDoc[]
 export const lexicons: Lexicons = new Lexicons(schemas)
 export const ids = {
-  DevAendraBskyBluemoji: 'dev.aendra.bsky.bluemoji',
-  DevAendraBskyFacet: 'dev.aendra.bsky.facet',
+  DevAendraRichtextBluemoji: 'dev.aendra.richtext.bluemoji',
+  DevAendraRichtextFacet: 'dev.aendra.richtext.facet',
   AppBskyActorDefs: 'app.bsky.actor.defs',
   AppBskyActorGetPreferences: 'app.bsky.actor.getPreferences',
   AppBskyActorGetProfile: 'app.bsky.actor.getProfile',

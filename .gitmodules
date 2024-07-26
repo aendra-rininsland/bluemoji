@@ -1,0 +1,3 @@
+[submodule "social-app"]
+	path = social-app
+	url = git@github.com:bluesky-social/social-app.git
