@@ -1,0 +1,21 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.collection.item",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A custom emoji",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "alt": { "type": "string" },
+          "createdAt": { "type": "string", "format": "datetime" },
+          "asset": { "type": "bytes" },
+          "adultOnly": { "type": "boolean", "default": false }
+        }
+      }
+    }
+  }
+}

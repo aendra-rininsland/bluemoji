@@ -54,7 +54,7 @@ export const register = (did?: string) => {
             const bluemoji = await agent.com.atproto.repo.getRecord({
               repo,
               rkey: feature.name.slice(1, -1),
-              collection: "dev.aendra.richtext.bluemoji"
+              collection: "blue.moji.richtext.bluemoji"
             });
 
             if (!bluemoji) return;

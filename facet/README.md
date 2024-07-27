@@ -19,7 +19,7 @@ import "@aendra/bluemoji/register";
 ```
 
 4. The `RichText` facet identifier will now return facets for text fragments like `:party-heart:` that
-   correspond to a matching `dev.aendra.richtext.bluemoji` record in the related repo. :tada:
+   correspond to a matching `blue.moji.richtext.bluemoji` record in the related repo. :tada:
 
 **Note that this doesn't work anywhere yet. Stay tuned for a client library to render these and an enhanced Bluesky app for adding them to your account**
 

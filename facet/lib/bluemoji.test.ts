@@ -5,7 +5,7 @@ import { register } from "./bluemoji";
 
 register("did:plc:kkf4naxqmweop7dv4l2iqqf5"); // @TODO This feels wrong...
 
-describe("dev.aendra.richtext.facet", () => {
+describe("blue.moji.richtext.facet", () => {
   const text =
     "Hello @aendra.com, check out this link: https://example.com :party-heart:";
 
@@ -48,7 +48,7 @@ describe("dev.aendra.richtext.facet", () => {
       const [bluemojiFeature] = bluemoji.features;
       assert.strictEqual(
         bluemojiFeature.$type,
-        "dev.aendra.richtext.facet#bluemoji"
+        "blue.moji.richtext.facet#bluemoji"
       );
       assert.strictEqual(
         bluemojiFeature.did,

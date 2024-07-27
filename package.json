@@ -4,14 +4,17 @@
   "author": "Ændra Rininsland",
   "license": "ISC",
   "description": "Monorepo for the Bluemoji project",
+  "scripts": {
+    "codegen": "lex gen-server ./lexicons  ../atproto/lexicons/app/bsky/*/* ../atproto/lexicons/com/atproto/*/* ./schema/blue.moji/**/* "
+  },
   "workspaces": [
     "facet",
     "webapp",
-    "bot",
-    "social-app"
+    "bot"
   ],
   "devDependencies": {
     "prettier": "^3.3.3",
-    "tsx": "^4.16.2"
+    "tsx": "^4.16.2",
+    "@atproto/lex-cli": "^0.3.2"
   }
 }
