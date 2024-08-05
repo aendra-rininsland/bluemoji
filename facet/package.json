@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "scripts": {
     "test": "tsx lib/bluemoji.test.ts",
     "build": "swc lib --out-dir dist"
@@ -11,7 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@atproto/api": "^0.12.22",
+    "@atproto/api": "^0.12.28",
     "@atproto/lexicon": "^0.4.0",
     "upng-js": "^2.1.0"
   },

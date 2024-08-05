@@ -26,26 +26,11 @@ export class BluemojiEnabledRichTextSegment extends RichTextSegment {
   }
 }
 
-const facetSort = (a: Facet, b: Facet) => a.index.byteStart - b.index.byteStart;
-export const register = (did?: string) => {
-  Object.defineProperty(RichTextSegment, "bluemoji", {
-    get(): BlueMojiRichtextFacet.Bluemoji | undefined {
-      const bluemoji = this.facet?.features.find(
-        BlueMojiRichtextFacet.isBluemoji
-      );
-      if (BlueMojiRichtextFacet.isBluemoji(bluemoji)) {
-        return bluemoji;
-      }
-      return undefined;
-    }
-  });
+export const facetSort = (a: Facet, b: Facet) =>
+  a.index.byteStart - b.index.byteStart;
 
-  (RichTextSegment as unknown as BluemojiEnabledRichTextSegment).isBluemoji =
-    function () {
-      return !!this.bluemoji;
-    };
-
-  RichText.prototype.detectFacets = async function (agent: AtpAgent) {
+export class BluemojiRichText extends RichText {
+  async detectFacets(agent: AtpAgent): Promise<void> {
     this.facets = detectFacets(this.unicodeText);
     if (this.facets) {
       for (const facet of this.facets) {
@@ -86,5 +71,5 @@ export const register = (did?: string) => {
       }
       this.facets.sort(facetSort);
     }
-  };
-};
+  }
+}
