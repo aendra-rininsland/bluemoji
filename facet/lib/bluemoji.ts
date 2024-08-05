@@ -3,7 +3,11 @@ import AtpAgent, {
   RichText,
   Facet,
   AppBskyRichtextFacet,
-  UnicodeString
+  UnicodeString,
+  Entity,
+  RichTextProps,
+  RichTextOpts,
+  sanitizeRichText
 } from "@atproto/api";
 import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
@@ -31,6 +35,20 @@ export const facetSort = (a: Facet, b: Facet) =>
   a.index.byteStart - b.index.byteStart;
 
 export class BluemojiRichText extends RichText {
+  constructor(props: RichTextProps, opts?: RichTextOpts) {
+    super(props, opts);
+    this.unicodeText = new UnicodeString(props.text);
+    this.facets = props.facets;
+    if (!this.facets?.length && props.entities?.length) {
+      this.facets = entitiesToFacets(this.unicodeText, props.entities);
+    }
+    if (this.facets) {
+      this.facets.sort(facetSort);
+    }
+    // if (opts?.cleanNewlines) {
+    //   sanitizeRichText(this, { cleanNewlines: true }).copyInto(this);
+    // }
+  }
   clone() {
     return new BluemojiRichText({
       text: this.unicodeText.utf16,
@@ -90,11 +108,13 @@ export class BluemojiRichText extends RichText {
 
             const { did: repo } = session;
 
-            const { data: record } = await agent.com.atproto.repo.getRecord({
+            const { data } = await agent.com.atproto.repo.getRecord({
               repo,
               rkey: feature.name.replace(/:/g, ""),
               collection: "blue.moji.collection"
             });
+
+            const { value: record } = data;
 
             if (!record || !BlueMojiCollectionItem.isRecord(record)) return;
 
@@ -127,4 +147,32 @@ function cloneDeep<T>(v: T): T {
     return v;
   }
   return JSON.parse(JSON.stringify(v));
+}
+
+function entitiesToFacets(text: UnicodeString, entities: Entity[]): Facet[] {
+  const facets: Facet[] = [];
+  for (const ent of entities) {
+    if (ent.type === "link") {
+      facets.push({
+        $type: "app.bsky.richtext.facet",
+        index: {
+          byteStart: text.utf16IndexToUtf8Index(ent.index.start),
+          byteEnd: text.utf16IndexToUtf8Index(ent.index.end)
+        },
+        features: [{ $type: "app.bsky.richtext.facet#link", uri: ent.value }]
+      });
+    } else if (ent.type === "mention") {
+      facets.push({
+        $type: "app.bsky.richtext.facet",
+        index: {
+          byteStart: text.utf16IndexToUtf8Index(ent.index.start),
+          byteEnd: text.utf16IndexToUtf8Index(ent.index.end)
+        },
+        features: [{ $type: "app.bsky.richtext.facet#mention", did: ent.value }]
+      });
+    } else if (ent.type === "bluemoji") {
+      console.log(ent);
+    }
+  }
+  return facets;
 }
