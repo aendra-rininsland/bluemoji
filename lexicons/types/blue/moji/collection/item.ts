@@ -7,13 +7,13 @@ import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
 
 export interface Record {
-  $type: 'blue.moji.collection.item'
   name: string
   alt: string
   createdAt: string
   asset: BytesAsset | BlobAsset | { $type: string; [k: string]: unknown }
   original?: BlobRef
   adultOnly: boolean
+  copyOf?: string
   [k: string]: unknown
 }
 

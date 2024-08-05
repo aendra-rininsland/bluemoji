@@ -9076,12 +9076,8 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
-          required: ['$type', 'name', 'alt', 'createdAt', 'asset'],
+          required: ['name', 'alt', 'createdAt', 'asset'],
           properties: {
-            $type: {
-              type: 'string',
-              const: 'blue.moji.collection.item',
-            },
             name: {
               type: 'string',
             },
@@ -9106,6 +9102,10 @@ export const schemaDict = {
             adultOnly: {
               type: 'boolean',
               default: false,
+            },
+            copyOf: {
+              type: 'string',
+              format: 'at-uri',
             },
           },
         },

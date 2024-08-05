@@ -8,9 +8,8 @@
       "key": "any",
       "record": {
         "type": "object",
-        "required": ["$type", "name", "alt", "createdAt", "asset"],
+        "required": ["name", "alt", "createdAt", "asset"],
         "properties": {
-          "$type": { "type": "string", "const": "blue.moji.collection.item" },
           "name": { "type": "string" },
           "alt": { "type": "string" },
           "createdAt": { "type": "string", "format": "datetime" },
