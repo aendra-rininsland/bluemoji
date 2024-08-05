@@ -6,7 +6,7 @@ import AtpAgent, {
 import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
-import { BluemojiEnabledRichTextSegment, facetSort } from "./bluemoji";
+import { BluemojiRichTextSegment, facetSort } from "./bluemoji";
 
 export const register = (did?: string) => {
   Object.defineProperty(RichTextSegment, "bluemoji", {
@@ -21,7 +21,7 @@ export const register = (did?: string) => {
     }
   });
 
-  (RichTextSegment as unknown as BluemojiEnabledRichTextSegment).isBluemoji =
+  (RichTextSegment as unknown as BluemojiRichTextSegment).isBluemoji =
     function () {
       return !!this.bluemoji;
     };

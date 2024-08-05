@@ -2,7 +2,8 @@ import AtpAgent, {
   RichTextSegment,
   RichText,
   Facet,
-  AppBskyRichtextFacet
+  AppBskyRichtextFacet,
+  UnicodeString
 } from "@atproto/api";
 import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
@@ -13,7 +14,7 @@ export const BLUEMOJI_REGEX = new RegExp(
   "gim"
 );
 
-export class BluemojiEnabledRichTextSegment extends RichTextSegment {
+export class BluemojiRichTextSegment extends RichTextSegment {
   get bluemoji(): BlueMojiRichtextFacet.Bluemoji | undefined {
     const fn = this.facet?.features.find(BlueMojiRichtextFacet.isBluemoji);
     if (BlueMojiRichtextFacet.isBluemoji(fn)) {
@@ -30,6 +31,54 @@ export const facetSort = (a: Facet, b: Facet) =>
   a.index.byteStart - b.index.byteStart;
 
 export class BluemojiRichText extends RichText {
+  clone() {
+    return new BluemojiRichText({
+      text: this.unicodeText.utf16,
+      facets: cloneDeep(this.facets)
+    });
+  }
+
+  *segments(): Generator<BluemojiRichTextSegment, void, void> {
+    const facets = this.facets || [];
+    if (!facets.length) {
+      yield new BluemojiRichTextSegment(this.unicodeText.utf16);
+      return;
+    }
+
+    let textCursor = 0;
+    let facetCursor = 0;
+    do {
+      const currFacet = facets[facetCursor];
+      if (textCursor < currFacet.index.byteStart) {
+        yield new BluemojiRichTextSegment(
+          this.unicodeText.slice(textCursor, currFacet.index.byteStart)
+        );
+      } else if (textCursor > currFacet.index.byteStart) {
+        facetCursor++;
+        continue;
+      }
+      if (currFacet.index.byteStart < currFacet.index.byteEnd) {
+        const subtext = this.unicodeText.slice(
+          currFacet.index.byteStart,
+          currFacet.index.byteEnd
+        );
+        if (!subtext.trim()) {
+          // dont empty string entities
+          yield new BluemojiRichTextSegment(subtext);
+        } else {
+          yield new BluemojiRichTextSegment(subtext, currFacet);
+        }
+      }
+      textCursor = currFacet.index.byteEnd;
+      facetCursor++;
+    } while (facetCursor < facets.length);
+    if (textCursor < this.unicodeText.length) {
+      yield new BluemojiRichTextSegment(
+        this.unicodeText.slice(textCursor, this.unicodeText.length)
+      );
+    }
+  }
+
   async detectFacets(agent: AtpAgent): Promise<void> {
     this.facets = detectFacets(this.unicodeText);
     if (this.facets) {
@@ -72,4 +121,10 @@ export class BluemojiRichText extends RichText {
       this.facets.sort(facetSort);
     }
   }
+}
+function cloneDeep<T>(v: T): T {
+  if (typeof v === "undefined") {
+    return v;
+  }
+  return JSON.parse(JSON.stringify(v));
 }

@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "scripts": {
     "test": "tsx lib/bluemoji.test.ts",
     "build": "swc lib --out-dir dist"
