@@ -2,12 +2,16 @@
 
 This is the root of the Bluemoji mono-repo. It contains:
 
-- **[/facet](facet/)** Extends `@atproto/api` so the `RichText` class can parse `:emoji:` strings
-- **[/webapp](webapp/)** work-in-progress webapp for uploading and using Bluemoji on Bluesky
+- **[/schema](schema/)** for the `blue.moji` schemata
+- **[/facet](facet/)** Extends `@atproto/api` so the `RichText` class can create `blue.moji.richtext.facet` entities from `:emoji:` strings
+- **[/lexicons](lexicons/)** for Lexicon TypeScript definitions
 
 Note that this is all very work-in-progress. You won't be able to see Bluemoji until
-either Bluesky adds @aendra/bluemoji to the app, a 3rd party dev does similar, or I finish the webapp mentioned above.
+either Bluesky adds @aendra/bluemoji to the app or a 3rd party dev does similar.
 
-In the meantime, you can upload Bluemoji at:
+I may also deploy a fork of the Bluesky AppView at some point but probably not
+until OAuth support arrives.
 
-https://observablehq.com/@aendra/bluemoji-uploader
+In the meantime, you can play with Bluemoji at:
+
+https://observablehq.com/@aendra/bluemoji-tools

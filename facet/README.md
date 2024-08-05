@@ -19,13 +19,16 @@ import "@aendra/bluemoji/register";
 ```
 
 4. The `RichText` facet identifier will now return facets for text fragments like `:party-heart:` that
-   correspond to a matching `blue.moji.richtext.bluemoji` record in the related repo. :tada:
+   correspond to a matching `blue.moji.collection` record in the related repo. :tada:
+
+UPDATE: I'm not sure the register method works at the moment. You may want to instead import the [`BluemojiRichText`](lib/bluemoji.ts) class and outright replace your existing `@atproto/api` RichText implementation. I'm working to make this easier, but it's challenging without a plugin infrastructure
+in the RichText interface.
 
 **Note that this doesn't work anywhere yet. Stay tuned for a client library to render these and an enhanced Bluesky app for adding them to your account**
 
 ## TODO:
 
-- [ ] Animated PNG support
+- [x] Animated PNG support
 - [ ] Fork AppView
 
 [1]: https://docs.bsky.app/docs/advanced-guides/post-richtext
