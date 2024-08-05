@@ -8,8 +8,6 @@ import * as BlueMojiRichtextFacet from "../../lexicons/types/blue/moji/richtext/
 import * as BlueMojiCollectionItem from "../../lexicons/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
 
-export * as lexicon from "../../lexicons";
-
 export const BLUEMOJI_REGEX = new RegExp(
   ":((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):",
   "gim"
