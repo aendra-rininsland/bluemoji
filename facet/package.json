@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "test": "tsx lib/bluemoji.test.ts",
     "build": "swc lib --out-dir dist"
@@ -22,10 +22,10 @@
     "node": ">=22"
   },
   "exports": {
-    ".": "./dist/bluemoji.js",
-    "./register": "./dist/register.js",
-    "./webcomponent": "./dist/webcomponent.js"
+    "./*": "./dist/*",
+    "./index.js": "./dist/bluemoji.js"
   },
+  "main": "./dist/bluemoji.js",
   "peerDependencies": {
     "react-native": "^0.74.4"
   },
