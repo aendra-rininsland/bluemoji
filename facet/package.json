@@ -12,7 +12,8 @@
   "description": "",
   "dependencies": {
     "@atproto/api": "^0.12.22",
-    "@atproto/lexicon": "^0.4.0"
+    "@atproto/lexicon": "^0.4.0",
+    "upng-js": "^2.1.0"
   },
   "devDependencies": {
     "swc": "^1.0.11"
@@ -23,5 +24,8 @@
   "exports": {
     ".": "./dist/bluemoji.js",
     "./register": "./dist/register.js"
+  },
+  "peerDependencies": {
+    "react-native": "^0.74.4"
   }
 }

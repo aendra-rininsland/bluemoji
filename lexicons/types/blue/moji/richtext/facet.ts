@@ -6,7 +6,6 @@ import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
 import * as AppBskyRichtextFacet from '../../../app/bsky/richtext/facet'
-import * as BlueMojiCollectionItem from '../collection/item'
 
 /** Annotation of a sub-string within rich text */
 export interface Main {
@@ -36,9 +35,8 @@ export function validateMain(v: unknown): ValidationResult {
 
 export interface Bluemoji {
   name: string
-  did: string
-  alt: string
-  record: BlueMojiCollectionItem.Main
+  uri: string
+  alt?: string
   [k: string]: unknown
 }
 

@@ -9010,6 +9010,60 @@ export const schemaDict = {
           },
         },
       },
+      collectionView: {
+        type: 'object',
+        required: ['uri', 'cid', 'creator', 'name', 'indexedAt'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          cid: {
+            type: 'string',
+            format: 'cid',
+          },
+          creator: {
+            type: 'ref',
+            ref: 'lex:app.bsky.actor.defs#profileView',
+          },
+          name: {
+            type: 'string',
+            maxLength: 64,
+            minLength: 1,
+          },
+          description: {
+            type: 'string',
+            maxGraphemes: 300,
+            maxLength: 3000,
+          },
+          descriptionFacets: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:app.bsky.richtext.facet',
+            },
+          },
+          avatar: {
+            type: 'string',
+            format: 'uri',
+          },
+          collectionItemCount: {
+            type: 'integer',
+            minimum: 0,
+          },
+          labels: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
+            },
+          },
+          indexedAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+        },
+      },
     },
   },
   BlueMojiCollectionItem: {
@@ -9022,7 +9076,12 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
+          required: ['$type', 'name', 'alt', 'createdAt', 'asset'],
           properties: {
+            $type: {
+              type: 'string',
+              const: 'blue.moji.collection.item',
+            },
             name: {
               type: 'string',
             },
@@ -9034,12 +9093,63 @@ export const schemaDict = {
               format: 'datetime',
             },
             asset: {
-              type: 'bytes',
+              type: 'union',
+              refs: [
+                'lex:blue.moji.collection.item#bytesAsset',
+                'lex:blue.moji.collection.item#blobAsset',
+              ],
+              closed: false,
+            },
+            original: {
+              type: 'blob',
             },
             adultOnly: {
               type: 'boolean',
               default: false,
             },
+          },
+        },
+      },
+      blobAsset: {
+        type: 'object',
+        required: ['$type', 'file'],
+        properties: {
+          $type: {
+            type: 'string',
+            const: 'blue.moji.collection.item#blobAsset',
+          },
+          file: {
+            type: 'blob',
+            accept: ['image/png', 'image/jpeg'],
+            maxSize: 262144,
+          },
+        },
+      },
+      bytesAsset: {
+        type: 'object',
+        required: ['$type', 'file'],
+        properties: {
+          $type: {
+            type: 'string',
+            const: 'blue.moji.collection.item#bytesAsset',
+          },
+          file: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#bytesFile',
+          },
+        },
+      },
+      bytesFile: {
+        type: 'object',
+        required: ['bytes', 'mimeType'],
+        properties: {
+          bytes: {
+            type: 'bytes',
+            maxLength: 65536,
+          },
+          mimeType: {
+            type: 'string',
+            enum: ['image/png', 'image/apng', 'image/gif'],
           },
         },
       },
@@ -9352,21 +9462,17 @@ export const schemaDict = {
       },
       bluemoji: {
         type: 'object',
-        required: ['name', 'did', 'alt', 'record'],
+        required: ['name', 'uri'],
         properties: {
           name: {
             type: 'string',
           },
-          did: {
+          uri: {
             type: 'string',
-            format: 'did',
+            format: 'at-uri',
           },
           alt: {
             type: 'string',
-          },
-          record: {
-            type: 'ref',
-            ref: 'lex:blue.moji.collection.item',
           },
         },
       },

@@ -24,15 +24,11 @@
     },
     "bluemoji": {
       "type": "object",
-      "required": ["name", "did", "alt", "record"],
+      "required": ["name", "uri"],
       "properties": {
         "name": { "type": "string" },
-        "did": { "type": "string", "format": "did" },
-        "alt": { "type": "string" },
-        "record": {
-          "type": "ref",
-          "ref": "blue.moji.collection.item"
-        }
+        "uri": { "type": "string", "format": "at-uri" },
+        "alt": { "type": "string" }
       }
     }
   }

@@ -1,0 +1,5 @@
+services:
+  imgproxy:
+    image: "darthsim/imgproxy:latest"
+    ports:
+      - "8080:8080"

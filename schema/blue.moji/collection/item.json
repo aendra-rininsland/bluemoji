@@ -8,12 +8,56 @@
       "key": "any",
       "record": {
         "type": "object",
+        "required": ["$type", "name", "alt", "createdAt", "asset"],
         "properties": {
+          "$type": { "type": "string", "const": "blue.moji.collection.item" },
           "name": { "type": "string" },
           "alt": { "type": "string" },
           "createdAt": { "type": "string", "format": "datetime" },
-          "asset": { "type": "bytes" },
+          "asset": {
+            "type": "union",
+            "refs": ["#bytesAsset", "#blobAsset"],
+            "closed": false
+          },
+          "original": { "type": "blob" },
           "adultOnly": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "blobAsset": {
+      "type": "object",
+      "required": ["$type", "file"],
+      "properties": {
+        "$type": {
+          "type": "string",
+          "const": "blue.moji.collection.item#blobAsset"
+        },
+        "file": {
+          "type": "blob",
+          "accept": ["image/png", "image/jpeg"],
+          "maxSize": 262144
+        }
+      }
+    },
+    "bytesAsset": {
+      "type": "object",
+      "required": ["$type", "file"],
+      "properties": {
+        "$type": {
+          "type": "string",
+          "const": "blue.moji.collection.item#bytesAsset"
+        },
+        "file": { "type": "ref", "ref": "#bytesFile" }
+      }
+    },
+    "bytesFile": {
+      "type": "object",
+      "required": ["bytes", "mimeType"],
+      "properties": {
+        "bytes": { "type": "bytes", "maxLength": 65536 },
+        "mimeType": {
+          "type": "string",
+          "enum": ["image/png", "image/apng", "image/gif"]
         }
       }
     }
