@@ -6,8 +6,9 @@ import AtpAgent, {
 } from "@atproto/api";
 import * as BlueMojiRichtextFacet from "../../lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "../../lexicons/types/blue/moji/collection/item";
-import * as BlueMojiCollectionDefs from "../../lexicons/types/blue/moji/collection/defs";
 import { detectFacets } from "./detect-facets";
+
+export * as lexicon from "../../lexicons";
 
 export const BLUEMOJI_REGEX = new RegExp(
   ":((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):",
@@ -52,13 +53,15 @@ export const register = (did?: string) => {
       for (const facet of this.facets) {
         for (const feature of facet.features) {
           if (BlueMojiRichtextFacet.isBluemoji(feature)) {
-            const repo = agent.session?.did;
-            if (!repo) return;
+            const session = agent.session;
+            if (!session) return;
+
+            const { did: repo } = session;
 
             const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
-              rkey: feature.name.slice(1, -1),
-              collection: "blue.moji.collection.item"
+              rkey: feature.name.replace(/:/g, ""),
+              collection: "blue.moji.collection"
             });
 
             if (!record || !BlueMojiCollectionItem.isRecord(record)) return;
@@ -68,7 +71,7 @@ export const register = (did?: string) => {
               const [, format = "png"] = mimeType?.split("/");
               feature.uri = `https://cdn.bsky.app/img/feed_fullsize/plain/${repo}/${ref}@${format.toUpperCase()}`;
             } else if (BlueMojiCollectionItem.isBytesAsset(record.asset)) {
-              feature.uri = `data:image/apng;base64,${btoa(String.fromCharCode.apply(null, record.asset.file?.bytes))}`;
+              feature.uri = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, record.asset.file?.bytes))}`;
             }
 
             if (typeof record.alt === "string") {

@@ -23,9 +23,14 @@
   },
   "exports": {
     ".": "./dist/bluemoji.js",
-    "./register": "./dist/register.js"
+    "./register": "./dist/register.js",
+    "./webcomponent": "./dist/webcomponent.js"
   },
   "peerDependencies": {
     "react-native": "^0.74.4"
-  }
+  },
+  "files": [
+    "dist",
+    "lib"
+  ]
 }
