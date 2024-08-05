@@ -4,7 +4,7 @@
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsx lib/index.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.12.9",
