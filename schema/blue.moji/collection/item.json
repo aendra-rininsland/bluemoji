@@ -20,7 +20,8 @@
             "closed": false
           },
           "original": { "type": "blob" },
-          "adultOnly": { "type": "boolean", "default": false }
+          "adultOnly": { "type": "boolean", "default": false },
+          "copyOf": { "type": "string", "format": "at-uri" }
         }
       }
     },
