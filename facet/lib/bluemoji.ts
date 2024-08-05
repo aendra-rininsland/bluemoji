@@ -4,8 +4,8 @@ import AtpAgent, {
   Facet,
   AppBskyRichtextFacet
 } from "@atproto/api";
-import * as BlueMojiRichtextFacet from "../../lexicons/types/blue/moji/richtext/facet";
-import * as BlueMojiCollectionItem from "../../lexicons/types/blue/moji/collection/item";
+import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
+import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
 
 export const BLUEMOJI_REGEX = new RegExp(

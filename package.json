@@ -11,7 +11,8 @@
   "workspaces": [
     "facet",
     "webapp",
-    "bot"
+    "bot",
+    "lexicons"
   ],
   "devDependencies": {
     "@atproto/lex-cli": "^0.3.2",
