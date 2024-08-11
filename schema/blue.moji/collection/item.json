@@ -8,7 +8,7 @@
       "key": "any",
       "record": {
         "type": "object",
-        "required": ["name", "alt", "createdAt", "formats"],
+        "required": ["name", "alt", "createdAt", "original"],
         "properties": {
           "name": { "type": "string" },
           "alt": { "type": "string" },
