@@ -8989,7 +8989,7 @@ export const schemaDict = {
     defs: {
       itemView: {
         type: 'object',
-        required: ['name', 'asset'],
+        required: ['name', 'assets'],
         properties: {
           name: {
             type: 'string',
@@ -9001,8 +9001,9 @@ export const schemaDict = {
             type: 'string',
             format: 'datetime',
           },
-          asset: {
-            type: 'bytes',
+          assets: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#sizes',
           },
           adultOnly: {
             type: 'boolean',
@@ -9076,7 +9077,7 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
-          required: ['name', 'alt', 'createdAt', 'asset'],
+          required: ['name', 'alt', 'createdAt', 'formats'],
           properties: {
             name: {
               type: 'string',
@@ -9088,12 +9089,9 @@ export const schemaDict = {
               type: 'string',
               format: 'datetime',
             },
-            asset: {
+            formats: {
               type: 'union',
-              refs: [
-                'lex:blue.moji.collection.item#bytesAsset',
-                'lex:blue.moji.collection.item#blobAsset',
-              ],
+              refs: ['lex:blue.moji.collection.item#formats_v0'],
               closed: false,
             },
             original: {
@@ -9110,14 +9108,20 @@ export const schemaDict = {
           },
         },
       },
+      formats_v0: {
+        type: 'object',
+        required: ['png_128px'],
+        properties: {
+          png_128px: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#bytesOrBlobType',
+          },
+        },
+      },
       blobAsset: {
         type: 'object',
-        required: ['$type', 'file'],
+        required: ['file'],
         properties: {
-          $type: {
-            type: 'string',
-            const: 'blue.moji.collection.item#blobAsset',
-          },
           file: {
             type: 'blob',
             accept: ['image/png', 'image/jpeg'],
@@ -9127,12 +9131,8 @@ export const schemaDict = {
       },
       bytesAsset: {
         type: 'object',
-        required: ['$type', 'file'],
+        required: ['file'],
         properties: {
-          $type: {
-            type: 'string',
-            const: 'blue.moji.collection.item#bytesAsset',
-          },
           file: {
             type: 'ref',
             ref: 'lex:blue.moji.collection.item#bytesFile',
@@ -9150,6 +9150,19 @@ export const schemaDict = {
           mimeType: {
             type: 'string',
             enum: ['image/png', 'image/apng', 'image/gif'],
+          },
+        },
+      },
+      bytesOrBlobType: {
+        type: 'object',
+        properties: {
+          blob: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#blobAsset',
+          },
+          bytes: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#bytesAsset',
           },
         },
       },
@@ -9438,29 +9451,6 @@ export const schemaDict = {
     id: 'blue.moji.richtext.facet',
     defs: {
       main: {
-        type: 'object',
-        description: 'Annotation of a sub-string within rich text',
-        required: ['index', 'features'],
-        properties: {
-          index: {
-            type: 'ref',
-            ref: 'lex:app.bsky.richtext.facet#byteSlice',
-          },
-          features: {
-            type: 'array',
-            items: {
-              type: 'union',
-              refs: [
-                'lex:app.bsky.richtext.facet#mention',
-                'lex:app.bsky.richtext.facet#link',
-                'lex:app.bsky.richtext.facet#tag',
-                'lex:blue.moji.richtext.facet#bluemoji',
-              ],
-            },
-          },
-        },
-      },
-      bluemoji: {
         type: 'object',
         required: ['name', 'uri'],
         properties: {

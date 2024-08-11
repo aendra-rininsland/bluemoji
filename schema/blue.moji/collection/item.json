@@ -8,14 +8,14 @@
       "key": "any",
       "record": {
         "type": "object",
-        "required": ["name", "alt", "createdAt", "asset"],
+        "required": ["name", "alt", "createdAt", "formats"],
         "properties": {
           "name": { "type": "string" },
           "alt": { "type": "string" },
           "createdAt": { "type": "string", "format": "datetime" },
-          "asset": {
+          "formats": {
             "type": "union",
-            "refs": ["#bytesAsset", "#blobAsset"],
+            "refs": ["#formats_v0"],
             "closed": false
           },
           "original": { "type": "blob" },
@@ -24,14 +24,17 @@
         }
       }
     },
+    "formats_v0": {
+      "type": "object",
+      "required": ["png_128px"],
+      "properties": {
+        "png_128px": { "type": "ref", "ref": "#bytesOrBlobType" }
+      }
+    },
     "blobAsset": {
       "type": "object",
-      "required": ["$type", "file"],
+      "required": ["file"],
       "properties": {
-        "$type": {
-          "type": "string",
-          "const": "blue.moji.collection.item#blobAsset"
-        },
         "file": {
           "type": "blob",
           "accept": ["image/png", "image/jpeg"],
@@ -41,12 +44,8 @@
     },
     "bytesAsset": {
       "type": "object",
-      "required": ["$type", "file"],
+      "required": ["file"],
       "properties": {
-        "$type": {
-          "type": "string",
-          "const": "blue.moji.collection.item#bytesAsset"
-        },
         "file": { "type": "ref", "ref": "#bytesFile" }
       }
     },
@@ -59,6 +58,13 @@
           "type": "string",
           "enum": ["image/png", "image/apng", "image/gif"]
         }
+      }
+    },
+    "bytesOrBlobType": {
+      "type": "object",
+      "properties": {
+        "blob": { "type": "ref", "ref": "#blobAsset" },
+        "bytes": { "type": "ref", "ref": "#bytesAsset" }
       }
     }
   }

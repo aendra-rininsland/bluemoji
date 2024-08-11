@@ -5,6 +5,7 @@ import { ValidationResult, BlobRef } from '@atproto/lexicon'
 import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
+import * as BlueMojiCollectionItem from './item'
 import * as AppBskyActorDefs from '../../../app/bsky/actor/defs'
 import * as AppBskyRichtextFacet from '../../../app/bsky/richtext/facet'
 import * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs'
@@ -13,7 +14,7 @@ export interface ItemView {
   name: string
   alt?: string
   createdAt?: string
-  asset: Uint8Array
+  assets: BlueMojiCollectionItem.Sizes
   adultOnly: boolean
   [k: string]: unknown
 }

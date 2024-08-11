@@ -4,12 +4,12 @@
   "defs": {
     "itemView": {
       "type": "object",
-      "required": ["name", "asset"],
+      "required": ["name", "assets"],
       "properties": {
         "name": { "type": "string" },
         "alt": { "type": "string" },
         "createdAt": { "type": "string", "format": "datetime" },
-        "asset": { "type": "bytes" },
+        "assets": { "type": "ref", "ref": "blue.moji.collection.item#sizes" },
         "adultOnly": { "type": "boolean", "default": false }
       }
     },
