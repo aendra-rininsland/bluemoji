@@ -19,7 +19,7 @@ export function detectFacets(text: any /*UnicodeString*/): Facet[] | undefined {
         },
         features: [
           {
-            $type: "blue.moji.richtext.facet#bluemoji",
+            $type: "blue.moji.richtext.facet",
             name: match[0]
           }
         ]

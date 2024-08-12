@@ -9417,17 +9417,28 @@ export const schemaDict = {
     defs: {
       main: {
         type: 'object',
-        required: ['name', 'uri'],
+        required: ['name'],
         properties: {
           name: {
             type: 'string',
           },
-          uri: {
-            type: 'string',
-            format: 'at-uri',
-          },
           alt: {
             type: 'string',
+          },
+          blobs: {
+            type: 'union',
+            refs: ['lex:blue.moji.richtext.facet#blobs_v0'],
+            closed: false,
+          },
+        },
+      },
+      blobs_v0: {
+        type: 'object',
+        required: ['png_128'],
+        properties: {
+          png_128: {
+            type: 'string',
+            format: 'cid',
           },
         },
       },

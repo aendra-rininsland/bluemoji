@@ -19,9 +19,9 @@ export const BLUEMOJI_REGEX = new RegExp(
 );
 
 export class BluemojiRichTextSegment extends RichTextSegment {
-  get bluemoji(): BlueMojiRichtextFacet.Bluemoji | undefined {
-    const fn = this.facet?.features.find(BlueMojiRichtextFacet.isBluemoji);
-    if (BlueMojiRichtextFacet.isBluemoji(fn)) {
+  get bluemoji(): BlueMojiRichtextFacet.Main | undefined {
+    const fn = this.facet?.features.find(BlueMojiRichtextFacet.isMain);
+    if (BlueMojiRichtextFacet.isMain(fn)) {
       return fn;
     }
     return undefined;
@@ -34,20 +34,23 @@ export class BluemojiRichTextSegment extends RichTextSegment {
 export const facetSort = (a: Facet, b: Facet) =>
   a.index.byteStart - b.index.byteStart;
 
+interface BluemojiRichTextOpts extends RichTextOpts {
+  did: string;
+}
 export class BluemojiRichText extends RichText {
-  constructor(props: RichTextProps, opts?: RichTextOpts) {
+  private _did?: string;
+
+  constructor(props: RichTextProps, opts?: BluemojiRichTextOpts) {
     super(props, opts);
     this.unicodeText = new UnicodeString(props.text);
     this.facets = props.facets;
+    this._did = opts?.did;
     if (!this.facets?.length && props.entities?.length) {
       this.facets = entitiesToFacets(this.unicodeText, props.entities);
     }
     if (this.facets) {
       this.facets.sort(facetSort);
     }
-    // if (opts?.cleanNewlines) {
-    //   sanitizeRichText(this, { cleanNewlines: true }).copyInto(this);
-    // }
   }
   clone() {
     return new BluemojiRichText({
@@ -102,32 +105,31 @@ export class BluemojiRichText extends RichText {
     if (this.facets) {
       for (const facet of this.facets) {
         for (const feature of facet.features) {
-          if (BlueMojiRichtextFacet.isBluemoji(feature)) {
-            const session = agent.session;
-            if (!session) return;
+          if (BlueMojiRichtextFacet.isMain(feature)) {
+            const { did: repo } = agent?.session || { did: this._did };
 
-            const { did: repo } = session;
+            if (!repo) throw new Error("Bluemoji facet DID is unknown");
 
-            const { data } = await agent.com.atproto.repo.getRecord({
+            const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
               rkey: feature.name.replace(/:/g, ""),
-              collection: "blue.moji.collection"
+              collection: "blue.moji.collection.item"
             });
 
-            const { value: record } = data;
-
-            if (!record || !BlueMojiCollectionItem.isRecord(record)) return;
-
-            if (BlueMojiCollectionItem.isBlobAsset(record.asset)) {
-              const { ref, mimeType } = record.asset.file;
-              const [, format = "png"] = mimeType?.split("/");
-              feature.uri = `https://cdn.bsky.app/img/feed_fullsize/plain/${repo}/${ref}@${format.toUpperCase()}`;
-            } else if (BlueMojiCollectionItem.isBytesAsset(record.asset)) {
-              feature.uri = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, record.asset.file?.bytes))}`;
-            }
-
-            if (typeof record.alt === "string") {
-              feature.alt = record.alt;
+            if (BlueMojiCollectionItem.isRecord(record.value)) {
+              feature.alt = record.value.alt;
+              if (
+                BlueMojiCollectionItem.isFormats_v0(record.value.formats) &&
+                BlueMojiCollectionItem.isBytesOrBlobType_v0(
+                  record.value.formats.png_128
+                ) &&
+                record.value.formats.png_128.blob
+              ) {
+                feature.blobs = {
+                  $type: "blue.moji.richtext.facet#blobs_v0",
+                  png_128: record.value.formats.png_128.blob.ref.toString()
+                };
+              }
             }
           } else if (AppBskyRichtextFacet.isMention(feature)) {
             const did = await agent
@@ -171,7 +173,20 @@ function entitiesToFacets(text: UnicodeString, entities: Entity[]): Facet[] {
         features: [{ $type: "app.bsky.richtext.facet#mention", did: ent.value }]
       });
     } else if (ent.type === "bluemoji") {
-      console.log(ent);
+      facets.push({
+        $type: "app.bsky.richtext.facet",
+        index: {
+          byteStart: text.utf16IndexToUtf8Index(ent.index.start),
+          byteEnd: text.utf16IndexToUtf8Index(ent.index.end)
+        },
+        features: [
+          {
+            $type: "blue.moji.richtext.facet",
+            name: ent.name,
+            alt: ent.alt
+          }
+        ]
+      });
     }
   }
   return facets;
