@@ -26,45 +26,19 @@
     },
     "formats_v0": {
       "type": "object",
-      "required": ["png_128px"],
+      "required": ["png_128"],
       "properties": {
-        "png_128px": { "type": "ref", "ref": "#bytesOrBlobType" }
+        "png_128": { "type": "ref", "ref": "#bytesOrBlobType_v0" }
       }
     },
-    "blobAsset": {
+    "bytesOrBlobType_v0": {
       "type": "object",
-      "required": ["file"],
       "properties": {
-        "file": {
+        "blob": {
           "type": "blob",
-          "accept": ["image/png", "image/jpeg"],
           "maxSize": 262144
-        }
-      }
-    },
-    "bytesAsset": {
-      "type": "object",
-      "required": ["file"],
-      "properties": {
-        "file": { "type": "ref", "ref": "#bytesFile" }
-      }
-    },
-    "bytesFile": {
-      "type": "object",
-      "required": ["bytes", "mimeType"],
-      "properties": {
-        "bytes": { "type": "bytes", "maxLength": 65536 },
-        "mimeType": {
-          "type": "string",
-          "enum": ["image/png", "image/apng", "image/gif"]
-        }
-      }
-    },
-    "bytesOrBlobType": {
-      "type": "object",
-      "properties": {
-        "blob": { "type": "ref", "ref": "#blobAsset" },
-        "bytes": { "type": "ref", "ref": "#bytesAsset" }
+        },
+        "raw": { "type": "bytes", "maxLength": 65536 }
       }
     }
   }

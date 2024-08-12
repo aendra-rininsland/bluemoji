@@ -9077,7 +9077,7 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
-          required: ['name', 'alt', 'createdAt', 'formats'],
+          required: ['name', 'alt', 'createdAt', 'original'],
           properties: {
             name: {
               type: 'string',
@@ -9110,59 +9110,24 @@ export const schemaDict = {
       },
       formats_v0: {
         type: 'object',
-        required: ['png_128px'],
+        required: ['png_128'],
         properties: {
-          png_128px: {
+          png_128: {
             type: 'ref',
-            ref: 'lex:blue.moji.collection.item#bytesOrBlobType',
+            ref: 'lex:blue.moji.collection.item#bytesOrBlobType_v0',
           },
         },
       },
-      blobAsset: {
-        type: 'object',
-        required: ['file'],
-        properties: {
-          file: {
-            type: 'blob',
-            accept: ['image/png', 'image/jpeg'],
-            maxSize: 262144,
-          },
-        },
-      },
-      bytesAsset: {
-        type: 'object',
-        required: ['file'],
-        properties: {
-          file: {
-            type: 'ref',
-            ref: 'lex:blue.moji.collection.item#bytesFile',
-          },
-        },
-      },
-      bytesFile: {
-        type: 'object',
-        required: ['bytes', 'mimeType'],
-        properties: {
-          bytes: {
-            type: 'bytes',
-            maxLength: 65536,
-          },
-          mimeType: {
-            type: 'string',
-            enum: ['image/png', 'image/apng', 'image/gif'],
-          },
-        },
-      },
-      bytesOrBlobType: {
+      bytesOrBlobType_v0: {
         type: 'object',
         properties: {
           blob: {
-            type: 'ref',
-            ref: 'lex:blue.moji.collection.item#blobAsset',
+            type: 'blob',
+            maxSize: 262144,
           },
-          bytes: {
-            type: 'ref',
-            ref: 'lex:blue.moji.collection.item#bytesAsset',
+          raw: {
+            type: 'bytes',
+            maxLength: 65536,
           },
         },
       },
