@@ -1,5 +1,5 @@
 export class BluemojiWebComponent extends HTMLElement {
-  static observedAttributes = ["asset", "size", "alt", "style"];
+  static observedAttributes = ["src", "size", "alt", "style"];
   img: HTMLImageElement;
 
   connectedCallback() {

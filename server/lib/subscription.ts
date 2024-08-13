@@ -15,7 +15,6 @@ export abstract class FirehoseSubscriptionBase {
   public sub: Subscription<RepoEvent>;
   public db: Database;
   public agent: BskyAgent;
-  public labeler: AtpAgent;
 
   constructor(
     public service: string,

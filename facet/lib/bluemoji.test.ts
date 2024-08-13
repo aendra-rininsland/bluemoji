@@ -47,6 +47,7 @@ describe("BluemojiRichText", () => {
     });
 
     it("now also facets emoji! ✨", () => {
+      console.log(bluemoji);
       const [bluemojiFeature] = bluemoji.features;
       assert.strictEqual(bluemojiFeature.$type, "blue.moji.richtext.facet");
       assert.strictEqual(bluemojiFeature.name, ":blue-kiss:");

@@ -1,12 +1,12 @@
 {
-  "name": "@aendra/bluemoji-bot",
+  "name": "@aendra/bluemoji-server",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "start": "tsx lib/index.ts"
   },
   "dependencies": {
+    "@aendra/lexicons": "^2.0.0",
     "@atproto/api": "^0.12.9",
     "@atproto/bsky": "^0.0.51",
     "@atproto/lexicon": "^0.4.0",
@@ -17,6 +17,7 @@
     "@types/better-sqlite3": "^7.6.10",
     "@types/csv-write-stream": "^2.0.3",
     "@types/node": "^20.11.24",
+    "@types/upng-js": "^2.1.5",
     "@xenova/transformers": "^2.17.1",
     "bee-queue": "^1.7.1",
     "better-sqlite3": "^9.4.3",
@@ -28,8 +29,12 @@
     "kysely": "^0.27.2",
     "onnxruntime-node": "^1.17.0",
     "p-queue": "^8.0.1",
+    "sharp": "^0.33.4",
+    "sharp-apng": "^0.1.5",
     "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "upng-js": "^2.1.0",
+    "webp-wasm": "^1.0.6"
   },
   "keywords": [],
   "author": "",

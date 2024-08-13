@@ -3,3 +3,17 @@ services:
     image: "darthsim/imgproxy:latest"
     ports:
       - "8080:8080"
+    environment:
+      IMGPROXY_BASE_URL: http://${APPVIEW_DOMAIN-bluemoji:5577}/blob/
+      IMGPROXY_ALLOWED_SOURCES: http://${APPVIEW_DOMAIN-bluemoji:5577}/blob/
+      IMGPROXY_STRIP_METADATA: true
+      IMGPROXY_ONLY_PRESETS: true
+      IMGPROXY_PRESETS: png_128=rs:fit:128:128:1:0
+      IMGPROXY_PREFERRED_FORMATS: webp,gif
+      IMGPROXY_MAX_ANIMATION_FRAMES: 20
+  bluemoji:
+    image: "aendra/bluemoji-server:latest"
+    ports:
+      - "5577:5577"
+    environment:
+      APPVIEW_LISTENHOST: "0.0.0.0"

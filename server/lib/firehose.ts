@@ -3,7 +3,7 @@ import {
   isCommit
 } from "@aendra/lexicons/types/com/atproto/sync/subscribeRepos";
 import { FirehoseSubscriptionBase, getOpsByType } from "./subscription";
-// import { queue } from "./queue";
+import { addToActionsQueue } from "./actions";
 
 export class FirehoseSubscription extends FirehoseSubscriptionBase {
   async handleEvent(evt: RepoEvent) {
@@ -17,13 +17,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
     const postsToCreate = ops.bluemoji;
 
     if (postsToCreate.length > 0) {
-      console.dir(postsToCreate);
-      // queue
-      //   .createJob(postsToCreate)
-      //   .timeout(30000)
-      //   .backoff("exponential", 2000)
-      //   .retries(5)
-      //   .save();
+      postsToCreate.forEach(addToActionsQueue);
     }
   }
 }

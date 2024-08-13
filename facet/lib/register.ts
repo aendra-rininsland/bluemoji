@@ -10,11 +10,9 @@ import { BluemojiRichTextSegment, facetSort } from "./bluemoji";
 
 export const register = (did?: string) => {
   Object.defineProperty(RichTextSegment, "bluemoji", {
-    get(): BlueMojiRichtextFacet.Bluemoji | undefined {
-      const bluemoji = this.facet?.features.find(
-        BlueMojiRichtextFacet.isBluemoji
-      );
-      if (BlueMojiRichtextFacet.isBluemoji(bluemoji)) {
+    get(): BlueMojiRichtextFacet.Main | undefined {
+      const bluemoji = this.facet?.features.find(BlueMojiRichtextFacet.isMain);
+      if (BlueMojiRichtextFacet.isMain(bluemoji)) {
         return bluemoji;
       }
       return undefined;
@@ -31,7 +29,7 @@ export const register = (did?: string) => {
     if (this.facets) {
       for (const facet of this.facets) {
         for (const feature of facet.features) {
-          if (BlueMojiRichtextFacet.isBluemoji(feature)) {
+          if (BlueMojiRichtextFacet.isMain(feature)) {
             const session = agent.session;
             if (!session) return;
 
@@ -45,12 +43,20 @@ export const register = (did?: string) => {
 
             if (!record || !BlueMojiCollectionItem.isRecord(record)) return;
 
-            if (BlueMojiCollectionItem.isBlobAsset(record.asset)) {
-              const { ref, mimeType } = record.asset.file;
-              const [, format = "png"] = mimeType?.split("/");
-              feature.uri = `https://cdn.bsky.app/img/feed_fullsize/plain/${repo}/${ref}@${format.toUpperCase()}`;
-            } else if (BlueMojiCollectionItem.isBytesAsset(record.asset)) {
-              feature.uri = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, record.asset.file?.bytes))}`;
+            if (BlueMojiCollectionItem.isRecord(record.value)) {
+              feature.alt = record.value.alt;
+              if (
+                BlueMojiCollectionItem.isFormats_v0(record.value.formats) &&
+                BlueMojiCollectionItem.isBytesOrBlobType_v0(
+                  record.value.formats.png_128
+                ) &&
+                record.value.formats.png_128.blob
+              ) {
+                feature.blobs = {
+                  $type: "blue.moji.richtext.facet#blobs_v0",
+                  png_128: record.value.formats.png_128.blob.ref.toString()
+                };
+              }
             }
 
             if (typeof record.alt === "string") {

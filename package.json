@@ -11,7 +11,7 @@
   "workspaces": [
     "facet",
     "webapp",
-    "bot",
+    "server",
     "lexicons"
   ],
   "devDependencies": {
