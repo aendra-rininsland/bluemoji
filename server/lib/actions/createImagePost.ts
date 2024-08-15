@@ -8,7 +8,8 @@ import {
 import { isLoggedIn, agent } from "../agent";
 import { CreateOp } from "../subscription";
 
-const TIMEOUT = 60 * 60 * 1000;
+const SECONDS = 60;
+const TIMEOUT = SECONDS * 60 * 1000;
 
 export const createImagePost = async (emojiRecord: CreateOp) => {
   // Ensure client logged in
@@ -16,6 +17,8 @@ export const createImagePost = async (emojiRecord: CreateOp) => {
 
   // Wait n seconds for Hive to catch up
   await new Promise((res) => setTimeout(res, TIMEOUT));
+
+  // agent.
 
   const text = "";
 

@@ -31,7 +31,11 @@ export function validateRecord(v: unknown): ValidationResult {
 }
 
 export interface Formats_v0 {
-  png_128: BytesOrBlobType_v0
+  png_128?: Blob_v0
+  apng_128?: Bytes_v0
+  gif_128?: Blob_v0
+  webp_128?: Blob_v0
+  lottie?: Bytes_v0
   [k: string]: unknown
 }
 
@@ -47,20 +51,5 @@ export function validateFormats_v0(v: unknown): ValidationResult {
   return lexicons.validate('blue.moji.collection.item#formats_v0', v)
 }
 
-export interface BytesOrBlobType_v0 {
-  blob?: BlobRef
-  raw?: Uint8Array
-  [k: string]: unknown
-}
-
-export function isBytesOrBlobType_v0(v: unknown): v is BytesOrBlobType_v0 {
-  return (
-    isObj(v) &&
-    hasProp(v, '$type') &&
-    v.$type === 'blue.moji.collection.item#bytesOrBlobType_v0'
-  )
-}
-
-export function validateBytesOrBlobType_v0(v: unknown): ValidationResult {
-  return lexicons.validate('blue.moji.collection.item#bytesOrBlobType_v0', v)
-}
+export type Blob_v0 = BlobRef
+export type Bytes_v0 = Uint8Array

@@ -2,8 +2,8 @@
   "name": "@aendra/bluemoji",
   "version": "3.0.2",
   "scripts": {
-    "test": "tsx lib/bluemoji.test.ts",
-    "build": "swc lib --out-dir dist"
+    "test": "tsx src/bluemoji.test.ts",
+    "build": "swc src --out-dir dist"
   },
   "type": "module",
   "keywords": [],
@@ -11,8 +11,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aendra/lexicons": "^2.0.0",
     "@atproto/api": "^0.12.28",
     "@atproto/lexicon": "^0.4.0",
+    "@dotlottie/dotlottie-js": "^0.8.1",
+    "@lottiefiles/dotlottie-web": "^0.30.2",
     "upng-js": "^2.1.0"
   },
   "devDependencies": {
@@ -31,6 +34,6 @@
   },
   "files": [
     "dist",
-    "lib"
+    "src"
   ]
 }

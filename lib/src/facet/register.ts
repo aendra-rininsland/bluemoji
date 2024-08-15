@@ -6,7 +6,7 @@ import AtpAgent, {
 import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
-import { BluemojiRichTextSegment, facetSort } from "./bluemoji";
+import { BluemojiRichTextSegment, facetSort } from "./BluemojiRichText";
 
 export const register = (did?: string) => {
   Object.defineProperty(RichTextSegment, "bluemoji", {
@@ -41,22 +41,21 @@ export const register = (did?: string) => {
               collection: "blue.moji.collection"
             });
 
-            if (!record || !BlueMojiCollectionItem.isRecord(record)) return;
+            if (!record || !BlueMojiCollectionItem.isRecord(record.value))
+              return;
 
-            if (BlueMojiCollectionItem.isRecord(record.value)) {
-              feature.alt = record.value.alt;
-              if (
-                BlueMojiCollectionItem.isFormats_v0(record.value.formats) &&
-                BlueMojiCollectionItem.isBytesOrBlobType_v0(
-                  record.value.formats.png_128
-                ) &&
-                record.value.formats.png_128.blob
-              ) {
-                feature.blobs = {
-                  $type: "blue.moji.richtext.facet#blobs_v0",
-                  png_128: record.value.formats.png_128.blob.ref.toString()
-                };
-              }
+            feature.alt = record.value.alt;
+            if (
+              BlueMojiCollectionItem.isFormats_v0(record.value.formats) &&
+              BlueMojiCollectionItem.isBytesOrBlobType_v0(
+                record.value.formats.png_128
+              ) &&
+              record.value.formats.png_128.blob
+            ) {
+              feature.blobs = {
+                $type: "blue.moji.richtext.facet#blobs_v0",
+                png_128: record.value.formats.png_128.blob.ref.toString()
+              };
             }
 
             if (typeof record.alt === "string") {

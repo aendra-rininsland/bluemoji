@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { BskyAgent } from "@atproto/api";
-import { BluemojiRichText } from "./bluemoji";
+import { BluemojiRichText } from "./BluemojiRichText";
 import { Blobs_v0 } from "@aendra/lexicons/types/blue/moji/richtext/facet";
 
 describe("BluemojiRichText", () => {

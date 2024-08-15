@@ -9,7 +9,7 @@
     "test:watch": "vitest"
   },
   "workspaces": [
-    "facet",
+    "lib",
     "webapp",
     "server",
     "lexicons"

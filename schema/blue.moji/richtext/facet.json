@@ -4,22 +4,26 @@
   "defs": {
     "main": {
       "type": "object",
-      "required": ["name"],
+      "required": ["did", "name", "formats"],
       "properties": {
+        "did": { "type": "string" },
         "name": { "type": "string" },
         "alt": { "type": "string" },
-        "blobs": {
+        "formats": {
           "type": "union",
-          "refs": ["#blobs_v0"],
+          "refs": ["#formats_v0"],
           "closed": false
         }
       }
     },
-    "blobs_v0": {
+    "formats_v0": {
       "type": "object",
-      "required": ["png_128"],
       "properties": {
-        "png_128": { "type": "string", "format": "cid" }
+        "png_128": { "type": "string", "format": "cid" },
+        "webp_128": { "type": "string", "format": "cid" },
+        "gif_128": { "type": "string", "format": "cid" },
+        "apng_128": { "type": "boolean", "default": false },
+        "lottie": { "type": "boolean", "default": false }
       }
     }
   }

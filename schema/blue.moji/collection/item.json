@@ -26,20 +26,19 @@
     },
     "formats_v0": {
       "type": "object",
-      "required": ["png_128"],
+      "required": [],
       "properties": {
-        "png_128": { "type": "ref", "ref": "#bytesOrBlobType_v0" }
+        "png_128": { "type": "ref", "ref": "#blob_v0" },
+        "apng_128": { "type": "ref", "ref": "#bytes_v0" },
+        "gif_128": { "type": "ref", "ref": "#blob_v0" },
+        "webp_128": { "type": "ref", "ref": "#blob_v0" },
+        "lottie": { "type": "ref", "ref": "#bytes_v0" }
       }
     },
-    "bytesOrBlobType_v0": {
-      "type": "object",
-      "properties": {
-        "blob": {
-          "type": "blob",
-          "maxSize": 262144
-        },
-        "raw": { "type": "bytes", "maxLength": 65536 }
-      }
-    }
+    "blob_v0": {
+      "type": "blob",
+      "maxSize": 262144
+    },
+    "bytes_v0": { "type": "bytes", "maxLength": 65536 }
   }
 }

@@ -9110,26 +9110,37 @@ export const schemaDict = {
       },
       formats_v0: {
         type: 'object',
-        required: ['png_128'],
+        required: [],
         properties: {
           png_128: {
             type: 'ref',
-            ref: 'lex:blue.moji.collection.item#bytesOrBlobType_v0',
+            ref: 'lex:blue.moji.collection.item#blob_v0',
+          },
+          apng_128: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#bytes_v0',
+          },
+          gif_128: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#blob_v0',
+          },
+          webp_128: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#blob_v0',
+          },
+          lottie: {
+            type: 'ref',
+            ref: 'lex:blue.moji.collection.item#bytes_v0',
           },
         },
       },
-      bytesOrBlobType_v0: {
-        type: 'object',
-        properties: {
-          blob: {
-            type: 'blob',
-            maxSize: 262144,
-          },
-          raw: {
-            type: 'bytes',
-            maxLength: 65536,
-          },
-        },
+      blob_v0: {
+        type: 'blob',
+        maxSize: 262144,
+      },
+      bytes_v0: {
+        type: 'bytes',
+        maxLength: 65536,
       },
     },
   },
@@ -9417,28 +9428,46 @@ export const schemaDict = {
     defs: {
       main: {
         type: 'object',
-        required: ['name'],
+        required: ['did', 'name', 'formats'],
         properties: {
+          did: {
+            type: 'string',
+          },
           name: {
             type: 'string',
           },
           alt: {
             type: 'string',
           },
-          blobs: {
+          formats: {
             type: 'union',
-            refs: ['lex:blue.moji.richtext.facet#blobs_v0'],
+            refs: ['lex:blue.moji.richtext.facet#formats_v0'],
             closed: false,
           },
         },
       },
-      blobs_v0: {
+      formats_v0: {
         type: 'object',
-        required: ['png_128'],
         properties: {
           png_128: {
             type: 'string',
             format: 'cid',
+          },
+          webp_128: {
+            type: 'string',
+            format: 'cid',
+          },
+          gif_128: {
+            type: 'string',
+            format: 'cid',
+          },
+          apng_128: {
+            type: 'boolean',
+            default: false,
+          },
+          lottie: {
+            type: 'boolean',
+            default: false,
           },
         },
       },
