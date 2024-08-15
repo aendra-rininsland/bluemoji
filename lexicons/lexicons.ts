@@ -9077,7 +9077,7 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
-          required: ['name', 'alt', 'createdAt', 'original'],
+          required: ['name', 'alt', 'createdAt', 'formats'],
           properties: {
             name: {
               type: 'string',
@@ -9094,9 +9094,6 @@ export const schemaDict = {
               refs: ['lex:blue.moji.collection.item#formats_v0'],
               closed: false,
             },
-            original: {
-              type: 'blob',
-            },
             adultOnly: {
               type: 'boolean',
               default: false,
@@ -9112,6 +9109,9 @@ export const schemaDict = {
         type: 'object',
         required: [],
         properties: {
+          original: {
+            type: 'blob',
+          },
           png_128: {
             type: 'ref',
             ref: 'lex:blue.moji.collection.item#blob_v0',
@@ -9150,6 +9150,7 @@ export const schemaDict = {
     defs: {
       main: {
         type: 'record',
+        description: 'A shareable Bluemoji pack',
         key: 'tid',
         record: {
           type: 'object',

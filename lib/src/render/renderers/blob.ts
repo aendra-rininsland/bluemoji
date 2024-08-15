@@ -41,12 +41,11 @@ export const renderBlobAsImg = (
         const format = record.formats[
           `${type}_${params.width}`
         ] as BlueMojiCollectionItem.Blob_v0;
-
-        img.src;
+        img.src = `${params.cdnBase}/${did}/${format.ref}@${type}`;
       } else {
         throw new Error("Invalid record");
       }
-    } else if (item.cid) {
+    } else if (cid) {
       img.src = `${params.cdnBase}/${did}/${cid}@${type}`;
     } else {
       throw new Error("Invalid blob info");

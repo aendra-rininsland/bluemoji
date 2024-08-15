@@ -8,7 +8,7 @@
       "key": "any",
       "record": {
         "type": "object",
-        "required": ["name", "alt", "createdAt", "original"],
+        "required": ["name", "createdAt", "formats"],
         "properties": {
           "name": { "type": "string" },
           "alt": { "type": "string" },
@@ -18,7 +18,6 @@
             "refs": ["#formats_v0"],
             "closed": false
           },
-          "original": { "type": "blob" },
           "adultOnly": { "type": "boolean", "default": false },
           "copyOf": { "type": "string", "format": "at-uri" }
         }
@@ -26,8 +25,8 @@
     },
     "formats_v0": {
       "type": "object",
-      "required": [],
       "properties": {
+        "original": { "type": "blob" },
         "png_128": { "type": "ref", "ref": "#blob_v0" },
         "apng_128": { "type": "ref", "ref": "#bytes_v0" },
         "gif_128": { "type": "ref", "ref": "#blob_v0" },

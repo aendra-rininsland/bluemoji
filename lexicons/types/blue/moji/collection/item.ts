@@ -10,8 +10,7 @@ export interface Record {
   name: string
   alt: string
   createdAt: string
-  formats?: Formats_v0 | { $type: string; [k: string]: unknown }
-  original: BlobRef
+  formats: Formats_v0 | { $type: string; [k: string]: unknown }
   adultOnly: boolean
   copyOf?: string
   [k: string]: unknown
@@ -31,6 +30,7 @@ export function validateRecord(v: unknown): ValidationResult {
 }
 
 export interface Formats_v0 {
+  original?: BlobRef
   png_128?: Blob_v0
   apng_128?: Bytes_v0
   gif_128?: Blob_v0
