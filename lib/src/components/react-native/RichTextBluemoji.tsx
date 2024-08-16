@@ -4,6 +4,8 @@
  */
 import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, AccessibilityInfo } from "react-native";
+import LottieView from "lottie-react-native";
+
 import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
 
@@ -17,7 +19,7 @@ const styles = StyleSheet.create({
 export const RichTextBluemoji = ({
   bluemoji
 }: {
-  bluemoji: BlueMojiRichtextFacet.Bluemoji;
+  bluemoji: BlueMojiRichtextFacet.Main;
   style?: { width: string; height: string };
 }) => {
   const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
@@ -36,21 +38,21 @@ export const RichTextBluemoji = ({
     return reduceMotionChangedSubscription.remove;
   }, []);
 
-  if (BlueMojiCollectionItem.isBlobAsset(bluemoji.asset)) {
-    const { uri } = bluemoji;
-    const [did] = uri.replace(/^at:\/\//, "").split("/");
-    const { ref, mimeType } = bluemoji.asset.file;
-    const [, format = "jpeg"] = mimeType?.split("/");
-    const cdnUri = `https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${ref}@${format}`;
-    return <Image style={styles.emoji16} source={{ uri: cdnUri }} />;
-  } else if (BlueMojiCollectionItem.isBytesAsset(bluemoji.asset)) {
-    // TODO does btoa work in RN?
+  if (BlueMojiCollectionItem.isFormats_v0(bluemoji.formats)) {
+    const { did, formats } = bluemoji;
 
-    const dataUri = `data:image/apng;base64,${btoa(String.fromCharCode.apply(null, bluemoji.asset.file?.bytes))}`;
-
-    return reduceMotionEnabled ? null : (
-      <Image style={styles.emoji16} source={{ uri: dataUri }} />
-    );
+    if (formats.lottie) {
+      <LottieView
+        source={require("../path/to/animation.json")} /* TODO */
+        style={{ width: "100%", height: "100%" }} /* TODO */
+        autoPlay
+        loop
+      />;
+    } else if (formats.apng_128) {
+    } else if (formats.png_128) {
+      const cdnUri = `https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${formats.png_128}@PNG`;
+      return <Image style={styles.emoji16} source={{ uri: cdnUri }} />;
+    }
   }
 
   return null;

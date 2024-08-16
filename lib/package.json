@@ -3,7 +3,7 @@
   "version": "3.0.2",
   "scripts": {
     "test": "tsx src/**/*.test.ts",
-    "build": "swc src --out-dir dist"
+    "build": "tsc"
   },
   "type": "module",
   "keywords": [],
@@ -16,6 +16,7 @@
     "@atproto/lexicon": "^0.4.0",
     "@dotlottie/dotlottie-js": "^0.8.1",
     "@lottiefiles/dotlottie-web": "^0.30.2",
+    "lottie-react-native": "^6.7.2",
     "upng-js": "^2.1.0"
   },
   "devDependencies": {

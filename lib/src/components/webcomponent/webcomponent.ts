@@ -1,6 +1,6 @@
 export class BluemojiWebComponent extends HTMLElement {
   static observedAttributes = ["src", "size", "alt", "style"];
-  img: HTMLImageElement;
+  img?: HTMLImageElement;
 
   connectedCallback() {
     const size = this.getAttribute("size");
@@ -15,11 +15,11 @@ export class BluemojiWebComponent extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     switch (name) {
       case "size": {
-        this.img.setAttribute("width", newValue);
-        this.img.setAttribute("height", newValue);
+        this.img?.setAttribute("width", newValue);
+        this.img?.setAttribute("height", newValue);
       }
       default: {
-        this.img.setAttribute(name, newValue);
+        this.img?.setAttribute(name, newValue);
       }
     }
   }
