@@ -1,8 +1,8 @@
 {
   "name": "bluemoji",
-  "version": "1.0.0",
+  "version": "1.0.0-prelease.1",
   "author": "Ændra Rininsland",
-  "license": "ISC",
+  "license": "MIT",
   "description": "Monorepo for the Bluemoji project",
   "scripts": {
     "codegen": "lex gen-server ./lexicons  ../atproto/lexicons/app/bsky/*/* ../atproto/lexicons/com/atproto/*/* ./schema/blue.moji/*/* ",
