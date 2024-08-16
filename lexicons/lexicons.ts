@@ -9077,10 +9077,11 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
-          required: ['name', 'alt', 'createdAt', 'formats'],
+          required: ['name', 'createdAt', 'formats'],
           properties: {
             name: {
               type: 'string',
+              description: 'Should be in the format :emoji:',
             },
             alt: {
               type: 'string',
@@ -9091,12 +9092,19 @@ export const schemaDict = {
             },
             formats: {
               type: 'union',
+              description: 'Open union to allow for future formats',
               refs: ['lex:blue.moji.collection.item#formats_v0'],
               closed: false,
             },
             adultOnly: {
               type: 'boolean',
               default: false,
+            },
+            labels: {
+              type: 'union',
+              description:
+                'Self-label values for this emoji. Effectively content warnings.',
+              refs: ['lex:com.atproto.label.defs#selfLabels'],
             },
             copyOf: {
               type: 'string',
@@ -9107,10 +9115,11 @@ export const schemaDict = {
       },
       formats_v0: {
         type: 'object',
-        required: [],
         properties: {
           original: {
             type: 'blob',
+            accept: ['image/*', 'application/lottie+zip'],
+            maxSize: 1000000,
           },
           png_128: {
             type: 'ref',
@@ -9137,10 +9146,13 @@ export const schemaDict = {
       blob_v0: {
         type: 'blob',
         maxSize: 262144,
+        description:
+          'Limiting blobs to 256kb because there may be many on page and these get optimised by ImgProxy anyway',
       },
       bytes_v0: {
         type: 'bytes',
         maxLength: 65536,
+        description: '64kb should be enough for anybody',
       },
     },
   },
@@ -9148,54 +9160,6 @@ export const schemaDict = {
     lexicon: 1,
     id: 'blue.moji.pack.defs',
     defs: {
-      main: {
-        type: 'record',
-        description: 'A shareable Bluemoji pack',
-        key: 'tid',
-        record: {
-          type: 'object',
-          required: ['name', 'createdAt', 'items'],
-          properties: {
-            name: {
-              type: 'string',
-              maxLength: 64,
-              minLength: 1,
-            },
-            description: {
-              type: 'string',
-              maxGraphemes: 300,
-              maxLength: 3000,
-            },
-            descriptionFacets: {
-              type: 'array',
-              items: {
-                type: 'ref',
-                ref: 'lex:blue.moji.richtext.facet',
-              },
-            },
-            icon: {
-              type: 'blob',
-              accept: ['image/png', 'image/jpeg'],
-              maxSize: 1000000,
-            },
-            adultOnly: {
-              type: 'boolean',
-              default: false,
-            },
-            createdAt: {
-              type: 'string',
-              format: 'datetime',
-            },
-            items: {
-              type: 'array',
-              items: {
-                type: 'ref',
-                ref: 'lex:blue.moji.collection#itemView',
-              },
-            },
-          },
-        },
-      },
       bluemojiPackView: {
         type: 'object',
         required: ['uri', 'cid', 'record', 'creator', 'indexedAt'],
@@ -9423,6 +9387,60 @@ export const schemaDict = {
       },
     },
   },
+  BlueMojiPackRecord: {
+    lexicon: 1,
+    id: 'blue.moji.pack.record',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'A shareable Bluemoji pack',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name', 'createdAt', 'items'],
+          properties: {
+            name: {
+              type: 'string',
+              maxLength: 64,
+              minLength: 1,
+            },
+            description: {
+              type: 'string',
+              maxGraphemes: 300,
+              maxLength: 3000,
+            },
+            descriptionFacets: {
+              type: 'array',
+              items: {
+                type: 'ref',
+                ref: 'lex:blue.moji.richtext.facet',
+              },
+            },
+            icon: {
+              type: 'blob',
+              accept: ['image/png', 'image/jpeg'],
+              maxSize: 1000000,
+            },
+            adultOnly: {
+              type: 'boolean',
+              default: false,
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+            },
+            items: {
+              type: 'array',
+              items: {
+                type: 'ref',
+                ref: 'lex:blue.moji.collection#itemView',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   BlueMojiRichtextFacet: {
     lexicon: 1,
     id: 'blue.moji.richtext.facet',
@@ -9433,12 +9451,24 @@ export const schemaDict = {
         properties: {
           did: {
             type: 'string',
+            description: 'DID of the user posting the Bluemoji',
           },
           name: {
             type: 'string',
+            description: 'Name of the Bluemoji in :emoji: format',
           },
           alt: {
             type: 'string',
+          },
+          adultOnly: {
+            type: 'boolean',
+            default: false,
+          },
+          labels: {
+            type: 'union',
+            description:
+              'Self-label values for this emoji. Effectively content warnings.',
+            refs: ['lex:com.atproto.label.defs#selfLabels'],
           },
           formats: {
             type: 'union',
@@ -9449,6 +9479,8 @@ export const schemaDict = {
       },
       formats_v0: {
         type: 'object',
+        description:
+          'On the facet, only the CID is provided as this can be combined with the DID to create CDN URLs for non-animated blobs. For APNG and dotLottie, raw Bytes are served and require a com.atproto.repo.getRecord roundtrip on render so are marked with a boolean',
         properties: {
           png_128: {
             type: 'string',
@@ -9655,5 +9687,6 @@ export const ids = {
   BlueMojiPackDefs: 'blue.moji.pack.defs',
   BlueMojiPackGetPack: 'blue.moji.pack.getPack',
   BlueMojiPackListitem: 'blue.moji.pack.listitem',
+  BlueMojiPackRecord: 'blue.moji.pack.record',
   BlueMojiRichtextFacet: 'blue.moji.richtext.facet',
 }

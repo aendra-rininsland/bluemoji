@@ -6,8 +6,7 @@ import AtpAgent, {
   UnicodeString,
   Entity,
   RichTextProps,
-  RichTextOpts,
-  sanitizeRichText
+  RichTextOpts
 } from "@atproto/api";
 import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
@@ -34,17 +33,11 @@ export class BluemojiRichTextSegment extends RichTextSegment {
 export const facetSort = (a: Facet, b: Facet) =>
   a.index.byteStart - b.index.byteStart;
 
-interface BluemojiRichTextOpts extends RichTextOpts {
-  did: string;
-}
 export class BluemojiRichText extends RichText {
-  private _did?: string;
-
-  constructor(props: RichTextProps, opts?: BluemojiRichTextOpts) {
+  constructor(props: RichTextProps, opts?: RichTextOpts) {
     super(props, opts);
     this.unicodeText = new UnicodeString(props.text);
     this.facets = props.facets;
-    this._did = opts?.did;
     if (!this.facets?.length && props.entities?.length) {
       this.facets = entitiesToFacets(this.unicodeText, props.entities);
     }
@@ -106,9 +99,12 @@ export class BluemojiRichText extends RichText {
       for (const facet of this.facets) {
         for (const feature of facet.features) {
           if (BlueMojiRichtextFacet.isMain(feature)) {
-            const { did: repo } = agent?.session || { did: this._did };
+            const { did: repo } = agent?.session || {};
 
-            if (!repo) throw new Error("Bluemoji facet DID is unknown");
+            if (!repo) {
+              console.error("Bluemoji facet DID is unknown");
+              continue;
+            }
 
             const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
@@ -118,17 +114,23 @@ export class BluemojiRichText extends RichText {
 
             if (BlueMojiCollectionItem.isRecord(record.value)) {
               feature.alt = record.value.alt;
-              if (
-                BlueMojiCollectionItem.isFormats_v0(record.value.formats) &&
-                BlueMojiCollectionItem.isBytesOrBlobType_v0(
-                  record.value.formats.png_128
-                ) &&
-                record.value.formats.png_128.blob
-              ) {
-                feature.blobs = {
-                  $type: "blue.moji.richtext.facet#blobs_v0",
-                  png_128: record.value.formats.png_128.blob.ref.toString()
-                };
+              feature.did = repo;
+              feature.formats = {
+                $type: "blue.moji.richtext.facet#formats_v0"
+              };
+              if (BlueMojiCollectionItem.isFormats_v0(record.value.formats)) {
+                if (record.value.formats.png_128) {
+                  feature.formats.png_128 =
+                    record.value.formats.png_128.ref.toString();
+                }
+
+                if (record.value.formats.apng_128) {
+                  feature.formats.apng_128 = !!record.value.formats.apng_128;
+                }
+
+                if (record.value.formats.lottie) {
+                  feature.formats.lottie = !!record.value.formats.lottie;
+                }
               }
             }
           } else if (AppBskyRichtextFacet.isMention(feature)) {
@@ -182,8 +184,10 @@ function entitiesToFacets(text: UnicodeString, entities: Entity[]): Facet[] {
         features: [
           {
             $type: "blue.moji.richtext.facet",
+            did: ent.did,
             name: ent.name,
-            alt: ent.alt
+            alt: ent.alt,
+            formats: ent.formats
           }
         ]
       });

@@ -5,34 +5,10 @@ import { ValidationResult, BlobRef } from '@atproto/lexicon'
 import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
-import * as BlueMojiRichtextFacet from '../richtext/facet'
-import * as BlueMojiCollection from '../collection'
 import * as AppBskyActorDefs from '../../../app/bsky/actor/defs'
 import * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs'
-
-export interface Record {
-  name: string
-  description?: string
-  descriptionFacets?: BlueMojiRichtextFacet.Main[]
-  icon?: BlobRef
-  adultOnly: boolean
-  createdAt: string
-  items: BlueMojiCollection.ItemView[]
-  [k: string]: unknown
-}
-
-export function isRecord(v: unknown): v is Record {
-  return (
-    isObj(v) &&
-    hasProp(v, '$type') &&
-    (v.$type === 'blue.moji.pack.defs#main' ||
-      v.$type === 'blue.moji.pack.defs')
-  )
-}
-
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate('blue.moji.pack.defs#main', v)
-}
+import * as BlueMojiRichtextFacet from '../richtext/facet'
+import * as BlueMojiCollection from '../collection'
 
 export interface BluemojiPackView {
   uri: string

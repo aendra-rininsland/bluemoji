@@ -2,7 +2,7 @@
   "name": "@aendra/bluemoji",
   "version": "3.0.2",
   "scripts": {
-    "test": "tsx src/bluemoji.test.ts",
+    "test": "tsx src/**/*.test.ts",
     "build": "swc src --out-dir dist"
   },
   "type": "module",

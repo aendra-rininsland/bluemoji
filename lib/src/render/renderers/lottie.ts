@@ -5,6 +5,7 @@ interface RenderLottieParams extends Omit<Config, "canvas" | "src"> {
   width: 128;
   height: 128;
   player: boolean;
+  raw: boolean;
 }
 
 export const renderLottieAsCanvas = (
@@ -14,9 +15,11 @@ export const renderLottieAsCanvas = (
     loop: true,
     width: 128,
     height: 128,
-    player: false
+    player: false,
+    raw: false
   }
 ) => {
+  if (params.raw && bytes) return bytes; // noop if bytes are requested for e.g. React Native
   try {
     const canvas = document.createElement("canvas");
     canvas.width = params.width;

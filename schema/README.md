@@ -57,6 +57,7 @@ The Bluemoji RichText facet type is provided by this schema. Bluemoji facets mus
 The following properties are optional:
 
 - **`alt`** Alt text from original record. See previous section.
+- **`adultOnly`** Boolean flag to toggle age appropriateness. This needs to be present on the facet to prevent a round-trip if adult content is disabled.
 
 The **`formats`** property is different here than in `blue.moji.collection.item` and
 is much simpler to reduce facet size. It contains any of the following:

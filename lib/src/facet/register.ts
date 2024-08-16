@@ -30,36 +30,39 @@ export const register = (did?: string) => {
       for (const facet of this.facets) {
         for (const feature of facet.features) {
           if (BlueMojiRichtextFacet.isMain(feature)) {
-            const session = agent.session;
-            if (!session) return;
+            const { did: repo } = agent?.session || {};
 
-            const { did: repo } = session;
+            if (!repo) {
+              console.error("Bluemoji facet DID is unknown");
+              continue;
+            }
 
             const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
               rkey: feature.name.replace(/:/g, ""),
-              collection: "blue.moji.collection"
+              collection: "blue.moji.collection.item"
             });
 
-            if (!record || !BlueMojiCollectionItem.isRecord(record.value))
-              return;
-
-            feature.alt = record.value.alt;
-            if (
-              BlueMojiCollectionItem.isFormats_v0(record.value.formats) &&
-              BlueMojiCollectionItem.isBytesOrBlobType_v0(
-                record.value.formats.png_128
-              ) &&
-              record.value.formats.png_128.blob
-            ) {
-              feature.blobs = {
-                $type: "blue.moji.richtext.facet#blobs_v0",
-                png_128: record.value.formats.png_128.blob.ref.toString()
+            if (BlueMojiCollectionItem.isRecord(record.value)) {
+              feature.alt = record.value.alt;
+              feature.did = repo;
+              feature.formats = {
+                $type: "blue.moji.richtext.facet#formats_v0"
               };
-            }
+              if (BlueMojiCollectionItem.isFormats_v0(record.value.formats)) {
+                if (record.value.formats.png_128) {
+                  feature.formats.png_128 =
+                    record.value.formats.png_128.ref.toString();
+                }
 
-            if (typeof record.alt === "string") {
-              feature.alt = record.alt;
+                if (record.value.formats.apng_128) {
+                  feature.formats.apng_128 = !!record.value.formats.apng_128;
+                }
+
+                if (record.value.formats.lottie) {
+                  feature.formats.lottie = !!record.value.formats.lottie;
+                }
+              }
             }
           } else if (AppBskyRichtextFacet.isMention(feature)) {
             const did = await agent

@@ -43,27 +43,23 @@ export async function uploadBluemoji({
     }
 
     if (encodings.includes("webp")) {
-      return;
-      // TODO: ENCODE
-      const encoded = "";
-      const { data: webpBlobAsset } = await agent.com.atproto.repo.uploadBlob(
-        encoded,
-        { encoding: "image/webp" }
-      );
-
-      formats.webp_128 = webpBlobAsset.blob;
+      // // TODO: ENCODE
+      // const encoded = "";
+      // const { data: webpBlobAsset } = await agent.com.atproto.repo.uploadBlob(
+      //   encoded,
+      //   { encoding: "image/webp" }
+      // );
+      // formats.webp_128 = webpBlobAsset.blob;
     }
 
     if (encodings.includes("gif")) {
-      return;
-      // TODO: ENCODE
-      const encoded = "";
-      const { data: gifBlobAsset } = await agent.com.atproto.repo.uploadBlob(
-        encoded,
-        { encoding: "image/gif" }
-      );
-
-      formats.webp_128 = gifBlobAsset.blob;
+      // // TODO: ENCODE
+      // const encoded = "";
+      // const { data: gifBlobAsset } = await agent.com.atproto.repo.uploadBlob(
+      //   encoded,
+      //   { encoding: "image/gif" }
+      // );
+      // formats.webp_128 = gifBlobAsset.blob;
     }
 
     const { data: originalBlob } = await agent.uploadBlob(originalBytes, {
@@ -80,10 +76,7 @@ export async function uploadBluemoji({
         alt: alttext,
         createdAt: new Date().toISOString(),
         original: originalBlob.blob,
-        formats: {
-          $type: "blue.moji.collection.item#formats_v0",
-          ...formats
-        }
+        formats
       }
     });
   } else {
