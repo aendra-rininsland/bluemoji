@@ -12,9 +12,9 @@
   "description": "Bluemoji types",
   "main": "./dist/index.js",
   "exports": {
+    ".": "./dist/index.js",
     "./*": "./dist/*"
   },
-  "types": "./src/types",
   "files": [
     "./dist",
     "./src"
