@@ -6,8 +6,8 @@ import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, AccessibilityInfo } from "react-native";
 import LottieView from "lottie-react-native";
 
-import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet.js";
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item.js";
+import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
+import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
 
 const styles = StyleSheet.create({
   emoji16: {
@@ -50,7 +50,7 @@ export const RichTextBluemoji = ({
       />;
     } else if (formats.apng_128) {
     } else if (formats.png_128) {
-      const cdnUri = `https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${formats.png_128}@PNG`;
+      const cdnUri = `https://cdn.bsky.app/img/avatar_thumbnail/plain/${did}/${formats.png_128}@PNG`;
       return <Image style={styles.emoji16} source={{ uri: cdnUri }} />;
     }
   }

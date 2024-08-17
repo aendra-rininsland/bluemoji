@@ -5,7 +5,7 @@
   "license": "MIT",
   "description": "Monorepo for the Bluemoji project",
   "scripts": {
-    "codegen": "lex gen-server ./lexicons/src  ../atproto/lexicons/app/bsky/*/* ../atproto/lexicons/com/atproto/*/* ./schema/blue.moji/*/* ",
+    "codegen": "lex gen-server --yes ./lexicons  ../atproto/lexicons/app/bsky/*/* ../atproto/lexicons/com/atproto/*/* ./schema/blue.moji/*/* && yab lexicons/**/*.ts",
     "test:watch": "vitest"
   },
   "workspaces": [
@@ -15,11 +15,11 @@
     "lexicons"
   ],
   "devDependencies": {
-    "@atproto/lex-cli": "^0.3.2",
+    "@atproto/lex-cli": "^0.5.0",
     "@swc/cli": "^0.4.0",
+    "add-js-extension": "^1.0.4",
     "multiformats": "^13.2.2",
     "prettier": "^3.3.3",
-    "swc": "^1.0.11",
     "tsx": "^4.16.2"
   }
 }

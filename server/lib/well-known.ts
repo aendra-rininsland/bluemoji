@@ -4,11 +4,11 @@ import { AppContext } from "./config";
 const makeRouter = (ctx: AppContext) => {
   const router = express.Router();
 
-  router.get("/.well-known/did.json", (_req, res) => {
+  router.get("/.well-known/didon", (_req, res) => {
     if (!ctx.cfg.serviceDid.endsWith(ctx.cfg.hostname)) {
       return res.sendStatus(404);
     }
-    res.json({
+    reson({
       "@context": ["https://www.w3.org/ns/did/v1"],
       id: ctx.cfg.serviceDid,
       service: [

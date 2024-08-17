@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "3.0.14",
+  "version": "3.0.15",
   "scripts": {
     "test": "tsx src/**/*.test.ts",
     "build": "npx swc ./src/* --out-dir ./dist",

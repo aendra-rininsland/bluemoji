@@ -3,11 +3,11 @@
  * This facilitates rendering of Bluemoji in a variety of formats
  */
 
-import * as BlueMojiRichTextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet.js";
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item.js";
-import { renderLottieAsCanvas } from "./renderers/lottie.js";
-import { renderApngAsImg } from "./renderers/apng.js";
-import { renderBlobAsImg, BlobTypeEnum } from "./renderers/blob.js";
+import * as BlueMojiRichTextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
+import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
+import { renderLottieAsCanvas } from "./renderers/lottie";
+import { renderApngAsImg } from "./renderers/apng";
+import { renderBlobAsImg, BlobTypeEnum } from "./renderers/blob";
 import { AtpAgent } from "@atproto/api";
 
 export async function render(

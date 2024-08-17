@@ -7,21 +7,16 @@ import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
-import * as AppBskyActorDefs from '../actor/defs'
-import * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs'
 
 export interface QueryParams {
-  limit: number
-  cursor?: string
+  priority?: boolean
   seenAt?: string
 }
 
 export type InputSchema = undefined
 
 export interface OutputSchema {
-  cursor?: string
-  notifications: Notification[]
-  seenAt?: string
+  count: number
   [k: string]: unknown
 }
 
@@ -49,40 +44,3 @@ export type HandlerReqCtx<HA extends HandlerAuth = never> = {
 export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
-
-export interface Notification {
-  uri: string
-  cid: string
-  author: AppBskyActorDefs.ProfileView
-  /** Expected values are 'like', 'repost', 'follow', 'mention', 'reply', 'quote', and 'starterpack-joined'. */
-  reason:
-    | 'like'
-    | 'repost'
-    | 'follow'
-    | 'mention'
-    | 'reply'
-    | 'quote'
-    | 'starterpack-joined'
-    | (string & {})
-  reasonSubject?: string
-  record: {}
-  isRead: boolean
-  indexedAt: string
-  labels?: ComAtprotoLabelDefs.Label[]
-  [k: string]: unknown
-}
-
-export function isNotification(v: unknown): v is Notification {
-  return (
-    isObj(v) &&
-    hasProp(v, '$type') &&
-    v.$type === 'app.bsky.notification.listNotifications#notification'
-  )
-}
-
-export function validateNotification(v: unknown): ValidationResult {
-  return lexicons.validate(
-    'app.bsky.notification.listNotifications#notification',
-    v,
-  )
-}

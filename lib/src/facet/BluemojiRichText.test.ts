@@ -1,11 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { AtpSessionData, AtpAgent } from "@atproto/api";
-import { BluemojiRichText } from "./BluemojiRichText.js";
+import { BluemojiRichText } from "./BluemojiRichText";
 import {
   Formats_v0,
   Record
-} from "@aendra/lexicons/types/blue/moji/collection/item.js";
+} from "@aendra/lexicons/types/blue/moji/collection/item";
 
 const stubRecord: Record = {
   $type: "blue.moji.collection.item",

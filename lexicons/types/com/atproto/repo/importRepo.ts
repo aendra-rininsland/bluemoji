@@ -11,22 +11,11 @@ import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 
 export interface QueryParams {}
 
-export type InputSchema = string | Uint8Array
-
-export interface OutputSchema {
-  blob: BlobRef
-  [k: string]: unknown
-}
+export type InputSchema = string | Uint8Array | Blob
 
 export interface HandlerInput {
-  encoding: '*/*'
+  encoding: 'application/vnd.ipld.car'
   body: stream.Readable
-}
-
-export interface HandlerSuccess {
-  encoding: 'application/json'
-  body: OutputSchema
-  headers?: { [key: string]: string }
 }
 
 export interface HandlerError {
@@ -34,7 +23,7 @@ export interface HandlerError {
   message?: string
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
+export type HandlerOutput = HandlerError | void
 export type HandlerReqCtx<HA extends HandlerAuth = never> = {
   auth: HA
   params: QueryParams

@@ -21,7 +21,7 @@
     "useDefineForClassFields": true,
 
     "module": "preserve",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
 
     "noErrorTruncation": true,

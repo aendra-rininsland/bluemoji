@@ -446,6 +446,9 @@ export const schemaDict = {
         description: 'A word that the account owner has muted.',
         required: ['value', 'targets'],
         properties: {
+          id: {
+            type: 'string',
+          },
           value: {
             type: 'string',
             description: 'The muted word itself.',
@@ -459,6 +462,19 @@ export const schemaDict = {
               type: 'ref',
               ref: 'lex:app.bsky.actor.defs#mutedWordTarget',
             },
+          },
+          actorTarget: {
+            type: 'string',
+            description:
+              'Groups of users to apply the muted word to. If undefined, applies to all users.',
+            knownValues: ['all', 'exclude-following'],
+            default: 'all',
+          },
+          expiresAt: {
+            type: 'string',
+            format: 'datetime',
+            description:
+              'The date and time at which the muted word will expire and no longer be applied.',
           },
         },
       },
@@ -1571,7 +1587,7 @@ export const schemaDict = {
           feedContext: {
             type: 'string',
             description:
-              'Context on a feed item that was orginally supplied by the feed generator on getFeedSkeleton.',
+              'Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton.',
             maxLength: 2000,
           },
         },
@@ -4446,6 +4462,9 @@ export const schemaDict = {
         parameters: {
           type: 'params',
           properties: {
+            priority: {
+              type: 'boolean',
+            },
             seenAt: {
               type: 'string',
               format: 'datetime',
@@ -4484,6 +4503,9 @@ export const schemaDict = {
               maximum: 100,
               default: 50,
             },
+            priority: {
+              type: 'boolean',
+            },
             cursor: {
               type: 'string',
             },
@@ -4508,6 +4530,9 @@ export const schemaDict = {
                   type: 'ref',
                   ref: 'lex:app.bsky.notification.listNotifications#notification',
                 },
+              },
+              priority: {
+                type: 'boolean',
               },
               seenAt: {
                 type: 'string',
@@ -4574,6 +4599,29 @@ export const schemaDict = {
             items: {
               type: 'ref',
               ref: 'lex:com.atproto.label.defs#label',
+            },
+          },
+        },
+      },
+    },
+  },
+  AppBskyNotificationPutPreferences: {
+    lexicon: 1,
+    id: 'app.bsky.notification.putPreferences',
+    defs: {
+      main: {
+        type: 'procedure',
+        description:
+          'Set notification-related preferences for an account. Requires auth.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['priority'],
+            properties: {
+              priority: {
+                type: 'boolean',
+              },
             },
           },
         },
@@ -5975,7 +6023,7 @@ export const schemaDict = {
       labelValueDefinition: {
         type: 'object',
         description:
-          'Declares a label value and its expected interpertations and behaviors.',
+          'Declares a label value and its expected interpretations and behaviors.',
         required: ['identifier', 'severity', 'blurs', 'locales'],
         properties: {
           identifier: {
@@ -7691,6 +7739,17 @@ export const schemaDict = {
               description:
                 'The DID of the service that the token will be used to authenticate with',
             },
+            exp: {
+              type: 'integer',
+              description:
+                'The time in Unix Epoch seconds that the JWT expires. Defaults to 60 seconds in the future. The service may enforce certain time bounds on tokens depending on the requested scope.',
+            },
+            lxm: {
+              type: 'string',
+              format: 'nsid',
+              description:
+                'Lexicon (XRPC) method to bind the requested token to',
+            },
           },
         },
         output: {
@@ -7705,6 +7764,13 @@ export const schemaDict = {
             },
           },
         },
+        errors: [
+          {
+            name: 'BadExpiration',
+            description:
+              'Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.',
+          },
+        ],
       },
     },
   },
@@ -9578,6 +9644,7 @@ export const ids = {
   AppBskyNotificationGetUnreadCount: 'app.bsky.notification.getUnreadCount',
   AppBskyNotificationListNotifications:
     'app.bsky.notification.listNotifications',
+  AppBskyNotificationPutPreferences: 'app.bsky.notification.putPreferences',
   AppBskyNotificationRegisterPush: 'app.bsky.notification.registerPush',
   AppBskyNotificationUpdateSeen: 'app.bsky.notification.updateSeen',
   AppBskyRichtextFacet: 'app.bsky.richtext.facet',

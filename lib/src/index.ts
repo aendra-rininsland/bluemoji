@@ -1,2 +1,2 @@
-export * from "./facet/index.js";
-export * from "./render/index.js";
+export * from "./facet/index";
+export * from "./render/index";

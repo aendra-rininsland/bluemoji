@@ -1,4 +1,4 @@
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item.js";
+import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
 
 interface RenderBlobParams {
   width: 128;
@@ -24,7 +24,7 @@ export const renderBlobAsImg = (
   params: RenderBlobParams = {
     width: 128,
     height: 128,
-    cdnBase: "https://cdn.bsky.app/img/feed_fullsize/plain/"
+    cdnBase: "https://cdn.bsky.app/img/avatar_thumbnail/plain/"
   }
 ) => {
   try {

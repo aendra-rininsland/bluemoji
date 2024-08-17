@@ -69,7 +69,7 @@ is much simpler to reduce facet size. It contains any of the following:
 - ~~**`gif_128`** The CID of the 128px² animated GIF `Blob`.~~ Currently unsupported.
 
 The intention for `Blob` objects is that they're fetched from the CDN via constructed asset
-URLs such as `https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${cid}@${type}`. Not hard-coding the asset URL into the facet enables ImgProxy CDNs other than Bluesky's to be used, depending
+URLs such as `https://cdn.bsky.app/img/avatar_thumbnail/plain/${did}/${cid}@${type}`. Not hard-coding the asset URL into the facet enables ImgProxy CDNs other than Bluesky's to be used, depending
 on implementer needs.
 
 ### `blue.moji.pack`
