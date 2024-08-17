@@ -14,7 +14,7 @@ export interface ItemView {
   name: string
   alt?: string
   createdAt?: string
-  assets: BlueMojiCollectionItem.Sizes
+  assets: BlueMojiCollectionItem.Formats_v0
   adultOnly: boolean
   [k: string]: unknown
 }

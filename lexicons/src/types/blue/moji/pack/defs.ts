@@ -41,7 +41,6 @@ export interface ListViewBasic {
   avatar?: string
   listItemCount?: number
   labels?: ComAtprotoLabelDefs.Label[]
-  viewer?: ListViewerState
   indexedAt?: string
   [k: string]: unknown
 }
@@ -68,7 +67,6 @@ export interface ListView {
   avatar?: string
   listItemCount?: number
   labels?: ComAtprotoLabelDefs.Label[]
-  viewer?: ListViewerState
   indexedAt: string
   [k: string]: unknown
 }

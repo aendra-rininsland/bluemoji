@@ -9003,7 +9003,7 @@ export const schemaDict = {
           },
           assets: {
             type: 'ref',
-            ref: 'lex:blue.moji.collection.item#sizes',
+            ref: 'lex:blue.moji.collection.item#formats_v0',
           },
           adultOnly: {
             type: 'boolean',
@@ -9236,10 +9236,6 @@ export const schemaDict = {
               ref: 'lex:com.atproto.label.defs#label',
             },
           },
-          viewer: {
-            type: 'ref',
-            ref: 'lex:blue.moji.pack.defs#listViewerState',
-          },
           indexedAt: {
             type: 'string',
             format: 'datetime',
@@ -9293,10 +9289,6 @@ export const schemaDict = {
               type: 'ref',
               ref: 'lex:com.atproto.label.defs#label',
             },
-          },
-          viewer: {
-            type: 'ref',
-            ref: 'lex:blue.moji.pack.defs#listViewerState',
           },
           indexedAt: {
             type: 'string',
