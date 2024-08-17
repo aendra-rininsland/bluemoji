@@ -1,4 +1,9 @@
-import { RichTextSegment, RichText, AppBskyRichtextFacet } from "@atproto/api";
+import {
+  AtpAgent,
+  RichTextSegment,
+  RichText,
+  AppBskyRichtextFacet
+} from "@atproto/api";
 import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet.js";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item.js";
 import { detectFacets } from "./detect-facets.js";

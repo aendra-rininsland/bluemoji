@@ -1,10 +1,44 @@
 {
-  "extends": "../../tsconfig/tests.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    "checkJs": true,
+
+    "strict": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noUnusedParameters": false,
+
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "preserveSymlinks": false,
+    "useDefineForClassFields": true,
+
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+
+    "noErrorTruncation": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "jsx": "preserve",
+    "module": "CommonJS",
+    "target": "ES2020",
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "ScriptHost"],
     "rootDir": ".",
-    "types": ["jest", "./jest.d.ts"],
+    "types": ["node", "jest"],
     "noEmit": true,
     "noUnusedLocals": false
   },
+  "typeAcquisition": {
+    "enable": false
+  },
+
   "include": ["./tests"]
 }
