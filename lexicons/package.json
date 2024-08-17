@@ -1,12 +1,12 @@
 {
   "name": "@aendra/lexicons",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "devDependencies": {
     "@swc/cli": "^0.4.0",
     "@swc/core": "^1.7.11"
   },
   "scripts": {
-    "build": "npx swc ./src/* --out-dir ./dist",
+    "build": "npx swc ./src -d dist",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
@@ -15,9 +15,9 @@
   "description": "Bluemoji types",
   "main": "./dist/index.js",
   "exports": {
-    ".": "./dist/index.js",
-    "./*": "./dist/*",
-    "./types/*": "./src/types/*"
+    ".": "./dist/src/index.js",
+    "./*": "./dist/src/*",
+    "./types/*": "./dist/src/types/*"
   },
   "files": [
     "./dist",
