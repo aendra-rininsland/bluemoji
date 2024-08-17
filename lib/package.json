@@ -3,7 +3,7 @@
   "version": "3.0.15",
   "scripts": {
     "test": "tsx src/**/*.test.ts",
-    "build": "npx swc ./src/* --out-dir ./dist",
+    "build": "vite build",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
@@ -22,15 +22,25 @@
   "devDependencies": {
     "@swc/cli": "^0.4.0",
     "@swc/core": "^1.7.11",
-    "swc": "^1.0.11"
+    "swc": "^1.0.11",
+    "vite": "^5.4.1"
   },
   "engines": {
     "node": ">=22"
   },
   "exports": {
-    ".": "./dist/facet/index.js",
-    "./render": "./dist/render/index.js",
-    "./facet": "./dist/facet/index.js"
+    ".": {
+      "require": "./dist/facet/index.cjs",
+      "default": "./dist/facet/index.js"
+    },
+    "./render": {
+      "require": "./dist/render/index.cjs",
+      "default": "./dist/render/index.js"
+    },
+    "./facet": {
+      "require": "./dist/facet/index.cjs",
+      "default": "./dist/facet/index.js"
+    }
   },
   "main": "./dist/index.js",
   "peerDependencies": {

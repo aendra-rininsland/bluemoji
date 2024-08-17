@@ -1,6 +1,6 @@
 {
   "name": "@aendra/lexicons",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "devDependencies": {
     "@swc/cli": "^0.4.0",
     "@swc/core": "^1.7.11"
@@ -13,12 +13,6 @@
   "author": "Ændra Rininsland",
   "license": "ISC",
   "description": "Bluemoji types",
-  "main": "./dist/index.js",
-  "exports": {
-    ".": "./dist/index.js",
-    "./*": "./dist/*"
-  },
-  "types": "./dist/index.d.ts",
   "files": [
     "./dist",
     "./src"
