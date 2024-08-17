@@ -1,10 +1,17 @@
 import { DotLottie, Config } from "@lottiefiles/dotlottie-web";
 
 interface RenderLottieParams extends Omit<Config, "canvas" | "src"> {
-  width?: 128;
-  height?: 128;
+  width: 128;
+  height: 128;
   player?: boolean;
   raw?: boolean;
+}
+
+export function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
+  return array.buffer.slice(
+    array.byteOffset,
+    array.byteLength + array.byteOffset
+  );
 }
 
 export const renderLottie = (
@@ -28,7 +35,7 @@ export const renderLottie = (
     const player = new DotLottie({
       ...params,
       canvas,
-      data: bytes
+      data: typedArrayToBuffer(bytes)
     });
 
     return params.player ? { canvas, player } : canvas;
