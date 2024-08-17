@@ -5,14 +5,15 @@
 
 import * as BlueMojiRichTextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
-import { renderLottieAsCanvas } from "./renderers/lottie";
+import { renderLottie } from "./renderers/lottie";
 import { renderApngAsImg } from "./renderers/apng";
 import { renderBlobAsImg, BlobTypeEnum } from "./renderers/blob";
 import { AtpAgent } from "@atproto/api";
 
 export async function render(
   agent: AtpAgent,
-  facet: BlueMojiRichTextFacet.Main
+  facet: BlueMojiRichTextFacet.Main,
+  params: { raw: boolean; player: boolean } = { raw: false, player: false }
 ) {
   try {
     if (BlueMojiRichTextFacet.isFormats_v0(facet.formats)) {
@@ -34,7 +35,8 @@ export async function render(
           if (!bytes) throw new Error("Invalid bytes in record");
 
           if (formats.lottie) {
-            return renderLottieAsCanvas(bytes.$bytes);
+            console.log(bytes, params);
+            return renderLottie(bytes, params);
           } else if (formats.apng_128) {
             return renderApngAsImg(bytes);
           }
