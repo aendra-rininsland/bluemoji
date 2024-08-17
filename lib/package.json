@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "3.0.15",
+  "version": "3.0.16",
   "scripts": {
     "test": "tsx src/**/*.test.ts",
     "build": "vite build",
