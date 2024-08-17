@@ -5,10 +5,10 @@ import { ValidationResult, BlobRef } from '@atproto/lexicon'
 import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
-import * as BlueMojiCollection from '../collection'
+import * as BlueMojiCollectionDefs from '../collection/defs'
 
 export interface Record {
-  subject: BlueMojiCollection.ItemView
+  subject: BlueMojiCollectionDefs.ItemView
   /** Reference (AT-URI) to the pack record (blue.moji.pack) */
   list: string
   createdAt: string

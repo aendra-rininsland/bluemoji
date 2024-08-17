@@ -1,13 +1,16 @@
 {
   "name": "@aendra/lexicons",
   "version": "2.0.0",
-  "type": "module",
   "devDependencies": {},
   "scripts": {
-    "build": "swc . --out-dir dist"
+    "build": "tsc --outDir dist"
   },
   "keywords": [],
   "author": "Ændra Rininsland",
   "license": "ISC",
-  "description": "Bluemoji types"
+  "description": "Bluemoji types",
+  "exports": {
+    ".": "./dist"
+  },
+  "types": "./src/types"
 }

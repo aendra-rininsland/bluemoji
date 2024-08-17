@@ -6,7 +6,8 @@ import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
 import * as BlueMojiRichtextFacet from '../richtext/facet'
-import * as BlueMojiCollection from '../collection'
+import * as BlueMojiCollectionDefs from '../collection/defs'
+import * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs'
 
 export interface Record {
   name: string
@@ -15,7 +16,10 @@ export interface Record {
   icon?: BlobRef
   adultOnly: boolean
   createdAt: string
-  items: BlueMojiCollection.ItemView[]
+  items: BlueMojiCollectionDefs.ItemView[]
+  labels?:
+    | ComAtprotoLabelDefs.SelfLabels
+    | { $type: string; [k: string]: unknown }
   [k: string]: unknown
 }
 

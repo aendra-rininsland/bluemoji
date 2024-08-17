@@ -7,8 +7,8 @@ import { isObj, hasProp } from '../../../../util'
 import { CID } from 'multiformats/cid'
 import * as AppBskyActorDefs from '../../../app/bsky/actor/defs'
 import * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs'
-import * as BlueMojiRichtextFacet from '../richtext/facet'
-import * as BlueMojiCollection from '../collection'
+import * as AppBskyRichtextFacet from '../../../app/bsky/richtext/facet'
+import * as BlueMojiCollectionDefs from '../collection/defs'
 
 export interface BluemojiPackView {
   uri: string
@@ -64,7 +64,7 @@ export interface ListView {
   creator: AppBskyActorDefs.ProfileViewBasic
   name: string
   description?: string
-  descriptionFacets?: BlueMojiRichtextFacet.Main[]
+  descriptionFacets?: AppBskyRichtextFacet.Main[]
   avatar?: string
   listItemCount?: number
   labels?: ComAtprotoLabelDefs.Label[]
@@ -87,7 +87,7 @@ export function validateListView(v: unknown): ValidationResult {
 
 export interface ListItemView {
   uri: string
-  subject: BlueMojiCollection.ItemView
+  subject: BlueMojiCollectionDefs.ItemView
   [k: string]: unknown
 }
 
