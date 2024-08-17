@@ -1,5 +1,3 @@
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
-
 interface RenderApngParams {
   width: 128;
   height: 128;

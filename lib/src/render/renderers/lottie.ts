@@ -1,4 +1,3 @@
-import * as BlueMojiRichTextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import { DotLottie, Config } from "@lottiefiles/dotlottie-web";
 
 interface RenderLottieParams extends Omit<Config, "canvas" | "src"> {

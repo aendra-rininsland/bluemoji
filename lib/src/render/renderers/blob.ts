@@ -1,4 +1,4 @@
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
+import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item.js";
 
 interface RenderBlobParams {
   width: 128;

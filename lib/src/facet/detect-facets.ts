@@ -1,8 +1,8 @@
-import { detectFacets as detectFacetsOriginal } from "@atproto/api/src/rich-text/detection";
+import { detectFacets as detectFacetsOriginal } from "@atproto/api/src/rich-text/detection.js";
 // This is broken between the src/ and dist/ versions of this
 // import { UnicodeString } from "@atproto/api/src/rich-text/unicode";
 import { Facet } from "@atproto/api";
-import { BLUEMOJI_REGEX } from "./BluemojiRichText";
+import { BLUEMOJI_REGEX } from "./BluemojiRichText.js";
 
 export function detectFacets(text: any /*UnicodeString*/): Facet[] | undefined {
   let match: any;

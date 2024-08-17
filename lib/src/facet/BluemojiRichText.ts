@@ -8,9 +8,9 @@ import AtpAgent, {
   RichTextProps,
   RichTextOpts
 } from "@atproto/api";
-import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
-import { detectFacets } from "./detect-facets";
+import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet.js";
+import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item.js";
+import { detectFacets } from "./detect-facets.js";
 
 export const BLUEMOJI_REGEX = new RegExp(
   ":((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):",

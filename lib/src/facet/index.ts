@@ -1,2 +1,2 @@
-export * from "./BluemojiRichText";
-export { register } from "./register";
+export * from "./BluemojiRichText.js";
+export { register } from "./register.js";
