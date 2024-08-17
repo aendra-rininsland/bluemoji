@@ -25,12 +25,10 @@ export const renderLottieAsCanvas = (
     canvas.width = params.width;
     canvas.height = params.height;
 
-    const blob = new Blob([bytes], { type: "application/lottie+zip" });
-    const src = URL.createObjectURL(blob);
     const player = new DotLottie({
       ...params,
       canvas,
-      src
+      data: bytes
     });
 
     return params.player ? { canvas, player } : canvas;

@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "scripts": {
     "test": "tsx src/**/*.test.ts",
     "build": "tsc"
@@ -26,8 +26,9 @@
     "node": ">=22"
   },
   "exports": {
-    "./*": "./dist/*",
-    "./index.js": "./dist/bluemoji.js"
+    ".": "./dist/facet/index.js",
+    "./render": "./dist/render/index.js",
+    "./facet": "./dist/facet/index.js"
   },
   "main": "./dist/bluemoji.js",
   "peerDependencies": {

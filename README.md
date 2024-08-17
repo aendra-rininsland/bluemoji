@@ -3,8 +3,8 @@
 This is the root of the Bluemoji mono-repo. It contains:
 
 - **[/schema](schema/)** for the `blue.moji` schemata
-- **[/facet](facet/)** Extends `@atproto/api` so the `RichText` class can create `blue.moji.richtext.facet` entities from `:emoji:` strings
-- **[/lexicons](lexicons/)** for Lexicon TypeScript definitions
+- **[/lib](lib/)** The npm `@aendra/bluemoji` helper library for uploading, manipulating, rendering Bluemoji
+- **[/lexicons](lexicons/)** The lexicon TypeScript definitions available at `@aendra/lexicons` on npm
 
 Note that this is all very work-in-progress. You won't be able to see Bluemoji until
 either Bluesky adds @aendra/bluemoji to the app or a 3rd party dev does similar.
