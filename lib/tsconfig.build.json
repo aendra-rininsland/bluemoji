@@ -20,7 +20,8 @@
     "preserveSymlinks": false,
     "useDefineForClassFields": true,
 
-    "moduleResolution": "node",
+    "module": "preserve",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
 
     "noErrorTruncation": true,
@@ -28,7 +29,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "jsx": "preserve",
-    "module": "CommonJS",
     "target": "ES2020",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node"],

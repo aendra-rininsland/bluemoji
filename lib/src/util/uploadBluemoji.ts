@@ -1,6 +1,6 @@
 import AtpAgent from "@atproto/api";
 import { resizePngToUintArray } from "./resizePngToUintArray";
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
+import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item.js";
 interface UploadBluemojiParams {
   agent: AtpAgent;
   emoji: ArrayBuffer;
