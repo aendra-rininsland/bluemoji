@@ -30,19 +30,19 @@
   },
   "exports": {
     ".": {
-      "require": "./dist/facet/index.cjs",
-      "default": "./dist/facet/index.js"
+      "require": "./dist/facet.cjs",
+      "default": "./dist/facet.js"
     },
     "./render": {
-      "require": "./dist/render/index.cjs",
-      "default": "./dist/render/index.js"
+      "require": "./dist/render.cjs",
+      "default": "./dist/render.js"
     },
     "./facet": {
-      "require": "./dist/facet/index.cjs",
-      "default": "./dist/facet/index.js"
+      "require": "./dist/facet.cjs",
+      "default": "./dist/facet.js"
     }
   },
-  "main": "./dist/index.js",
+  "main": "./dist/facet.cjs",
   "peerDependencies": {
     "react-native": "^0.74.4"
   },
