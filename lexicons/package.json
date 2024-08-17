@@ -1,6 +1,6 @@
 {
   "name": "@aendra/lexicons",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "devDependencies": {},
   "scripts": {
     "build": "tsc --outDir dist",
@@ -14,5 +14,9 @@
   "exports": {
     "./*": "./dist/*"
   },
-  "types": "./src/types"
+  "types": "./src/types",
+  "files": [
+    "./dist",
+    "./src"
+  ]
 }
