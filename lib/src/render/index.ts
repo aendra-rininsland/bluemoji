@@ -13,7 +13,12 @@ import { AtpAgent } from "@atproto/api";
 export async function render(
   agent: AtpAgent,
   facet: BlueMojiRichTextFacet.Main,
-  params: { raw: boolean; player: boolean } = { raw: false, player: false }
+  params: { raw: boolean; player: boolean; width: 128; height: 128 } = {
+    raw: false,
+    player: false,
+    width: 128,
+    height: 128
+  }
 ) {
   try {
     if (BlueMojiRichTextFacet.isFormats_v0(facet.formats)) {

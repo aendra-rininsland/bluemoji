@@ -31,11 +31,14 @@ export const renderLottie = (
     const canvas = document.createElement("canvas");
     canvas.width = params.width;
     canvas.height = params.height;
+    const ab = typedArrayToBuffer(bytes);
+
+    console.log(ab, bytes);
 
     const player = new DotLottie({
       ...params,
       canvas,
-      data: typedArrayToBuffer(bytes)
+      data: ab
     });
 
     return params.player ? { canvas, player } : canvas;
