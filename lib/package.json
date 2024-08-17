@@ -3,10 +3,9 @@
   "version": "3.0.7",
   "scripts": {
     "test": "tsx src/**/*.test.ts",
-    "build": "tsc",
+    "build": "tsc --build tsconfig.build.json",
     "prepublishOnly": "npm run build"
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -31,7 +30,7 @@
     "./render": "./dist/render/index.js",
     "./facet": "./dist/facet/index.js"
   },
-  "main": "./dist/facet/index.js",
+  "main": "./dist/index.js",
   "peerDependencies": {
     "react-native": "^0.74.4"
   },
