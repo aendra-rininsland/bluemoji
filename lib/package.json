@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "3.0.9",
+  "version": "3.0.12",
   "scripts": {
     "test": "tsx src/**/*.test.ts",
     "build": "tsc --build tsconfig.build.json",
