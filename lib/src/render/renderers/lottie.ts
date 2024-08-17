@@ -8,7 +8,7 @@ interface RenderLottieParams extends Omit<Config, "canvas" | "src"> {
 }
 
 export const renderLottieAsCanvas = (
-  bytes: Uint8Array,
+  bytes: { $bytes: Uint8Array },
   params: RenderLottieParams = {
     autoplay: true,
     loop: true,

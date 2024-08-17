@@ -4,7 +4,7 @@ interface RenderApngParams {
 }
 
 export const renderApngAsImg = (
-  bytes: Uint8Array,
+  bytes: { $bytes: Uint8Array },
   params: RenderApngParams = {
     width: 128,
     height: 128
@@ -15,7 +15,7 @@ export const renderApngAsImg = (
     img.width = params.width;
     img.height = params.height;
 
-    const blob = new Blob([bytes], { type: "image/png" });
+    const blob = new Blob([bytes.$bytes], { type: "image/png" });
     img.src = URL.createObjectURL(blob);
 
     return img;

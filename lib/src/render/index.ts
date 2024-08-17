@@ -34,7 +34,7 @@ export async function render(
           if (!bytes) throw new Error("Invalid bytes in record");
 
           if (formats.lottie) {
-            return renderLottieAsCanvas(bytes);
+            return renderLottieAsCanvas(bytes.$bytes);
           } else if (formats.apng_128) {
             return renderApngAsImg(bytes);
           }
