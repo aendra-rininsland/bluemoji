@@ -20,7 +20,7 @@ void (async function () {
     maybeStr(process.env.APPVIEW_SERVICE_DID) ?? `did:web:${hostname}`;
   const server = await main({
     port: maybeInt(process.env.APPVIEW_PORT) ?? 5577,
-    listenhost: maybeStr(process.env.APPVIEW_LISTENHOST) ?? "localhost",
+    listenhost: maybeStr(process.env.APPVIEW_LISTENHOST) ?? "0.0.0.0",
     sqliteLocation: maybeStr(process.env.APPVIEW_SQLITE_LOCATION) ?? ":memory:",
     subscriptionEndpoint:
       maybeStr(process.env.APPVIEW_SUBSCRIPTION_ENDPOINT) ??
@@ -30,7 +30,7 @@ void (async function () {
     subscriptionReconnectDelay:
       maybeInt(process.env.APPVIEW_SUBSCRIPTION_RECONNECT_DELAY) ?? 3000,
     hostname,
-    serviceDid
+    serviceDid,
   });
 
   await server.start();

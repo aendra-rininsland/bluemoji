@@ -1,7 +1,7 @@
 import {
-  OutputSchema as RepoEvent,
-  isCommit
-} from "@aendra/lexicons/types/com/atproto/sync/subscribeRepos";
+  Commit as RepoEvent,
+  isCommit,
+} from "../../lexicons/types/com/atproto/sync/subscribeRepos";
 import { FirehoseSubscriptionBase, getOpsByType } from "./subscription";
 import { addToActionsQueue } from "./actions";
 

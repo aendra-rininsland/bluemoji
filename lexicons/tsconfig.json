@@ -38,5 +38,5 @@
   "typeAcquisition": {
     "enable": false
   },
-  "include": ["./*.ts", "types/**/*.ts"]
+  "include": ["./*.ts", "types/**/*.ts", "client/**/*.ts"]
 }

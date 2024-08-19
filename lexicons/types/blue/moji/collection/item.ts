@@ -2,8 +2,8 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
 import * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs'
 
@@ -60,3 +60,24 @@ export function validateFormats_v0(v: unknown): ValidationResult {
 export type Blob_v0 = BlobRef
 /** 64kb should be enough for anybody */
 export type Bytes_v0 = Uint8Array
+
+export interface ItemView {
+  name: string
+  alt?: string
+  createdAt?: string
+  formats: Formats_v0
+  adultOnly: boolean
+  [k: string]: unknown
+}
+
+export function isItemView(v: unknown): v is ItemView {
+  return (
+    isObj(v) &&
+    hasProp(v, '$type') &&
+    v.$type === 'blue.moji.collection.item#itemView'
+  )
+}
+
+export function validateItemView(v: unknown): ValidationResult {
+  return lexicons.validate('blue.moji.collection.item#itemView', v)
+}

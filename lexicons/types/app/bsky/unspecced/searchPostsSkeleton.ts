@@ -1,19 +1,18 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from 'express'
+import { Headers, XRPCError } from '@atproto/xrpc'
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 import * as AppBskyUnspeccedDefs from './defs'
 
 export interface QueryParams {
   /** Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. */
   q: string
   /** Specifies the ranking order of results. */
-  sort: 'top' | 'latest' | (string & {})
+  sort?: 'top' | 'latest' | (string & {})
   /** Filter results for posts after the indicated datetime (inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYYY-MM-DD). */
   since?: string
   /** Filter results for posts before the indicated datetime (not inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYY-MM-DD). */
@@ -32,7 +31,7 @@ export interface QueryParams {
   tag?: string[]
   /** DID of the account making the request (not included for public/unauthenticated queries). Used for 'from:me' queries. */
   viewer?: string
-  limit: number
+  limit?: number
   /** Optional pagination mechanism; may not necessarily allow scrolling through entire result set. */
   cursor?: string
 }
@@ -47,28 +46,25 @@ export interface OutputSchema {
   [k: string]: unknown
 }
 
-export type HandlerInput = undefined
-
-export interface HandlerSuccess {
-  encoding: 'application/json'
-  body: OutputSchema
-  headers?: { [key: string]: string }
+export interface CallOptions {
+  headers?: Headers
 }
 
-export interface HandlerError {
-  status: number
-  message?: string
-  error?: 'BadQueryString'
+export interface Response {
+  success: boolean
+  headers: Headers
+  data: OutputSchema
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA
-  params: QueryParams
-  input: HandlerInput
-  req: express.Request
-  res: express.Response
+export class BadQueryStringError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
 }
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput
+
+export function toKnownErr(e: any) {
+  if (e instanceof XRPCError) {
+    if (e.error === 'BadQueryString') return new BadQueryStringError(e)
+  }
+  return e
+}

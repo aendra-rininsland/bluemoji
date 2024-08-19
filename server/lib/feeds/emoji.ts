@@ -1,5 +1,5 @@
 import { AppContext } from "../config";
-import { QueryParams } from "@aendra/lexicons/types/app/bsky/feed/getFeedSkeleton";
+import { QueryParams } from "../../lexicons/types/app/bsky/feed/getFeedSkeleton";
 
 // max 15 chars
 export const shortname = "whats-alf";
@@ -19,7 +19,7 @@ export const handler = async (ctx: AppContext, params: QueryParams) => {
   const res = await builder.execute();
 
   const feed = res.map((row) => ({
-    post: row.uri
+    post: row.uri,
   }));
 
   let cursor: string | undefined;
@@ -30,6 +30,6 @@ export const handler = async (ctx: AppContext, params: QueryParams) => {
 
   return {
     cursor,
-    feed
+    feed,
   };
 };

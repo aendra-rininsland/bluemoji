@@ -2,34 +2,12 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import * as BlueMojiCollectionItem from './item'
 import * as AppBskyActorDefs from '../../../app/bsky/actor/defs'
 import * as AppBskyRichtextFacet from '../../../app/bsky/richtext/facet'
 import * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs'
-
-export interface ItemView {
-  name: string
-  alt?: string
-  createdAt?: string
-  assets: BlueMojiCollectionItem.Formats_v0
-  adultOnly: boolean
-  [k: string]: unknown
-}
-
-export function isItemView(v: unknown): v is ItemView {
-  return (
-    isObj(v) &&
-    hasProp(v, '$type') &&
-    v.$type === 'blue.moji.collection.defs#itemView'
-  )
-}
-
-export function validateItemView(v: unknown): ValidationResult {
-  return lexicons.validate('blue.moji.collection.defs#itemView', v)
-}
 
 export interface CollectionView {
   uri: string

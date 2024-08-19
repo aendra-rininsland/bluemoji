@@ -131,3 +131,5 @@ dist
 .pnp.*
 
 social-app
+keys.json
+bluemoji-bot.db

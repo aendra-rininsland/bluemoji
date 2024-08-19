@@ -14,5 +14,5 @@ export const validateAuth = async (
   const jwt = authorization.replace("Bearer ", "").trim();
   return verifyJwt(jwt, serviceDid, async (did: string) => {
     return didResolver.resolveAtprotoKey(did);
-  });
+  }).toString();
 };

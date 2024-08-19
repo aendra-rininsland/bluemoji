@@ -56,6 +56,20 @@
       "type": "bytes",
       "maxLength": 65536,
       "description": "64kb should be enough for anybody"
+    },
+    "itemView": {
+      "type": "object",
+      "required": ["name", "formats"],
+      "properties": {
+        "name": { "type": "string" },
+        "alt": { "type": "string" },
+        "createdAt": { "type": "string", "format": "datetime" },
+        "formats": {
+          "type": "ref",
+          "ref": "#formats_v0"
+        },
+        "adultOnly": { "type": "boolean", "default": false }
+      }
     }
   }
 }

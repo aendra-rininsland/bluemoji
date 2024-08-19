@@ -1,10 +1,12 @@
+import { AuthVerifier } from "./auth-verifier";
 import { Database } from "./db";
-import { DidResolver } from "@atproto/identity";
+import { IdResolver } from "@atproto/identity";
 
 export type AppContext = {
   db: Database;
-  didResolver: DidResolver;
+  didResolver: IdResolver;
   cfg: Config;
+  authVerifier: AuthVerifier;
 };
 
 export type Config = {

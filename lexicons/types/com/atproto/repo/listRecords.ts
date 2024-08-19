@@ -1,12 +1,11 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from 'express'
+import { Headers, XRPCError } from '@atproto/xrpc'
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 
 export interface QueryParams {
   /** The handle or DID of the repo. */
@@ -14,7 +13,7 @@ export interface QueryParams {
   /** The NSID of the record type. */
   collection: string
   /** The number of records to return. */
-  limit: number
+  limit?: number
   cursor?: string
   /** DEPRECATED: The lowest sort-ordered rkey to start from (exclusive) */
   rkeyStart?: string
@@ -32,30 +31,21 @@ export interface OutputSchema {
   [k: string]: unknown
 }
 
-export type HandlerInput = undefined
-
-export interface HandlerSuccess {
-  encoding: 'application/json'
-  body: OutputSchema
-  headers?: { [key: string]: string }
+export interface CallOptions {
+  headers?: Headers
 }
 
-export interface HandlerError {
-  status: number
-  message?: string
+export interface Response {
+  success: boolean
+  headers: Headers
+  data: OutputSchema
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA
-  params: QueryParams
-  input: HandlerInput
-  req: express.Request
-  res: express.Response
+export function toKnownErr(e: any) {
+  if (e instanceof XRPCError) {
+  }
+  return e
 }
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput
 
 export interface Record {
   uri: string

@@ -3,16 +3,20 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "tsx lib/index.ts"
+    "start": "tsx lib/index.ts",
+    "codegen": "lex gen-server ./lexicons  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*",
+    "genkeys": "tsx scripts/generate-keys.ts"
   },
   "dependencies": {
-    "@aendra/lexicons": "^2.0.0",
-    "@atproto/api": "^0.12.9",
+    "@aendra/lexicons": "*",
+    "@atproto/api": "^0.13.1",
     "@atproto/bsky": "^0.0.51",
-    "@atproto/lexicon": "^0.4.0",
+    "@atproto/jwk-jose": "^0.1.2",
+    "@atproto/lexicon": "^0.4.1",
+    "@atproto/oauth-client-node": "^0.0.4",
     "@atproto/ozone": "^0.1.1",
     "@atproto/repo": "^0.4.0",
-    "@atproto/xrpc-server": "^0.4.3",
+    "@atproto/xrpc-server": "^0.6.2",
     "@huggingface/inference": "^2.6.4",
     "@types/better-sqlite3": "^7.6.10",
     "@types/csv-write-stream": "^2.0.3",

@@ -1,12 +1,11 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from 'express'
+import { Headers, XRPCError } from '@atproto/xrpc'
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 
 export interface QueryParams {}
 
@@ -24,25 +23,26 @@ export interface InputSchema {
   [k: string]: unknown
 }
 
-export interface HandlerInput {
+export interface CallOptions {
+  headers?: Headers
+  qp?: QueryParams
   encoding: 'application/json'
-  body: InputSchema
 }
 
-export interface HandlerError {
-  status: number
-  message?: string
-  error?: 'InvalidSwap'
+export interface Response {
+  success: boolean
+  headers: Headers
 }
 
-export type HandlerOutput = HandlerError | void
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA
-  params: QueryParams
-  input: HandlerInput
-  req: express.Request
-  res: express.Response
+export class InvalidSwapError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
 }
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput
+
+export function toKnownErr(e: any) {
+  if (e instanceof XRPCError) {
+    if (e.error === 'InvalidSwap') return new InvalidSwapError(e)
+  }
+  return e
+}

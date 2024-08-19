@@ -6,13 +6,14 @@
     "@swc/core": "^1.7.11"
   },
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "npm run codegen -- --yes && tsc",
+    "prepublishOnly": "npm run build",
+    "codegen": "lex gen-api ./  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*"
   },
   "keywords": [],
   "author": "Ændra Rininsland",
   "license": "ISC",
-  "description": "Bluemoji types",
+  "description": "Client-side lexicons for @aendra.com ATProto projects",
   "files": [
     "./dist",
     "./src"

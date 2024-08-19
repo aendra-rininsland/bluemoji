@@ -1,4 +1,4 @@
-import { Server } from "@aendra/lexicons";
+import { Server } from "../../lexicons";
 import { AppContext } from "../config";
 import algos from "../feeds";
 import { AtUri } from "@atproto/syntax";
@@ -10,14 +10,14 @@ export default function (server: Server, ctx: AppContext) {
         ctx.cfg.publisherDid,
         "app.bsky.feed.generator",
         shortname
-      ).toString()
+      ).toString(),
     }));
     return {
       encoding: "application/json",
       body: {
         did: ctx.cfg.serviceDid,
-        feeds
-      }
+        feeds,
+      },
     };
   });
 }

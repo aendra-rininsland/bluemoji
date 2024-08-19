@@ -1,38 +1,11 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
+import { Headers, XRPCError } from '@atproto/xrpc'
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import { HandlerAuth, ErrorFrame } from '@atproto/xrpc-server'
-import { IncomingMessage } from 'http'
-
-export interface QueryParams {
-  /** The last known event seq number to backfill from. */
-  cursor?: number
-}
-
-export type OutputSchema =
-  | Commit
-  | Identity
-  | Account
-  | Handle
-  | Migrate
-  | Tombstone
-  | Info
-  | { $type: string; [k: string]: unknown }
-export type HandlerError = ErrorFrame<'FutureCursor' | 'ConsumerTooSlow'>
-export type HandlerOutput = HandlerError | OutputSchema
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA
-  params: QueryParams
-  req: IncomingMessage
-  signal: AbortSignal
-}
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => AsyncIterable<HandlerOutput>
 
 /** Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature. */
 export interface Commit {

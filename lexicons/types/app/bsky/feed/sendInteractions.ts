@@ -1,12 +1,11 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from 'express'
+import { Headers, XRPCError } from '@atproto/xrpc'
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 import * as AppBskyFeedDefs from './defs'
 
 export interface QueryParams {}
@@ -20,30 +19,20 @@ export interface OutputSchema {
   [k: string]: unknown
 }
 
-export interface HandlerInput {
+export interface CallOptions {
+  headers?: Headers
+  qp?: QueryParams
   encoding: 'application/json'
-  body: InputSchema
 }
 
-export interface HandlerSuccess {
-  encoding: 'application/json'
-  body: OutputSchema
-  headers?: { [key: string]: string }
+export interface Response {
+  success: boolean
+  headers: Headers
+  data: OutputSchema
 }
 
-export interface HandlerError {
-  status: number
-  message?: string
+export function toKnownErr(e: any) {
+  if (e instanceof XRPCError) {
+  }
+  return e
 }
-
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA
-  params: QueryParams
-  input: HandlerInput
-  req: express.Request
-  res: express.Response
-}
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput

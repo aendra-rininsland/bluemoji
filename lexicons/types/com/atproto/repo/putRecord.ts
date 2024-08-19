@@ -1,12 +1,11 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from 'express'
+import { Headers, XRPCError } from '@atproto/xrpc'
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 
 export interface QueryParams {}
 
@@ -18,7 +17,7 @@ export interface InputSchema {
   /** The Record Key. */
   rkey: string
   /** Can be set to 'false' to skip Lexicon schema validation of record data. */
-  validate: boolean
+  validate?: boolean
   /** The record to write. */
   record: {}
   /** Compare and swap with the previous record by CID. WARNING: nullable and optional field; may cause problems with golang implementation */
@@ -34,31 +33,27 @@ export interface OutputSchema {
   [k: string]: unknown
 }
 
-export interface HandlerInput {
+export interface CallOptions {
+  headers?: Headers
+  qp?: QueryParams
   encoding: 'application/json'
-  body: InputSchema
 }
 
-export interface HandlerSuccess {
-  encoding: 'application/json'
-  body: OutputSchema
-  headers?: { [key: string]: string }
+export interface Response {
+  success: boolean
+  headers: Headers
+  data: OutputSchema
 }
 
-export interface HandlerError {
-  status: number
-  message?: string
-  error?: 'InvalidSwap'
+export class InvalidSwapError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA
-  params: QueryParams
-  input: HandlerInput
-  req: express.Request
-  res: express.Response
+export function toKnownErr(e: any) {
+  if (e instanceof XRPCError) {
+    if (e.error === 'InvalidSwap') return new InvalidSwapError(e)
+  }
+  return e
 }
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput

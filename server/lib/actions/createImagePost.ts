@@ -1,9 +1,9 @@
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
+import * as BlueMojiCollectionItem from "../../lexicons/types/blue/moji/collection/item";
 import {
   BskyAgent,
   RichText,
   AppBskyFeedPost,
-  AppBskyEmbedExternal
+  AppBskyEmbedExternal,
 } from "@atproto/api";
 import { isLoggedIn, agent } from "../agent";
 import { CreateOp } from "../subscription";
@@ -29,6 +29,6 @@ export const createImagePost = async (emojiRecord: CreateOp) => {
     text: rt.text,
     facets: rt.facets,
     createdAt: timestamp,
-    embed
+    embed,
   };
 };

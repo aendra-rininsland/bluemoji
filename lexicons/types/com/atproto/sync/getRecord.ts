@@ -1,13 +1,11 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from 'express'
-import stream from 'stream'
+import { Headers, XRPCError } from '@atproto/xrpc'
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../../lexicons'
 import { isObj, hasProp } from '../../../../util'
+import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
-import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 
 export interface QueryParams {
   /** The DID of the repo. */
@@ -20,33 +18,54 @@ export interface QueryParams {
 }
 
 export type InputSchema = undefined
-export type HandlerInput = undefined
 
-export interface HandlerSuccess {
-  encoding: 'application/vnd.ipld.car'
-  body: Uint8Array | stream.Readable
-  headers?: { [key: string]: string }
+export interface CallOptions {
+  headers?: Headers
 }
 
-export interface HandlerError {
-  status: number
-  message?: string
-  error?:
-    | 'RecordNotFound'
-    | 'RepoNotFound'
-    | 'RepoTakendown'
-    | 'RepoSuspended'
-    | 'RepoDeactivated'
+export interface Response {
+  success: boolean
+  headers: Headers
+  data: Uint8Array
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA
-  params: QueryParams
-  input: HandlerInput
-  req: express.Request
-  res: express.Response
+export class RecordNotFoundError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
 }
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput
+
+export class RepoNotFoundError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
+}
+
+export class RepoTakendownError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
+}
+
+export class RepoSuspendedError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
+}
+
+export class RepoDeactivatedError extends XRPCError {
+  constructor(src: XRPCError) {
+    super(src.status, src.error, src.message, src.headers)
+  }
+}
+
+export function toKnownErr(e: any) {
+  if (e instanceof XRPCError) {
+    if (e.error === 'RecordNotFound') return new RecordNotFoundError(e)
+    if (e.error === 'RepoNotFound') return new RepoNotFoundError(e)
+    if (e.error === 'RepoTakendown') return new RepoTakendownError(e)
+    if (e.error === 'RepoSuspended') return new RepoSuspendedError(e)
+    if (e.error === 'RepoDeactivated') return new RepoDeactivatedError(e)
+  }
+  return e
+}
