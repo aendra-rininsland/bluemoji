@@ -30,7 +30,7 @@ export default function Page() {
   }, [creds]);
 
   return (
-    <>
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <label className="flex items-center text-3xl">
         Handle{" "}
         <input
@@ -65,6 +65,6 @@ export default function Page() {
       <button type="submit" onClick={onSubmit}>
         Login
       </button>
-    </>
+    </main>
   );
 }

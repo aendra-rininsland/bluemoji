@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Nav } from "./lib/Nav/client";
 
 export default function Home() {
   return (
