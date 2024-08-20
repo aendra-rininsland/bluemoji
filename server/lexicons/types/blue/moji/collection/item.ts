@@ -18,6 +18,7 @@ export interface Record {
     | ComAtprotoLabelDefs.SelfLabels
     | { $type: string; [k: string]: unknown }
   copyOf?: string
+  fallbackText: string
   [k: string]: unknown
 }
 

@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "dev": "tsx lib/index.ts",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build --ssrManifest --outDir dist/client",
+    "build:server": "vite build --ssr lib/entry-server.tsx --outDir dist/server",
+    "preview": "cross-env NODE_ENV=production node server",
     "start": "tsx lib/index.ts",
     "codegen": "lex gen-server ./lexicons  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*",
     "genkeys": "tsx scripts/generate-keys.ts"
@@ -31,8 +36,10 @@
     "execa": "^8.0.1",
     "forever": "^4.0.3",
     "kysely": "^0.27.2",
+    "next": "^14.2.5",
     "onnxruntime-node": "^1.17.0",
     "p-queue": "^8.0.1",
+    "pino-http": "^10.2.0",
     "sharp": "^0.33.4",
     "sharp-apng": "^0.1.5",
     "tsx": "^4.7.1",

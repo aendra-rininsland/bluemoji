@@ -1815,7 +1815,7 @@ export const schemaDict = {
       main: {
         type: 'query',
         description:
-          'Get a list of posts liked by an actor. Requires auth, actor must be the requesting account.',
+          'Get a list of posts liked by an actor. Does not require auth.',
         parameters: {
           type: 'params',
           required: ['actor'],
@@ -9193,6 +9193,11 @@ export const schemaDict = {
             copyOf: {
               type: 'string',
               format: 'at-uri',
+            },
+            fallbackText: {
+              type: 'string',
+              maxLength: 1,
+              default: '◌',
             },
           },
         },

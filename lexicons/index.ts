@@ -1,10 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import {
-  Client as XrpcClient,
-  ServiceClient as XrpcServiceClient,
-} from '@atproto/xrpc'
+import { XrpcClient, FetchHandler, FetchHandlerOptions } from '@atproto/xrpc'
 import { schemas } from './lexicons'
 import { CID } from 'multiformats/cid'
 import * as AppBskyActorDefs from './types/app/bsky/actor/defs'
@@ -378,50 +375,36 @@ export const COM_ATPROTO_MODERATION = {
   DefsReasonAppeal: 'com.atproto.moderation.defs#reasonAppeal',
 }
 
-export class AtpBaseClient {
-  xrpc: XrpcClient = new XrpcClient()
-
-  constructor() {
-    this.xrpc.addLexicons(schemas)
-  }
-
-  service(serviceUri: string | URL): AtpServiceClient {
-    return new AtpServiceClient(this, this.xrpc.service(serviceUri))
-  }
-}
-
-export class AtpServiceClient {
-  _baseClient: AtpBaseClient
-  xrpc: XrpcServiceClient
+export class AtpBaseClient extends XrpcClient {
   app: AppNS
   com: ComNS
   blue: BlueNS
 
-  constructor(baseClient: AtpBaseClient, xrpcService: XrpcServiceClient) {
-    this._baseClient = baseClient
-    this.xrpc = xrpcService
+  constructor(options: FetchHandler | FetchHandlerOptions) {
+    super(options, schemas)
     this.app = new AppNS(this)
     this.com = new ComNS(this)
     this.blue = new BlueNS(this)
   }
 
-  setHeader(key: string, value: string): void {
-    this.xrpc.setHeader(key, value)
+  /** @deprecated use `this` instead */
+  get xrpc(): XrpcClient {
+    return this
   }
 }
 
 export class AppNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   bsky: AppBskyNS
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.bsky = new AppBskyNS(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.bsky = new AppBskyNS(client)
   }
 }
 
 export class AppBskyNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   actor: AppBskyActorNS
   embed: AppBskyEmbedNS
   feed: AppBskyFeedNS
@@ -431,111 +414,118 @@ export class AppBskyNS {
   richtext: AppBskyRichtextNS
   unspecced: AppBskyUnspeccedNS
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.actor = new AppBskyActorNS(service)
-    this.embed = new AppBskyEmbedNS(service)
-    this.feed = new AppBskyFeedNS(service)
-    this.graph = new AppBskyGraphNS(service)
-    this.labeler = new AppBskyLabelerNS(service)
-    this.notification = new AppBskyNotificationNS(service)
-    this.richtext = new AppBskyRichtextNS(service)
-    this.unspecced = new AppBskyUnspeccedNS(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.actor = new AppBskyActorNS(client)
+    this.embed = new AppBskyEmbedNS(client)
+    this.feed = new AppBskyFeedNS(client)
+    this.graph = new AppBskyGraphNS(client)
+    this.labeler = new AppBskyLabelerNS(client)
+    this.notification = new AppBskyNotificationNS(client)
+    this.richtext = new AppBskyRichtextNS(client)
+    this.unspecced = new AppBskyUnspeccedNS(client)
   }
 }
 
 export class AppBskyActorNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   profile: ProfileRecord
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.profile = new ProfileRecord(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.profile = new ProfileRecord(client)
   }
 
   getPreferences(
     params?: AppBskyActorGetPreferences.QueryParams,
     opts?: AppBskyActorGetPreferences.CallOptions,
   ): Promise<AppBskyActorGetPreferences.Response> {
-    return this._service.xrpc
-      .call('app.bsky.actor.getPreferences', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyActorGetPreferences.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.actor.getPreferences',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getProfile(
     params?: AppBskyActorGetProfile.QueryParams,
     opts?: AppBskyActorGetProfile.CallOptions,
   ): Promise<AppBskyActorGetProfile.Response> {
-    return this._service.xrpc
-      .call('app.bsky.actor.getProfile', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyActorGetProfile.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.actor.getProfile',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getProfiles(
     params?: AppBskyActorGetProfiles.QueryParams,
     opts?: AppBskyActorGetProfiles.CallOptions,
   ): Promise<AppBskyActorGetProfiles.Response> {
-    return this._service.xrpc
-      .call('app.bsky.actor.getProfiles', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyActorGetProfiles.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.actor.getProfiles',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getSuggestions(
     params?: AppBskyActorGetSuggestions.QueryParams,
     opts?: AppBskyActorGetSuggestions.CallOptions,
   ): Promise<AppBskyActorGetSuggestions.Response> {
-    return this._service.xrpc
-      .call('app.bsky.actor.getSuggestions', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyActorGetSuggestions.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.actor.getSuggestions',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   putPreferences(
     data?: AppBskyActorPutPreferences.InputSchema,
     opts?: AppBskyActorPutPreferences.CallOptions,
   ): Promise<AppBskyActorPutPreferences.Response> {
-    return this._service.xrpc
-      .call('app.bsky.actor.putPreferences', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyActorPutPreferences.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.actor.putPreferences',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   searchActors(
     params?: AppBskyActorSearchActors.QueryParams,
     opts?: AppBskyActorSearchActors.CallOptions,
   ): Promise<AppBskyActorSearchActors.Response> {
-    return this._service.xrpc
-      .call('app.bsky.actor.searchActors', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyActorSearchActors.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.actor.searchActors',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   searchActorsTypeahead(
     params?: AppBskyActorSearchActorsTypeahead.QueryParams,
     opts?: AppBskyActorSearchActorsTypeahead.CallOptions,
   ): Promise<AppBskyActorSearchActorsTypeahead.Response> {
-    return this._service.xrpc
-      .call('app.bsky.actor.searchActorsTypeahead', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyActorSearchActorsTypeahead.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.actor.searchActorsTypeahead',
+      params,
+      undefined,
+      opts,
+    )
   }
 }
 
 export class ProfileRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -544,7 +534,7 @@ export class ProfileRecord {
     cursor?: string
     records: { uri: string; value: AppBskyActorProfile.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.actor.profile',
       ...params,
     })
@@ -554,7 +544,7 @@ export class ProfileRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyActorProfile.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.actor.profile',
       ...params,
     })
@@ -570,7 +560,7 @@ export class ProfileRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.actor.profile'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.actor.profile', rkey: 'self', ...params, record },
@@ -583,7 +573,7 @@ export class ProfileRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.actor.profile', ...params },
@@ -593,57 +583,59 @@ export class ProfileRecord {
 }
 
 export class AppBskyEmbedNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 }
 
 export class AppBskyFeedNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   generator: GeneratorRecord
   like: LikeRecord
   post: PostRecord
   repost: RepostRecord
   threadgate: ThreadgateRecord
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.generator = new GeneratorRecord(service)
-    this.like = new LikeRecord(service)
-    this.post = new PostRecord(service)
-    this.repost = new RepostRecord(service)
-    this.threadgate = new ThreadgateRecord(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.generator = new GeneratorRecord(client)
+    this.like = new LikeRecord(client)
+    this.post = new PostRecord(client)
+    this.repost = new RepostRecord(client)
+    this.threadgate = new ThreadgateRecord(client)
   }
 
   describeFeedGenerator(
     params?: AppBskyFeedDescribeFeedGenerator.QueryParams,
     opts?: AppBskyFeedDescribeFeedGenerator.CallOptions,
   ): Promise<AppBskyFeedDescribeFeedGenerator.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.describeFeedGenerator', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedDescribeFeedGenerator.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.describeFeedGenerator',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getActorFeeds(
     params?: AppBskyFeedGetActorFeeds.QueryParams,
     opts?: AppBskyFeedGetActorFeeds.CallOptions,
   ): Promise<AppBskyFeedGetActorFeeds.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getActorFeeds', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetActorFeeds.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.getActorFeeds',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getActorLikes(
     params?: AppBskyFeedGetActorLikes.QueryParams,
     opts?: AppBskyFeedGetActorLikes.CallOptions,
   ): Promise<AppBskyFeedGetActorLikes.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.feed.getActorLikes', params, undefined, opts)
       .catch((e) => {
         throw AppBskyFeedGetActorLikes.toKnownErr(e)
@@ -654,7 +646,7 @@ export class AppBskyFeedNS {
     params?: AppBskyFeedGetAuthorFeed.QueryParams,
     opts?: AppBskyFeedGetAuthorFeed.CallOptions,
   ): Promise<AppBskyFeedGetAuthorFeed.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.feed.getAuthorFeed', params, undefined, opts)
       .catch((e) => {
         throw AppBskyFeedGetAuthorFeed.toKnownErr(e)
@@ -665,7 +657,7 @@ export class AppBskyFeedNS {
     params?: AppBskyFeedGetFeed.QueryParams,
     opts?: AppBskyFeedGetFeed.CallOptions,
   ): Promise<AppBskyFeedGetFeed.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.feed.getFeed', params, undefined, opts)
       .catch((e) => {
         throw AppBskyFeedGetFeed.toKnownErr(e)
@@ -676,29 +668,31 @@ export class AppBskyFeedNS {
     params?: AppBskyFeedGetFeedGenerator.QueryParams,
     opts?: AppBskyFeedGetFeedGenerator.CallOptions,
   ): Promise<AppBskyFeedGetFeedGenerator.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getFeedGenerator', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetFeedGenerator.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.getFeedGenerator',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getFeedGenerators(
     params?: AppBskyFeedGetFeedGenerators.QueryParams,
     opts?: AppBskyFeedGetFeedGenerators.CallOptions,
   ): Promise<AppBskyFeedGetFeedGenerators.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getFeedGenerators', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetFeedGenerators.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.getFeedGenerators',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getFeedSkeleton(
     params?: AppBskyFeedGetFeedSkeleton.QueryParams,
     opts?: AppBskyFeedGetFeedSkeleton.CallOptions,
   ): Promise<AppBskyFeedGetFeedSkeleton.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.feed.getFeedSkeleton', params, undefined, opts)
       .catch((e) => {
         throw AppBskyFeedGetFeedSkeleton.toKnownErr(e)
@@ -709,18 +703,14 @@ export class AppBskyFeedNS {
     params?: AppBskyFeedGetLikes.QueryParams,
     opts?: AppBskyFeedGetLikes.CallOptions,
   ): Promise<AppBskyFeedGetLikes.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getLikes', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetLikes.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.feed.getLikes', params, undefined, opts)
   }
 
   getListFeed(
     params?: AppBskyFeedGetListFeed.QueryParams,
     opts?: AppBskyFeedGetListFeed.CallOptions,
   ): Promise<AppBskyFeedGetListFeed.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.feed.getListFeed', params, undefined, opts)
       .catch((e) => {
         throw AppBskyFeedGetListFeed.toKnownErr(e)
@@ -731,7 +721,7 @@ export class AppBskyFeedNS {
     params?: AppBskyFeedGetPostThread.QueryParams,
     opts?: AppBskyFeedGetPostThread.CallOptions,
   ): Promise<AppBskyFeedGetPostThread.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.feed.getPostThread', params, undefined, opts)
       .catch((e) => {
         throw AppBskyFeedGetPostThread.toKnownErr(e)
@@ -742,51 +732,50 @@ export class AppBskyFeedNS {
     params?: AppBskyFeedGetPosts.QueryParams,
     opts?: AppBskyFeedGetPosts.CallOptions,
   ): Promise<AppBskyFeedGetPosts.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getPosts', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetPosts.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.feed.getPosts', params, undefined, opts)
   }
 
   getRepostedBy(
     params?: AppBskyFeedGetRepostedBy.QueryParams,
     opts?: AppBskyFeedGetRepostedBy.CallOptions,
   ): Promise<AppBskyFeedGetRepostedBy.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getRepostedBy', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetRepostedBy.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.getRepostedBy',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getSuggestedFeeds(
     params?: AppBskyFeedGetSuggestedFeeds.QueryParams,
     opts?: AppBskyFeedGetSuggestedFeeds.CallOptions,
   ): Promise<AppBskyFeedGetSuggestedFeeds.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getSuggestedFeeds', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetSuggestedFeeds.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.getSuggestedFeeds',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getTimeline(
     params?: AppBskyFeedGetTimeline.QueryParams,
     opts?: AppBskyFeedGetTimeline.CallOptions,
   ): Promise<AppBskyFeedGetTimeline.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.getTimeline', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyFeedGetTimeline.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.getTimeline',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   searchPosts(
     params?: AppBskyFeedSearchPosts.QueryParams,
     opts?: AppBskyFeedSearchPosts.CallOptions,
   ): Promise<AppBskyFeedSearchPosts.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.feed.searchPosts', params, undefined, opts)
       .catch((e) => {
         throw AppBskyFeedSearchPosts.toKnownErr(e)
@@ -797,19 +786,20 @@ export class AppBskyFeedNS {
     data?: AppBskyFeedSendInteractions.InputSchema,
     opts?: AppBskyFeedSendInteractions.CallOptions,
   ): Promise<AppBskyFeedSendInteractions.Response> {
-    return this._service.xrpc
-      .call('app.bsky.feed.sendInteractions', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyFeedSendInteractions.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.feed.sendInteractions',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class GeneratorRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -818,7 +808,7 @@ export class GeneratorRecord {
     cursor?: string
     records: { uri: string; value: AppBskyFeedGenerator.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.feed.generator',
       ...params,
     })
@@ -828,7 +818,7 @@ export class GeneratorRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedGenerator.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.feed.generator',
       ...params,
     })
@@ -844,7 +834,7 @@ export class GeneratorRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.feed.generator'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.feed.generator', ...params, record },
@@ -857,7 +847,7 @@ export class GeneratorRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.feed.generator', ...params },
@@ -867,10 +857,10 @@ export class GeneratorRecord {
 }
 
 export class LikeRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -879,7 +869,7 @@ export class LikeRecord {
     cursor?: string
     records: { uri: string; value: AppBskyFeedLike.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.feed.like',
       ...params,
     })
@@ -889,7 +879,7 @@ export class LikeRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedLike.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.feed.like',
       ...params,
     })
@@ -905,7 +895,7 @@ export class LikeRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.feed.like'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.feed.like', ...params, record },
@@ -918,7 +908,7 @@ export class LikeRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.feed.like', ...params },
@@ -928,10 +918,10 @@ export class LikeRecord {
 }
 
 export class PostRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -940,7 +930,7 @@ export class PostRecord {
     cursor?: string
     records: { uri: string; value: AppBskyFeedPost.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.feed.post',
       ...params,
     })
@@ -950,7 +940,7 @@ export class PostRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedPost.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.feed.post',
       ...params,
     })
@@ -966,7 +956,7 @@ export class PostRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.feed.post'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.feed.post', ...params, record },
@@ -979,7 +969,7 @@ export class PostRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.feed.post', ...params },
@@ -989,10 +979,10 @@ export class PostRecord {
 }
 
 export class RepostRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1001,7 +991,7 @@ export class RepostRecord {
     cursor?: string
     records: { uri: string; value: AppBskyFeedRepost.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.feed.repost',
       ...params,
     })
@@ -1011,7 +1001,7 @@ export class RepostRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedRepost.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.feed.repost',
       ...params,
     })
@@ -1027,7 +1017,7 @@ export class RepostRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.feed.repost'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.feed.repost', ...params, record },
@@ -1040,7 +1030,7 @@ export class RepostRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.feed.repost', ...params },
@@ -1050,10 +1040,10 @@ export class RepostRecord {
 }
 
 export class ThreadgateRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1062,7 +1052,7 @@ export class ThreadgateRecord {
     cursor?: string
     records: { uri: string; value: AppBskyFeedThreadgate.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.feed.threadgate',
       ...params,
     })
@@ -1076,7 +1066,7 @@ export class ThreadgateRecord {
     cid: string
     value: AppBskyFeedThreadgate.Record
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.feed.threadgate',
       ...params,
     })
@@ -1092,7 +1082,7 @@ export class ThreadgateRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.feed.threadgate'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.feed.threadgate', ...params, record },
@@ -1105,7 +1095,7 @@ export class ThreadgateRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.feed.threadgate', ...params },
@@ -1115,7 +1105,7 @@ export class ThreadgateRecord {
 }
 
 export class AppBskyGraphNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   block: BlockRecord
   follow: FollowRecord
   list: ListRecord
@@ -1123,131 +1113,126 @@ export class AppBskyGraphNS {
   listitem: ListitemRecord
   starterpack: StarterpackRecord
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.block = new BlockRecord(service)
-    this.follow = new FollowRecord(service)
-    this.list = new ListRecord(service)
-    this.listblock = new ListblockRecord(service)
-    this.listitem = new ListitemRecord(service)
-    this.starterpack = new StarterpackRecord(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.block = new BlockRecord(client)
+    this.follow = new FollowRecord(client)
+    this.list = new ListRecord(client)
+    this.listblock = new ListblockRecord(client)
+    this.listitem = new ListitemRecord(client)
+    this.starterpack = new StarterpackRecord(client)
   }
 
   getActorStarterPacks(
     params?: AppBskyGraphGetActorStarterPacks.QueryParams,
     opts?: AppBskyGraphGetActorStarterPacks.CallOptions,
   ): Promise<AppBskyGraphGetActorStarterPacks.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getActorStarterPacks', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetActorStarterPacks.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getActorStarterPacks',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getBlocks(
     params?: AppBskyGraphGetBlocks.QueryParams,
     opts?: AppBskyGraphGetBlocks.CallOptions,
   ): Promise<AppBskyGraphGetBlocks.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getBlocks', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetBlocks.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getBlocks',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getFollowers(
     params?: AppBskyGraphGetFollowers.QueryParams,
     opts?: AppBskyGraphGetFollowers.CallOptions,
   ): Promise<AppBskyGraphGetFollowers.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getFollowers', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetFollowers.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getFollowers',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getFollows(
     params?: AppBskyGraphGetFollows.QueryParams,
     opts?: AppBskyGraphGetFollows.CallOptions,
   ): Promise<AppBskyGraphGetFollows.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getFollows', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetFollows.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getFollows',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getKnownFollowers(
     params?: AppBskyGraphGetKnownFollowers.QueryParams,
     opts?: AppBskyGraphGetKnownFollowers.CallOptions,
   ): Promise<AppBskyGraphGetKnownFollowers.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getKnownFollowers', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetKnownFollowers.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getKnownFollowers',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getList(
     params?: AppBskyGraphGetList.QueryParams,
     opts?: AppBskyGraphGetList.CallOptions,
   ): Promise<AppBskyGraphGetList.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getList', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetList.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.graph.getList', params, undefined, opts)
   }
 
   getListBlocks(
     params?: AppBskyGraphGetListBlocks.QueryParams,
     opts?: AppBskyGraphGetListBlocks.CallOptions,
   ): Promise<AppBskyGraphGetListBlocks.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getListBlocks', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetListBlocks.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getListBlocks',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getListMutes(
     params?: AppBskyGraphGetListMutes.QueryParams,
     opts?: AppBskyGraphGetListMutes.CallOptions,
   ): Promise<AppBskyGraphGetListMutes.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getListMutes', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetListMutes.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getListMutes',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getLists(
     params?: AppBskyGraphGetLists.QueryParams,
     opts?: AppBskyGraphGetLists.CallOptions,
   ): Promise<AppBskyGraphGetLists.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getLists', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetLists.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.graph.getLists', params, undefined, opts)
   }
 
   getMutes(
     params?: AppBskyGraphGetMutes.QueryParams,
     opts?: AppBskyGraphGetMutes.CallOptions,
   ): Promise<AppBskyGraphGetMutes.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getMutes', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetMutes.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.graph.getMutes', params, undefined, opts)
   }
 
   getRelationships(
     params?: AppBskyGraphGetRelationships.QueryParams,
     opts?: AppBskyGraphGetRelationships.CallOptions,
   ): Promise<AppBskyGraphGetRelationships.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.graph.getRelationships', params, undefined, opts)
       .catch((e) => {
         throw AppBskyGraphGetRelationships.toKnownErr(e)
@@ -1258,112 +1243,101 @@ export class AppBskyGraphNS {
     params?: AppBskyGraphGetStarterPack.QueryParams,
     opts?: AppBskyGraphGetStarterPack.CallOptions,
   ): Promise<AppBskyGraphGetStarterPack.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getStarterPack', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetStarterPack.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getStarterPack',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getStarterPacks(
     params?: AppBskyGraphGetStarterPacks.QueryParams,
     opts?: AppBskyGraphGetStarterPacks.CallOptions,
   ): Promise<AppBskyGraphGetStarterPacks.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.getStarterPacks', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyGraphGetStarterPacks.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getStarterPacks',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getSuggestedFollowsByActor(
     params?: AppBskyGraphGetSuggestedFollowsByActor.QueryParams,
     opts?: AppBskyGraphGetSuggestedFollowsByActor.CallOptions,
   ): Promise<AppBskyGraphGetSuggestedFollowsByActor.Response> {
-    return this._service.xrpc
-      .call(
-        'app.bsky.graph.getSuggestedFollowsByActor',
-        params,
-        undefined,
-        opts,
-      )
-      .catch((e) => {
-        throw AppBskyGraphGetSuggestedFollowsByActor.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.getSuggestedFollowsByActor',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   muteActor(
     data?: AppBskyGraphMuteActor.InputSchema,
     opts?: AppBskyGraphMuteActor.CallOptions,
   ): Promise<AppBskyGraphMuteActor.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.muteActor', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyGraphMuteActor.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.graph.muteActor', opts?.qp, data, opts)
   }
 
   muteActorList(
     data?: AppBskyGraphMuteActorList.InputSchema,
     opts?: AppBskyGraphMuteActorList.CallOptions,
   ): Promise<AppBskyGraphMuteActorList.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.muteActorList', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyGraphMuteActorList.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.muteActorList',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   muteThread(
     data?: AppBskyGraphMuteThread.InputSchema,
     opts?: AppBskyGraphMuteThread.CallOptions,
   ): Promise<AppBskyGraphMuteThread.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.muteThread', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyGraphMuteThread.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.graph.muteThread', opts?.qp, data, opts)
   }
 
   unmuteActor(
     data?: AppBskyGraphUnmuteActor.InputSchema,
     opts?: AppBskyGraphUnmuteActor.CallOptions,
   ): Promise<AppBskyGraphUnmuteActor.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.unmuteActor', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyGraphUnmuteActor.toKnownErr(e)
-      })
+    return this._client.call('app.bsky.graph.unmuteActor', opts?.qp, data, opts)
   }
 
   unmuteActorList(
     data?: AppBskyGraphUnmuteActorList.InputSchema,
     opts?: AppBskyGraphUnmuteActorList.CallOptions,
   ): Promise<AppBskyGraphUnmuteActorList.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.unmuteActorList', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyGraphUnmuteActorList.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.unmuteActorList',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   unmuteThread(
     data?: AppBskyGraphUnmuteThread.InputSchema,
     opts?: AppBskyGraphUnmuteThread.CallOptions,
   ): Promise<AppBskyGraphUnmuteThread.Response> {
-    return this._service.xrpc
-      .call('app.bsky.graph.unmuteThread', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyGraphUnmuteThread.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.graph.unmuteThread',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class BlockRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1372,7 +1346,7 @@ export class BlockRecord {
     cursor?: string
     records: { uri: string; value: AppBskyGraphBlock.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.graph.block',
       ...params,
     })
@@ -1382,7 +1356,7 @@ export class BlockRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphBlock.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.graph.block',
       ...params,
     })
@@ -1398,7 +1372,7 @@ export class BlockRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.graph.block'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.graph.block', ...params, record },
@@ -1411,7 +1385,7 @@ export class BlockRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.graph.block', ...params },
@@ -1421,10 +1395,10 @@ export class BlockRecord {
 }
 
 export class FollowRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1433,7 +1407,7 @@ export class FollowRecord {
     cursor?: string
     records: { uri: string; value: AppBskyGraphFollow.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.graph.follow',
       ...params,
     })
@@ -1443,7 +1417,7 @@ export class FollowRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphFollow.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.graph.follow',
       ...params,
     })
@@ -1459,7 +1433,7 @@ export class FollowRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.graph.follow'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.graph.follow', ...params, record },
@@ -1472,7 +1446,7 @@ export class FollowRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.graph.follow', ...params },
@@ -1482,10 +1456,10 @@ export class FollowRecord {
 }
 
 export class ListRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1494,7 +1468,7 @@ export class ListRecord {
     cursor?: string
     records: { uri: string; value: AppBskyGraphList.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.graph.list',
       ...params,
     })
@@ -1504,7 +1478,7 @@ export class ListRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphList.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.graph.list',
       ...params,
     })
@@ -1520,7 +1494,7 @@ export class ListRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.graph.list'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.graph.list', ...params, record },
@@ -1533,7 +1507,7 @@ export class ListRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.graph.list', ...params },
@@ -1543,10 +1517,10 @@ export class ListRecord {
 }
 
 export class ListblockRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1555,7 +1529,7 @@ export class ListblockRecord {
     cursor?: string
     records: { uri: string; value: AppBskyGraphListblock.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.graph.listblock',
       ...params,
     })
@@ -1569,7 +1543,7 @@ export class ListblockRecord {
     cid: string
     value: AppBskyGraphListblock.Record
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.graph.listblock',
       ...params,
     })
@@ -1585,7 +1559,7 @@ export class ListblockRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.graph.listblock'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.graph.listblock', ...params, record },
@@ -1598,7 +1572,7 @@ export class ListblockRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.graph.listblock', ...params },
@@ -1608,10 +1582,10 @@ export class ListblockRecord {
 }
 
 export class ListitemRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1620,7 +1594,7 @@ export class ListitemRecord {
     cursor?: string
     records: { uri: string; value: AppBskyGraphListitem.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.graph.listitem',
       ...params,
     })
@@ -1630,7 +1604,7 @@ export class ListitemRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphListitem.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.graph.listitem',
       ...params,
     })
@@ -1646,7 +1620,7 @@ export class ListitemRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.graph.listitem'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.graph.listitem', ...params, record },
@@ -1659,7 +1633,7 @@ export class ListitemRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.graph.listitem', ...params },
@@ -1669,10 +1643,10 @@ export class ListitemRecord {
 }
 
 export class StarterpackRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1681,7 +1655,7 @@ export class StarterpackRecord {
     cursor?: string
     records: { uri: string; value: AppBskyGraphStarterpack.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.graph.starterpack',
       ...params,
     })
@@ -1695,7 +1669,7 @@ export class StarterpackRecord {
     cid: string
     value: AppBskyGraphStarterpack.Record
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.graph.starterpack',
       ...params,
     })
@@ -1711,7 +1685,7 @@ export class StarterpackRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.graph.starterpack'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'app.bsky.graph.starterpack', ...params, record },
@@ -1724,7 +1698,7 @@ export class StarterpackRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.graph.starterpack', ...params },
@@ -1734,31 +1708,32 @@ export class StarterpackRecord {
 }
 
 export class AppBskyLabelerNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   service: ServiceRecord
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.service = new ServiceRecord(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.service = new ServiceRecord(client)
   }
 
   getServices(
     params?: AppBskyLabelerGetServices.QueryParams,
     opts?: AppBskyLabelerGetServices.CallOptions,
   ): Promise<AppBskyLabelerGetServices.Response> {
-    return this._service.xrpc
-      .call('app.bsky.labeler.getServices', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyLabelerGetServices.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.labeler.getServices',
+      params,
+      undefined,
+      opts,
+    )
   }
 }
 
 export class ServiceRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -1767,7 +1742,7 @@ export class ServiceRecord {
     cursor?: string
     records: { uri: string; value: AppBskyLabelerService.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'app.bsky.labeler.service',
       ...params,
     })
@@ -1781,7 +1756,7 @@ export class ServiceRecord {
     cid: string
     value: AppBskyLabelerService.Record
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'app.bsky.labeler.service',
       ...params,
     })
@@ -1797,7 +1772,7 @@ export class ServiceRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'app.bsky.labeler.service'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       {
@@ -1815,7 +1790,7 @@ export class ServiceRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'app.bsky.labeler.service', ...params },
@@ -1825,131 +1800,129 @@ export class ServiceRecord {
 }
 
 export class AppBskyNotificationNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   getUnreadCount(
     params?: AppBskyNotificationGetUnreadCount.QueryParams,
     opts?: AppBskyNotificationGetUnreadCount.CallOptions,
   ): Promise<AppBskyNotificationGetUnreadCount.Response> {
-    return this._service.xrpc
-      .call('app.bsky.notification.getUnreadCount', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyNotificationGetUnreadCount.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.notification.getUnreadCount',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   listNotifications(
     params?: AppBskyNotificationListNotifications.QueryParams,
     opts?: AppBskyNotificationListNotifications.CallOptions,
   ): Promise<AppBskyNotificationListNotifications.Response> {
-    return this._service.xrpc
-      .call('app.bsky.notification.listNotifications', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyNotificationListNotifications.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.notification.listNotifications',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   putPreferences(
     data?: AppBskyNotificationPutPreferences.InputSchema,
     opts?: AppBskyNotificationPutPreferences.CallOptions,
   ): Promise<AppBskyNotificationPutPreferences.Response> {
-    return this._service.xrpc
-      .call('app.bsky.notification.putPreferences', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyNotificationPutPreferences.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.notification.putPreferences',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   registerPush(
     data?: AppBskyNotificationRegisterPush.InputSchema,
     opts?: AppBskyNotificationRegisterPush.CallOptions,
   ): Promise<AppBskyNotificationRegisterPush.Response> {
-    return this._service.xrpc
-      .call('app.bsky.notification.registerPush', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyNotificationRegisterPush.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.notification.registerPush',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   updateSeen(
     data?: AppBskyNotificationUpdateSeen.InputSchema,
     opts?: AppBskyNotificationUpdateSeen.CallOptions,
   ): Promise<AppBskyNotificationUpdateSeen.Response> {
-    return this._service.xrpc
-      .call('app.bsky.notification.updateSeen', opts?.qp, data, opts)
-      .catch((e) => {
-        throw AppBskyNotificationUpdateSeen.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.notification.updateSeen',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class AppBskyRichtextNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 }
 
 export class AppBskyUnspeccedNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   getPopularFeedGenerators(
     params?: AppBskyUnspeccedGetPopularFeedGenerators.QueryParams,
     opts?: AppBskyUnspeccedGetPopularFeedGenerators.CallOptions,
   ): Promise<AppBskyUnspeccedGetPopularFeedGenerators.Response> {
-    return this._service.xrpc
-      .call(
-        'app.bsky.unspecced.getPopularFeedGenerators',
-        params,
-        undefined,
-        opts,
-      )
-      .catch((e) => {
-        throw AppBskyUnspeccedGetPopularFeedGenerators.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.unspecced.getPopularFeedGenerators',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getSuggestionsSkeleton(
     params?: AppBskyUnspeccedGetSuggestionsSkeleton.QueryParams,
     opts?: AppBskyUnspeccedGetSuggestionsSkeleton.CallOptions,
   ): Promise<AppBskyUnspeccedGetSuggestionsSkeleton.Response> {
-    return this._service.xrpc
-      .call(
-        'app.bsky.unspecced.getSuggestionsSkeleton',
-        params,
-        undefined,
-        opts,
-      )
-      .catch((e) => {
-        throw AppBskyUnspeccedGetSuggestionsSkeleton.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.unspecced.getSuggestionsSkeleton',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getTaggedSuggestions(
     params?: AppBskyUnspeccedGetTaggedSuggestions.QueryParams,
     opts?: AppBskyUnspeccedGetTaggedSuggestions.CallOptions,
   ): Promise<AppBskyUnspeccedGetTaggedSuggestions.Response> {
-    return this._service.xrpc
-      .call('app.bsky.unspecced.getTaggedSuggestions', params, undefined, opts)
-      .catch((e) => {
-        throw AppBskyUnspeccedGetTaggedSuggestions.toKnownErr(e)
-      })
+    return this._client.call(
+      'app.bsky.unspecced.getTaggedSuggestions',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   searchActorsSkeleton(
     params?: AppBskyUnspeccedSearchActorsSkeleton.QueryParams,
     opts?: AppBskyUnspeccedSearchActorsSkeleton.CallOptions,
   ): Promise<AppBskyUnspeccedSearchActorsSkeleton.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.unspecced.searchActorsSkeleton', params, undefined, opts)
       .catch((e) => {
         throw AppBskyUnspeccedSearchActorsSkeleton.toKnownErr(e)
@@ -1960,7 +1933,7 @@ export class AppBskyUnspeccedNS {
     params?: AppBskyUnspeccedSearchPostsSkeleton.QueryParams,
     opts?: AppBskyUnspeccedSearchPostsSkeleton.CallOptions,
   ): Promise<AppBskyUnspeccedSearchPostsSkeleton.Response> {
-    return this._service.xrpc
+    return this._client
       .call('app.bsky.unspecced.searchPostsSkeleton', params, undefined, opts)
       .catch((e) => {
         throw AppBskyUnspeccedSearchPostsSkeleton.toKnownErr(e)
@@ -1969,17 +1942,17 @@ export class AppBskyUnspeccedNS {
 }
 
 export class ComNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   atproto: ComAtprotoNS
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.atproto = new ComAtprotoNS(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.atproto = new ComAtprotoNS(client)
   }
 }
 
 export class ComAtprotoNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   admin: ComAtprotoAdminNS
   identity: ComAtprotoIdentityNS
   label: ComAtprotoLabelNS
@@ -1989,315 +1962,327 @@ export class ComAtprotoNS {
   sync: ComAtprotoSyncNS
   temp: ComAtprotoTempNS
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.admin = new ComAtprotoAdminNS(service)
-    this.identity = new ComAtprotoIdentityNS(service)
-    this.label = new ComAtprotoLabelNS(service)
-    this.moderation = new ComAtprotoModerationNS(service)
-    this.repo = new ComAtprotoRepoNS(service)
-    this.server = new ComAtprotoServerNS(service)
-    this.sync = new ComAtprotoSyncNS(service)
-    this.temp = new ComAtprotoTempNS(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.admin = new ComAtprotoAdminNS(client)
+    this.identity = new ComAtprotoIdentityNS(client)
+    this.label = new ComAtprotoLabelNS(client)
+    this.moderation = new ComAtprotoModerationNS(client)
+    this.repo = new ComAtprotoRepoNS(client)
+    this.server = new ComAtprotoServerNS(client)
+    this.sync = new ComAtprotoSyncNS(client)
+    this.temp = new ComAtprotoTempNS(client)
   }
 }
 
 export class ComAtprotoAdminNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   deleteAccount(
     data?: ComAtprotoAdminDeleteAccount.InputSchema,
     opts?: ComAtprotoAdminDeleteAccount.CallOptions,
   ): Promise<ComAtprotoAdminDeleteAccount.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.deleteAccount', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminDeleteAccount.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.deleteAccount',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   disableAccountInvites(
     data?: ComAtprotoAdminDisableAccountInvites.InputSchema,
     opts?: ComAtprotoAdminDisableAccountInvites.CallOptions,
   ): Promise<ComAtprotoAdminDisableAccountInvites.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.disableAccountInvites', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminDisableAccountInvites.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.disableAccountInvites',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   disableInviteCodes(
     data?: ComAtprotoAdminDisableInviteCodes.InputSchema,
     opts?: ComAtprotoAdminDisableInviteCodes.CallOptions,
   ): Promise<ComAtprotoAdminDisableInviteCodes.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.disableInviteCodes', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminDisableInviteCodes.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.disableInviteCodes',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   enableAccountInvites(
     data?: ComAtprotoAdminEnableAccountInvites.InputSchema,
     opts?: ComAtprotoAdminEnableAccountInvites.CallOptions,
   ): Promise<ComAtprotoAdminEnableAccountInvites.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.enableAccountInvites', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminEnableAccountInvites.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.enableAccountInvites',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   getAccountInfo(
     params?: ComAtprotoAdminGetAccountInfo.QueryParams,
     opts?: ComAtprotoAdminGetAccountInfo.CallOptions,
   ): Promise<ComAtprotoAdminGetAccountInfo.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.getAccountInfo', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminGetAccountInfo.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.getAccountInfo',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getAccountInfos(
     params?: ComAtprotoAdminGetAccountInfos.QueryParams,
     opts?: ComAtprotoAdminGetAccountInfos.CallOptions,
   ): Promise<ComAtprotoAdminGetAccountInfos.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.getAccountInfos', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminGetAccountInfos.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.getAccountInfos',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getInviteCodes(
     params?: ComAtprotoAdminGetInviteCodes.QueryParams,
     opts?: ComAtprotoAdminGetInviteCodes.CallOptions,
   ): Promise<ComAtprotoAdminGetInviteCodes.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.getInviteCodes', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminGetInviteCodes.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.getInviteCodes',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getSubjectStatus(
     params?: ComAtprotoAdminGetSubjectStatus.QueryParams,
     opts?: ComAtprotoAdminGetSubjectStatus.CallOptions,
   ): Promise<ComAtprotoAdminGetSubjectStatus.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.getSubjectStatus', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminGetSubjectStatus.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.getSubjectStatus',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   searchAccounts(
     params?: ComAtprotoAdminSearchAccounts.QueryParams,
     opts?: ComAtprotoAdminSearchAccounts.CallOptions,
   ): Promise<ComAtprotoAdminSearchAccounts.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.searchAccounts', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminSearchAccounts.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.searchAccounts',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   sendEmail(
     data?: ComAtprotoAdminSendEmail.InputSchema,
     opts?: ComAtprotoAdminSendEmail.CallOptions,
   ): Promise<ComAtprotoAdminSendEmail.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.sendEmail', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminSendEmail.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.sendEmail',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   updateAccountEmail(
     data?: ComAtprotoAdminUpdateAccountEmail.InputSchema,
     opts?: ComAtprotoAdminUpdateAccountEmail.CallOptions,
   ): Promise<ComAtprotoAdminUpdateAccountEmail.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.updateAccountEmail', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminUpdateAccountEmail.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.updateAccountEmail',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   updateAccountHandle(
     data?: ComAtprotoAdminUpdateAccountHandle.InputSchema,
     opts?: ComAtprotoAdminUpdateAccountHandle.CallOptions,
   ): Promise<ComAtprotoAdminUpdateAccountHandle.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.updateAccountHandle', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminUpdateAccountHandle.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.updateAccountHandle',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   updateAccountPassword(
     data?: ComAtprotoAdminUpdateAccountPassword.InputSchema,
     opts?: ComAtprotoAdminUpdateAccountPassword.CallOptions,
   ): Promise<ComAtprotoAdminUpdateAccountPassword.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.updateAccountPassword', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminUpdateAccountPassword.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.updateAccountPassword',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   updateSubjectStatus(
     data?: ComAtprotoAdminUpdateSubjectStatus.InputSchema,
     opts?: ComAtprotoAdminUpdateSubjectStatus.CallOptions,
   ): Promise<ComAtprotoAdminUpdateSubjectStatus.Response> {
-    return this._service.xrpc
-      .call('com.atproto.admin.updateSubjectStatus', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoAdminUpdateSubjectStatus.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.admin.updateSubjectStatus',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class ComAtprotoIdentityNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   getRecommendedDidCredentials(
     params?: ComAtprotoIdentityGetRecommendedDidCredentials.QueryParams,
     opts?: ComAtprotoIdentityGetRecommendedDidCredentials.CallOptions,
   ): Promise<ComAtprotoIdentityGetRecommendedDidCredentials.Response> {
-    return this._service.xrpc
-      .call(
-        'com.atproto.identity.getRecommendedDidCredentials',
-        params,
-        undefined,
-        opts,
-      )
-      .catch((e) => {
-        throw ComAtprotoIdentityGetRecommendedDidCredentials.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.identity.getRecommendedDidCredentials',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   requestPlcOperationSignature(
     data?: ComAtprotoIdentityRequestPlcOperationSignature.InputSchema,
     opts?: ComAtprotoIdentityRequestPlcOperationSignature.CallOptions,
   ): Promise<ComAtprotoIdentityRequestPlcOperationSignature.Response> {
-    return this._service.xrpc
-      .call(
-        'com.atproto.identity.requestPlcOperationSignature',
-        opts?.qp,
-        data,
-        opts,
-      )
-      .catch((e) => {
-        throw ComAtprotoIdentityRequestPlcOperationSignature.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.identity.requestPlcOperationSignature',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   resolveHandle(
     params?: ComAtprotoIdentityResolveHandle.QueryParams,
     opts?: ComAtprotoIdentityResolveHandle.CallOptions,
   ): Promise<ComAtprotoIdentityResolveHandle.Response> {
-    return this._service.xrpc
-      .call('com.atproto.identity.resolveHandle', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoIdentityResolveHandle.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.identity.resolveHandle',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   signPlcOperation(
     data?: ComAtprotoIdentitySignPlcOperation.InputSchema,
     opts?: ComAtprotoIdentitySignPlcOperation.CallOptions,
   ): Promise<ComAtprotoIdentitySignPlcOperation.Response> {
-    return this._service.xrpc
-      .call('com.atproto.identity.signPlcOperation', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoIdentitySignPlcOperation.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.identity.signPlcOperation',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   submitPlcOperation(
     data?: ComAtprotoIdentitySubmitPlcOperation.InputSchema,
     opts?: ComAtprotoIdentitySubmitPlcOperation.CallOptions,
   ): Promise<ComAtprotoIdentitySubmitPlcOperation.Response> {
-    return this._service.xrpc
-      .call('com.atproto.identity.submitPlcOperation', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoIdentitySubmitPlcOperation.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.identity.submitPlcOperation',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   updateHandle(
     data?: ComAtprotoIdentityUpdateHandle.InputSchema,
     opts?: ComAtprotoIdentityUpdateHandle.CallOptions,
   ): Promise<ComAtprotoIdentityUpdateHandle.Response> {
-    return this._service.xrpc
-      .call('com.atproto.identity.updateHandle', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoIdentityUpdateHandle.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.identity.updateHandle',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class ComAtprotoLabelNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   queryLabels(
     params?: ComAtprotoLabelQueryLabels.QueryParams,
     opts?: ComAtprotoLabelQueryLabels.CallOptions,
   ): Promise<ComAtprotoLabelQueryLabels.Response> {
-    return this._service.xrpc
-      .call('com.atproto.label.queryLabels', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoLabelQueryLabels.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.label.queryLabels',
+      params,
+      undefined,
+      opts,
+    )
   }
 }
 
 export class ComAtprotoModerationNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   createReport(
     data?: ComAtprotoModerationCreateReport.InputSchema,
     opts?: ComAtprotoModerationCreateReport.CallOptions,
   ): Promise<ComAtprotoModerationCreateReport.Response> {
-    return this._service.xrpc
-      .call('com.atproto.moderation.createReport', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoModerationCreateReport.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.moderation.createReport',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class ComAtprotoRepoNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   applyWrites(
     data?: ComAtprotoRepoApplyWrites.InputSchema,
     opts?: ComAtprotoRepoApplyWrites.CallOptions,
   ): Promise<ComAtprotoRepoApplyWrites.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.repo.applyWrites', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoRepoApplyWrites.toKnownErr(e)
@@ -2308,7 +2293,7 @@ export class ComAtprotoRepoNS {
     data?: ComAtprotoRepoCreateRecord.InputSchema,
     opts?: ComAtprotoRepoCreateRecord.CallOptions,
   ): Promise<ComAtprotoRepoCreateRecord.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.repo.createRecord', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoRepoCreateRecord.toKnownErr(e)
@@ -2319,7 +2304,7 @@ export class ComAtprotoRepoNS {
     data?: ComAtprotoRepoDeleteRecord.InputSchema,
     opts?: ComAtprotoRepoDeleteRecord.CallOptions,
   ): Promise<ComAtprotoRepoDeleteRecord.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.repo.deleteRecord', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoRepoDeleteRecord.toKnownErr(e)
@@ -2330,62 +2315,67 @@ export class ComAtprotoRepoNS {
     params?: ComAtprotoRepoDescribeRepo.QueryParams,
     opts?: ComAtprotoRepoDescribeRepo.CallOptions,
   ): Promise<ComAtprotoRepoDescribeRepo.Response> {
-    return this._service.xrpc
-      .call('com.atproto.repo.describeRepo', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoRepoDescribeRepo.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.repo.describeRepo',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getRecord(
     params?: ComAtprotoRepoGetRecord.QueryParams,
     opts?: ComAtprotoRepoGetRecord.CallOptions,
   ): Promise<ComAtprotoRepoGetRecord.Response> {
-    return this._service.xrpc
-      .call('com.atproto.repo.getRecord', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoRepoGetRecord.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.repo.getRecord',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   importRepo(
     data?: ComAtprotoRepoImportRepo.InputSchema,
     opts?: ComAtprotoRepoImportRepo.CallOptions,
   ): Promise<ComAtprotoRepoImportRepo.Response> {
-    return this._service.xrpc
-      .call('com.atproto.repo.importRepo', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoRepoImportRepo.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.repo.importRepo',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   listMissingBlobs(
     params?: ComAtprotoRepoListMissingBlobs.QueryParams,
     opts?: ComAtprotoRepoListMissingBlobs.CallOptions,
   ): Promise<ComAtprotoRepoListMissingBlobs.Response> {
-    return this._service.xrpc
-      .call('com.atproto.repo.listMissingBlobs', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoRepoListMissingBlobs.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.repo.listMissingBlobs',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   listRecords(
     params?: ComAtprotoRepoListRecords.QueryParams,
     opts?: ComAtprotoRepoListRecords.CallOptions,
   ): Promise<ComAtprotoRepoListRecords.Response> {
-    return this._service.xrpc
-      .call('com.atproto.repo.listRecords', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoRepoListRecords.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.repo.listRecords',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   putRecord(
     data?: ComAtprotoRepoPutRecord.InputSchema,
     opts?: ComAtprotoRepoPutRecord.CallOptions,
   ): Promise<ComAtprotoRepoPutRecord.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.repo.putRecord', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoRepoPutRecord.toKnownErr(e)
@@ -2396,48 +2386,51 @@ export class ComAtprotoRepoNS {
     data?: ComAtprotoRepoUploadBlob.InputSchema,
     opts?: ComAtprotoRepoUploadBlob.CallOptions,
   ): Promise<ComAtprotoRepoUploadBlob.Response> {
-    return this._service.xrpc
-      .call('com.atproto.repo.uploadBlob', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoRepoUploadBlob.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.repo.uploadBlob',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class ComAtprotoServerNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   activateAccount(
     data?: ComAtprotoServerActivateAccount.InputSchema,
     opts?: ComAtprotoServerActivateAccount.CallOptions,
   ): Promise<ComAtprotoServerActivateAccount.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.activateAccount', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerActivateAccount.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.activateAccount',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   checkAccountStatus(
     params?: ComAtprotoServerCheckAccountStatus.QueryParams,
     opts?: ComAtprotoServerCheckAccountStatus.CallOptions,
   ): Promise<ComAtprotoServerCheckAccountStatus.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.checkAccountStatus', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoServerCheckAccountStatus.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.checkAccountStatus',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   confirmEmail(
     data?: ComAtprotoServerConfirmEmail.InputSchema,
     opts?: ComAtprotoServerConfirmEmail.CallOptions,
   ): Promise<ComAtprotoServerConfirmEmail.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.confirmEmail', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerConfirmEmail.toKnownErr(e)
@@ -2448,7 +2441,7 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerCreateAccount.InputSchema,
     opts?: ComAtprotoServerCreateAccount.CallOptions,
   ): Promise<ComAtprotoServerCreateAccount.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.createAccount', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerCreateAccount.toKnownErr(e)
@@ -2459,7 +2452,7 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerCreateAppPassword.InputSchema,
     opts?: ComAtprotoServerCreateAppPassword.CallOptions,
   ): Promise<ComAtprotoServerCreateAppPassword.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.createAppPassword', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerCreateAppPassword.toKnownErr(e)
@@ -2470,29 +2463,31 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerCreateInviteCode.InputSchema,
     opts?: ComAtprotoServerCreateInviteCode.CallOptions,
   ): Promise<ComAtprotoServerCreateInviteCode.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.createInviteCode', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerCreateInviteCode.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.createInviteCode',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   createInviteCodes(
     data?: ComAtprotoServerCreateInviteCodes.InputSchema,
     opts?: ComAtprotoServerCreateInviteCodes.CallOptions,
   ): Promise<ComAtprotoServerCreateInviteCodes.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.createInviteCodes', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerCreateInviteCodes.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.createInviteCodes',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   createSession(
     data?: ComAtprotoServerCreateSession.InputSchema,
     opts?: ComAtprotoServerCreateSession.CallOptions,
   ): Promise<ComAtprotoServerCreateSession.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.createSession', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerCreateSession.toKnownErr(e)
@@ -2503,18 +2498,19 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerDeactivateAccount.InputSchema,
     opts?: ComAtprotoServerDeactivateAccount.CallOptions,
   ): Promise<ComAtprotoServerDeactivateAccount.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.deactivateAccount', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerDeactivateAccount.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.deactivateAccount',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   deleteAccount(
     data?: ComAtprotoServerDeleteAccount.InputSchema,
     opts?: ComAtprotoServerDeleteAccount.CallOptions,
   ): Promise<ComAtprotoServerDeleteAccount.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.deleteAccount', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerDeleteAccount.toKnownErr(e)
@@ -2525,29 +2521,31 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerDeleteSession.InputSchema,
     opts?: ComAtprotoServerDeleteSession.CallOptions,
   ): Promise<ComAtprotoServerDeleteSession.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.deleteSession', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerDeleteSession.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.deleteSession',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   describeServer(
     params?: ComAtprotoServerDescribeServer.QueryParams,
     opts?: ComAtprotoServerDescribeServer.CallOptions,
   ): Promise<ComAtprotoServerDescribeServer.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.describeServer', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoServerDescribeServer.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.describeServer',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getAccountInviteCodes(
     params?: ComAtprotoServerGetAccountInviteCodes.QueryParams,
     opts?: ComAtprotoServerGetAccountInviteCodes.CallOptions,
   ): Promise<ComAtprotoServerGetAccountInviteCodes.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.getAccountInviteCodes', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoServerGetAccountInviteCodes.toKnownErr(e)
@@ -2558,7 +2556,7 @@ export class ComAtprotoServerNS {
     params?: ComAtprotoServerGetServiceAuth.QueryParams,
     opts?: ComAtprotoServerGetServiceAuth.CallOptions,
   ): Promise<ComAtprotoServerGetServiceAuth.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.getServiceAuth', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoServerGetServiceAuth.toKnownErr(e)
@@ -2569,18 +2567,19 @@ export class ComAtprotoServerNS {
     params?: ComAtprotoServerGetSession.QueryParams,
     opts?: ComAtprotoServerGetSession.CallOptions,
   ): Promise<ComAtprotoServerGetSession.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.getSession', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoServerGetSession.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.getSession',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   listAppPasswords(
     params?: ComAtprotoServerListAppPasswords.QueryParams,
     opts?: ComAtprotoServerListAppPasswords.CallOptions,
   ): Promise<ComAtprotoServerListAppPasswords.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.listAppPasswords', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoServerListAppPasswords.toKnownErr(e)
@@ -2591,7 +2590,7 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerRefreshSession.InputSchema,
     opts?: ComAtprotoServerRefreshSession.CallOptions,
   ): Promise<ComAtprotoServerRefreshSession.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.refreshSession', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerRefreshSession.toKnownErr(e)
@@ -2602,62 +2601,67 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerRequestAccountDelete.InputSchema,
     opts?: ComAtprotoServerRequestAccountDelete.CallOptions,
   ): Promise<ComAtprotoServerRequestAccountDelete.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.requestAccountDelete', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerRequestAccountDelete.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.requestAccountDelete',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   requestEmailConfirmation(
     data?: ComAtprotoServerRequestEmailConfirmation.InputSchema,
     opts?: ComAtprotoServerRequestEmailConfirmation.CallOptions,
   ): Promise<ComAtprotoServerRequestEmailConfirmation.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.requestEmailConfirmation', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerRequestEmailConfirmation.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.requestEmailConfirmation',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   requestEmailUpdate(
     data?: ComAtprotoServerRequestEmailUpdate.InputSchema,
     opts?: ComAtprotoServerRequestEmailUpdate.CallOptions,
   ): Promise<ComAtprotoServerRequestEmailUpdate.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.requestEmailUpdate', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerRequestEmailUpdate.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.requestEmailUpdate',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   requestPasswordReset(
     data?: ComAtprotoServerRequestPasswordReset.InputSchema,
     opts?: ComAtprotoServerRequestPasswordReset.CallOptions,
   ): Promise<ComAtprotoServerRequestPasswordReset.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.requestPasswordReset', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerRequestPasswordReset.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.requestPasswordReset',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   reserveSigningKey(
     data?: ComAtprotoServerReserveSigningKey.InputSchema,
     opts?: ComAtprotoServerReserveSigningKey.CallOptions,
   ): Promise<ComAtprotoServerReserveSigningKey.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.reserveSigningKey', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerReserveSigningKey.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.reserveSigningKey',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   resetPassword(
     data?: ComAtprotoServerResetPassword.InputSchema,
     opts?: ComAtprotoServerResetPassword.CallOptions,
   ): Promise<ComAtprotoServerResetPassword.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.resetPassword', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerResetPassword.toKnownErr(e)
@@ -2668,18 +2672,19 @@ export class ComAtprotoServerNS {
     data?: ComAtprotoServerRevokeAppPassword.InputSchema,
     opts?: ComAtprotoServerRevokeAppPassword.CallOptions,
   ): Promise<ComAtprotoServerRevokeAppPassword.Response> {
-    return this._service.xrpc
-      .call('com.atproto.server.revokeAppPassword', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoServerRevokeAppPassword.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.server.revokeAppPassword',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   updateEmail(
     data?: ComAtprotoServerUpdateEmail.InputSchema,
     opts?: ComAtprotoServerUpdateEmail.CallOptions,
   ): Promise<ComAtprotoServerUpdateEmail.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.server.updateEmail', opts?.qp, data, opts)
       .catch((e) => {
         throw ComAtprotoServerUpdateEmail.toKnownErr(e)
@@ -2688,17 +2693,17 @@ export class ComAtprotoServerNS {
 }
 
 export class ComAtprotoSyncNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   getBlob(
     params?: ComAtprotoSyncGetBlob.QueryParams,
     opts?: ComAtprotoSyncGetBlob.CallOptions,
   ): Promise<ComAtprotoSyncGetBlob.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.getBlob', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncGetBlob.toKnownErr(e)
@@ -2709,7 +2714,7 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncGetBlocks.QueryParams,
     opts?: ComAtprotoSyncGetBlocks.CallOptions,
   ): Promise<ComAtprotoSyncGetBlocks.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.getBlocks', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncGetBlocks.toKnownErr(e)
@@ -2720,18 +2725,19 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncGetCheckout.QueryParams,
     opts?: ComAtprotoSyncGetCheckout.CallOptions,
   ): Promise<ComAtprotoSyncGetCheckout.Response> {
-    return this._service.xrpc
-      .call('com.atproto.sync.getCheckout', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoSyncGetCheckout.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.sync.getCheckout',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getHead(
     params?: ComAtprotoSyncGetHead.QueryParams,
     opts?: ComAtprotoSyncGetHead.CallOptions,
   ): Promise<ComAtprotoSyncGetHead.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.getHead', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncGetHead.toKnownErr(e)
@@ -2742,7 +2748,7 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncGetLatestCommit.QueryParams,
     opts?: ComAtprotoSyncGetLatestCommit.CallOptions,
   ): Promise<ComAtprotoSyncGetLatestCommit.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.getLatestCommit', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncGetLatestCommit.toKnownErr(e)
@@ -2753,7 +2759,7 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncGetRecord.QueryParams,
     opts?: ComAtprotoSyncGetRecord.CallOptions,
   ): Promise<ComAtprotoSyncGetRecord.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.getRecord', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncGetRecord.toKnownErr(e)
@@ -2764,7 +2770,7 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncGetRepo.QueryParams,
     opts?: ComAtprotoSyncGetRepo.CallOptions,
   ): Promise<ComAtprotoSyncGetRepo.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.getRepo', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncGetRepo.toKnownErr(e)
@@ -2775,7 +2781,7 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncGetRepoStatus.QueryParams,
     opts?: ComAtprotoSyncGetRepoStatus.CallOptions,
   ): Promise<ComAtprotoSyncGetRepoStatus.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.getRepoStatus', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncGetRepoStatus.toKnownErr(e)
@@ -2786,7 +2792,7 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncListBlobs.QueryParams,
     opts?: ComAtprotoSyncListBlobs.CallOptions,
   ): Promise<ComAtprotoSyncListBlobs.Response> {
-    return this._service.xrpc
+    return this._client
       .call('com.atproto.sync.listBlobs', params, undefined, opts)
       .catch((e) => {
         throw ComAtprotoSyncListBlobs.toKnownErr(e)
@@ -2797,148 +2803,157 @@ export class ComAtprotoSyncNS {
     params?: ComAtprotoSyncListRepos.QueryParams,
     opts?: ComAtprotoSyncListRepos.CallOptions,
   ): Promise<ComAtprotoSyncListRepos.Response> {
-    return this._service.xrpc
-      .call('com.atproto.sync.listRepos', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoSyncListRepos.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.sync.listRepos',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   notifyOfUpdate(
     data?: ComAtprotoSyncNotifyOfUpdate.InputSchema,
     opts?: ComAtprotoSyncNotifyOfUpdate.CallOptions,
   ): Promise<ComAtprotoSyncNotifyOfUpdate.Response> {
-    return this._service.xrpc
-      .call('com.atproto.sync.notifyOfUpdate', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoSyncNotifyOfUpdate.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.sync.notifyOfUpdate',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   requestCrawl(
     data?: ComAtprotoSyncRequestCrawl.InputSchema,
     opts?: ComAtprotoSyncRequestCrawl.CallOptions,
   ): Promise<ComAtprotoSyncRequestCrawl.Response> {
-    return this._service.xrpc
-      .call('com.atproto.sync.requestCrawl', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoSyncRequestCrawl.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.sync.requestCrawl',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class ComAtprotoTempNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   checkSignupQueue(
     params?: ComAtprotoTempCheckSignupQueue.QueryParams,
     opts?: ComAtprotoTempCheckSignupQueue.CallOptions,
   ): Promise<ComAtprotoTempCheckSignupQueue.Response> {
-    return this._service.xrpc
-      .call('com.atproto.temp.checkSignupQueue', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoTempCheckSignupQueue.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.temp.checkSignupQueue',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   fetchLabels(
     params?: ComAtprotoTempFetchLabels.QueryParams,
     opts?: ComAtprotoTempFetchLabels.CallOptions,
   ): Promise<ComAtprotoTempFetchLabels.Response> {
-    return this._service.xrpc
-      .call('com.atproto.temp.fetchLabels', params, undefined, opts)
-      .catch((e) => {
-        throw ComAtprotoTempFetchLabels.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.temp.fetchLabels',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   requestPhoneVerification(
     data?: ComAtprotoTempRequestPhoneVerification.InputSchema,
     opts?: ComAtprotoTempRequestPhoneVerification.CallOptions,
   ): Promise<ComAtprotoTempRequestPhoneVerification.Response> {
-    return this._service.xrpc
-      .call('com.atproto.temp.requestPhoneVerification', opts?.qp, data, opts)
-      .catch((e) => {
-        throw ComAtprotoTempRequestPhoneVerification.toKnownErr(e)
-      })
+    return this._client.call(
+      'com.atproto.temp.requestPhoneVerification',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 }
 
 export class BlueNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   moji: BlueMojiNS
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.moji = new BlueMojiNS(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.moji = new BlueMojiNS(client)
   }
 }
 
 export class BlueMojiNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   collection: BlueMojiCollectionNS
   packs: BlueMojiPacksNS
   richtext: BlueMojiRichtextNS
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.collection = new BlueMojiCollectionNS(service)
-    this.packs = new BlueMojiPacksNS(service)
-    this.richtext = new BlueMojiRichtextNS(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.collection = new BlueMojiCollectionNS(client)
+    this.packs = new BlueMojiPacksNS(client)
+    this.richtext = new BlueMojiRichtextNS(client)
   }
 }
 
 export class BlueMojiCollectionNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   item: ItemRecord
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.item = new ItemRecord(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.item = new ItemRecord(client)
   }
 
   getItem(
     params?: BlueMojiCollectionGetItem.QueryParams,
     opts?: BlueMojiCollectionGetItem.CallOptions,
   ): Promise<BlueMojiCollectionGetItem.Response> {
-    return this._service.xrpc
-      .call('blue.moji.collection.getItem', params, undefined, opts)
-      .catch((e) => {
-        throw BlueMojiCollectionGetItem.toKnownErr(e)
-      })
+    return this._client.call(
+      'blue.moji.collection.getItem',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   listCollection(
     params?: BlueMojiCollectionListCollection.QueryParams,
     opts?: BlueMojiCollectionListCollection.CallOptions,
   ): Promise<BlueMojiCollectionListCollection.Response> {
-    return this._service.xrpc
-      .call('blue.moji.collection.listCollection', params, undefined, opts)
-      .catch((e) => {
-        throw BlueMojiCollectionListCollection.toKnownErr(e)
-      })
+    return this._client.call(
+      'blue.moji.collection.listCollection',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   putItem(
     data?: BlueMojiCollectionPutItem.InputSchema,
     opts?: BlueMojiCollectionPutItem.CallOptions,
   ): Promise<BlueMojiCollectionPutItem.Response> {
-    return this._service.xrpc
-      .call('blue.moji.collection.putItem', opts?.qp, data, opts)
-      .catch((e) => {
-        throw BlueMojiCollectionPutItem.toKnownErr(e)
-      })
+    return this._client.call(
+      'blue.moji.collection.putItem',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   saveToCollection(
     data?: BlueMojiCollectionSaveToCollection.InputSchema,
     opts?: BlueMojiCollectionSaveToCollection.CallOptions,
   ): Promise<BlueMojiCollectionSaveToCollection.Response> {
-    return this._service.xrpc
+    return this._client
       .call('blue.moji.collection.saveToCollection', opts?.qp, data, opts)
       .catch((e) => {
         throw BlueMojiCollectionSaveToCollection.toKnownErr(e)
@@ -2947,10 +2962,10 @@ export class BlueMojiCollectionNS {
 }
 
 export class ItemRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -2959,7 +2974,7 @@ export class ItemRecord {
     cursor?: string
     records: { uri: string; value: BlueMojiCollectionItem.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'blue.moji.collection.item',
       ...params,
     })
@@ -2973,7 +2988,7 @@ export class ItemRecord {
     cid: string
     value: BlueMojiCollectionItem.Record
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'blue.moji.collection.item',
       ...params,
     })
@@ -2989,7 +3004,7 @@ export class ItemRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'blue.moji.collection.item'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'blue.moji.collection.item', ...params, record },
@@ -3002,7 +3017,7 @@ export class ItemRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'blue.moji.collection.item', ...params },
@@ -3012,55 +3027,53 @@ export class ItemRecord {
 }
 
 export class BlueMojiPacksNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
   pack: PackRecord
   packitem: PackitemRecord
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
-    this.pack = new PackRecord(service)
-    this.packitem = new PackitemRecord(service)
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.pack = new PackRecord(client)
+    this.packitem = new PackitemRecord(client)
   }
 
   getActorPacks(
     params?: BlueMojiPacksGetActorPacks.QueryParams,
     opts?: BlueMojiPacksGetActorPacks.CallOptions,
   ): Promise<BlueMojiPacksGetActorPacks.Response> {
-    return this._service.xrpc
-      .call('blue.moji.packs.getActorPacks', params, undefined, opts)
-      .catch((e) => {
-        throw BlueMojiPacksGetActorPacks.toKnownErr(e)
-      })
+    return this._client.call(
+      'blue.moji.packs.getActorPacks',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getPack(
     params?: BlueMojiPacksGetPack.QueryParams,
     opts?: BlueMojiPacksGetPack.CallOptions,
   ): Promise<BlueMojiPacksGetPack.Response> {
-    return this._service.xrpc
-      .call('blue.moji.packs.getPack', params, undefined, opts)
-      .catch((e) => {
-        throw BlueMojiPacksGetPack.toKnownErr(e)
-      })
+    return this._client.call('blue.moji.packs.getPack', params, undefined, opts)
   }
 
   getPacks(
     params?: BlueMojiPacksGetPacks.QueryParams,
     opts?: BlueMojiPacksGetPacks.CallOptions,
   ): Promise<BlueMojiPacksGetPacks.Response> {
-    return this._service.xrpc
-      .call('blue.moji.packs.getPacks', params, undefined, opts)
-      .catch((e) => {
-        throw BlueMojiPacksGetPacks.toKnownErr(e)
-      })
+    return this._client.call(
+      'blue.moji.packs.getPacks',
+      params,
+      undefined,
+      opts,
+    )
   }
 }
 
 export class PackRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -3069,7 +3082,7 @@ export class PackRecord {
     cursor?: string
     records: { uri: string; value: BlueMojiPacksPack.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'blue.moji.packs.pack',
       ...params,
     })
@@ -3079,7 +3092,7 @@ export class PackRecord {
   async get(
     params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: BlueMojiPacksPack.Record }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'blue.moji.packs.pack',
       ...params,
     })
@@ -3095,7 +3108,7 @@ export class PackRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'blue.moji.packs.pack'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'blue.moji.packs.pack', ...params, record },
@@ -3108,7 +3121,7 @@ export class PackRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'blue.moji.packs.pack', ...params },
@@ -3118,10 +3131,10 @@ export class PackRecord {
 }
 
 export class PackitemRecord {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 
   async list(
@@ -3130,7 +3143,7 @@ export class PackitemRecord {
     cursor?: string
     records: { uri: string; value: BlueMojiPacksPackitem.Record }[]
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
       collection: 'blue.moji.packs.packitem',
       ...params,
     })
@@ -3144,7 +3157,7 @@ export class PackitemRecord {
     cid: string
     value: BlueMojiPacksPackitem.Record
   }> {
-    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
       collection: 'blue.moji.packs.packitem',
       ...params,
     })
@@ -3160,7 +3173,7 @@ export class PackitemRecord {
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
     record.$type = 'blue.moji.packs.packitem'
-    const res = await this._service.xrpc.call(
+    const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
       { collection: 'blue.moji.packs.packitem', ...params, record },
@@ -3173,7 +3186,7 @@ export class PackitemRecord {
     params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
     headers?: Record<string, string>,
   ): Promise<void> {
-    await this._service.xrpc.call(
+    await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
       { collection: 'blue.moji.packs.packitem', ...params },
@@ -3183,9 +3196,9 @@ export class PackitemRecord {
 }
 
 export class BlueMojiRichtextNS {
-  _service: AtpServiceClient
+  _client: XrpcClient
 
-  constructor(service: AtpServiceClient) {
-    this._service = service
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 }

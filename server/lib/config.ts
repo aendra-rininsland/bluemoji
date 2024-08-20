@@ -1,7 +1,8 @@
 import { AuthVerifier } from "./auth-verifier";
 import { Database } from "./db";
 import { IdResolver } from "@atproto/identity";
-
+const pkg = require('../package.json');
+console.log(pkg)
 export type AppContext = {
   db: Database;
   didResolver: IdResolver;
@@ -18,4 +19,7 @@ export type Config = {
   serviceDid: string;
   publisherDid: string;
   subscriptionReconnectDelay: number;
+  service: {
+    version: 
+  }
 };
