@@ -2,26 +2,25 @@
  * @file
  * XBlock Twitter Screenshot Blocker
  */
-import { dbLogger, loggerMiddleware } from "./logger";
+import { loggerMiddleware } from "./logger";
 import cors from "cors";
 import compression from "compression";
 import { DAY, SECOND } from "@atproto/common";
 import events from "events";
 import express from "express";
-import fs from "node:fs/promises";
 import { FirehoseSubscription } from "./firehose";
 import { db, migrateToLatest } from "./db";
 import { isLoggedIn, agent } from "./agent";
 import { createServer } from "../lexicons";
 import feedGeneration from "./routes/feed-generation";
-import { IdResolver, DidCache, MemoryCache } from "@atproto/identity";
+import { IdResolver, MemoryCache } from "@atproto/identity";
 import describeGenerator from "./routes/describe-generator";
 import { AppContext, Config } from "./config";
 import wellKnown from "./well-known";
 import serveBlobs from "./routes/blob";
 import { AuthVerifier } from "./auth-verifier";
 import oAuth from "./routes/oauth";
-import next from "next";
+import * as vite from "./vite";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -29,11 +28,6 @@ const base = process.env.BASE || "/";
 
 export async function main(cfg: Config) {
   const dev = process.env.NODE_ENV !== "production";
-
-  // frontend
-  const frontend = next({ dev });
-  const frontendHandler = frontend.getRequestHandler();
-  await frontend.prepare();
 
   // backend
   const firehose = new FirehoseSubscription("wss://bsky.network", db, agent);
@@ -73,7 +67,7 @@ export async function main(cfg: Config) {
   app.use(wellKnown(ctx));
   app.use(serveBlobs(ctx));
   app.use(await oAuth(ctx));
-  app.get("*", (req, res) => frontendHandler(req, res));
+  app.use(await vite.makeRouter());
 
   return {
     server,

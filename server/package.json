@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx lib/index.ts",
+    "dev": "tsx lib",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --ssrManifest --outDir dist/client",
-    "build:server": "vite build --ssr lib/entry-server.tsx --outDir dist/server",
+    "build:server": "vite build --ssr lib/app/entry-server.tsx --outDir dist/server",
     "preview": "cross-env NODE_ENV=production node server",
-    "start": "tsx lib/index.ts",
     "codegen": "lex gen-server ./lexicons  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*",
     "genkeys": "tsx scripts/generate-keys.ts"
   },
@@ -21,6 +20,7 @@
     "@atproto/oauth-client-node": "^0.0.4",
     "@atproto/ozone": "^0.1.1",
     "@atproto/repo": "^0.4.0",
+    "@atproto/xrpc": "^0.6.0",
     "@atproto/xrpc-server": "^0.6.2",
     "@huggingface/inference": "^2.6.4",
     "@types/better-sqlite3": "^7.6.10",
@@ -36,19 +36,28 @@
     "execa": "^8.0.1",
     "forever": "^4.0.3",
     "kysely": "^0.27.2",
-    "next": "^14.2.5",
     "onnxruntime-node": "^1.17.0",
     "p-queue": "^8.0.1",
     "pino-http": "^10.2.0",
+    "react-router-dom": "^6.26.1",
     "sharp": "^0.33.4",
     "sharp-apng": "^0.1.5",
+    "sirv": "^2.0.4",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3",
     "upng-js": "^2.1.0",
+    "w": "^1.1.0",
     "webp-wasm": "^1.0.6"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sass": "^1.77.8",
+    "vite": "^5.4.2"
+  }
 }

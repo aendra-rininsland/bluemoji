@@ -1,0 +1,19 @@
+@mixin border-top-right($top, $right, $color) {
+  content: "";
+  position: absolute;
+  top: $top;
+  right: $right;
+  border-width: 1px 2px 0px;
+  border-style: solid;
+  border-color: $color;
+}
+
+@mixin border-bottom-left($bottom, $left, $color) {
+  content: "";
+  position: absolute;
+  bottom: $bottom;
+  left: $left;
+  border-width: 1px 2px 0px;
+  border-style: solid;
+  border-color: $color;
+}

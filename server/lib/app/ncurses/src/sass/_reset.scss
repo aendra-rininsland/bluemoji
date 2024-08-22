@@ -1,0 +1,19 @@
+body {
+  background-color: $background-color;
+  color: $font-color;
+  font-family: $font-family;
+  font-size: $font-size;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: $font-size;
+  font-weight: normal;
+}
+
+a {
+  text-decoration: none;
+}
+
+p {
+  margin: 0;
+}

@@ -1,0 +1,156 @@
+@import "https://cdn.jsdelivr.net/npm/comic-mono@0.0.1/index.css";
+@import "variables";
+@import "reset";
+@import "mixins";
+
+body {
+  font-family: "Comic Mono", "Courier new", "Courier", "Monaco";
+}
+
+.backtitle {
+  color: #68fdfe;
+  border-bottom: 1px solid #68fdfe;
+  margin: 10px 0;
+}
+
+.box {
+  color: #000000;
+  width: var(--max-width);
+  margin: 0 auto;
+  padding: 10px 5px;
+  background-color: #c7c7c7;
+  box-shadow: 15px 15px 0px #000000;
+
+  .content {
+    position: relative;
+    padding: 10px;
+    border-top: 1px solid #ffffff;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #ffffff;
+
+    &::before {
+      @include border-top-right(-1px, -1px, #000);
+    }
+
+    &::after {
+      @include border-bottom-left(-1px, -1px, #fff);
+    }
+  } // .content
+
+  .title {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: #c7c7c7;
+    color: #6a76fb;
+  }
+
+  .buttons {
+    position: relative;
+    margin: 10px -10px 0;
+    padding: 10px 10px 0;
+    border-top: 1px solid #fff;
+    text-align: center;
+
+    &::before {
+      @include border-top-right(-1px, -1px, #000);
+    }
+
+    .btn {
+      color: #686868;
+
+      &:hover,
+      &.active {
+        background-color: #0a2fc4;
+        color: #ffffff;
+      }
+
+      &::before {
+        content: "\003c\0000a0";
+      }
+
+      &::after {
+        content: "\0000a0\003e";
+      }
+    } // .btn
+  } // .buttons
+
+  ul.menu {
+    position: relative;
+    list-style: none;
+    counter-reset: section;
+    padding: 10px 5px;
+    border-bottom: 1px solid #ffffff;
+    border-left: 1px solid #000000;
+    border-top: 1px solid #000000;
+    border-right: 1px solid #ffffff;
+    margin-bottom: 70px;
+
+    &::before {
+      @include border-top-right(-1px, -1px, #fff);
+    }
+
+    &::after {
+      @include border-bottom-left(-1px, -1px, #000);
+    }
+
+    li a {
+      margin-left: 20px;
+      color: #000000;
+    }
+
+    li.active a,
+    li a:hover {
+      background-color: #0a2fc4;
+      color: #ffffff;
+    }
+
+    li::before {
+      position: absolute;
+      counter-increment: section;
+      content: counters(section, ".") " ";
+      color: #c71e14;
+    }
+
+    li.active::before,
+    li:hover::before {
+      background-color: #0a2fc4;
+      color: #fd6f6b;
+    }
+  } // ul.menu
+} // .box
+
+.input-group {
+  position: relative;
+  margin-bottom: 10px;
+
+  &::before {
+    @include border-top-right(21.5px, 0px, #fff);
+  }
+
+  &::after {
+    @include border-bottom-left(0px, 0px, #000);
+  }
+
+  label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+  }
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 35px;
+    padding: 1px 5px;
+    background-color: #c7c7c7;
+    border-top: 1px solid #000000;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+    border-left: 1px solid #000000;
+    font-family: $font-family;
+    font-size: $font-size;
+  }
+}

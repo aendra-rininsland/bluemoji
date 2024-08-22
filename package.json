@@ -15,11 +15,16 @@
   ],
   "devDependencies": {
     "@atproto/lex-cli": "^0.5.0",
+    "@eslint/js": "^9.9.0",
     "@swc/cli": "^0.4.0",
     "add-js-extension": "^1.0.4",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.35.0",
+    "globals": "^15.9.0",
     "multiformats": "^13.2.2",
     "prettier": "^3.3.3",
-    "tsx": "^4.16.2"
+    "tsx": "^4.16.2",
+    "typescript-eslint": "^8.2.0"
   },
   "dependencies": {
     "@types/node": "^22.4.1"

@@ -8,7 +8,7 @@ const makeRouter = (ctx: AppContext) => {
     if (!ctx.cfg.serviceDid.endsWith(ctx.cfg.hostname)) {
       return res.sendStatus(404);
     }
-    reson({
+    res.json({
       "@context": ["https://www.w3.org/ns/did/v1"],
       id: ctx.cfg.serviceDid,
       service: [

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ncurses-css</title>
+    <link rel="stylesheet" href="dist/ncurses.css">
+  </head>
+  <body>
+    <div class="container">
+      <header class="backtitle">
+        <h3>Back Title</h3>
+      </header>
+
+      <div class="box">
+        <div class="content">
+          <span class="title">msgbox</span>
+          Hello world!
+          <div class="buttons">
+            <a href="#" class="btn active">OK</a>
+          </div> <!-- .buttons -->
+        </div> <!-- .content -->
+      </div> <!-- .box -->
+
+      <div class="box" style="margin-top: 50px;">
+        <div class="content">
+          <span class="title">menu</span>
+          <p>Please choose an option:</p>
+          <ul class="menu">
+            <li class="active">
+              <a href="#" class="btn active">Add a record to DB</a>
+            </li>
+            <li>
+              <a href="#" class="btn">Delete a record from DB</a>
+            </li>
+            <li>
+              <a href="#" class="btn">Exit from this menu</a>
+            </li>
+          </ul>
+          <div class="buttons">
+            <a href="#" class="btn active">OK</a>
+            <a href="#" class="btn">Cancel</a>
+          </div> <!-- .buttons -->
+        </div> <!-- .content -->
+      </div>  <!-- .box -->
+
+      <div class="box" style="margin-top: 50px;">
+        <div class="content">
+          <span class="title">inputbox</span>
+          <div class="input-group">
+            <label for="someinput">Enter some text</label>
+            <input type="text" class="" id="someinput">
+          </div>
+
+          <div class="input-group">
+            <label for="otherinput">Enter other text</label>
+            <input type="text" class="" id="otherinput">
+          </div>
+
+          <div class="buttons">
+            <a href="#" class="btn active">OK</a>
+            <a href="#" class="btn">Cancel</a>
+          </div> <!-- .buttons -->
+        </div> <!-- .content -->
+      </div>  <!-- .box -->
+    </div> <!-- .container -->
+  </body>
+</html>
