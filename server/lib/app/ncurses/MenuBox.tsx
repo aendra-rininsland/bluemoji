@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useState
 } from "react";
+import { ContentBox } from "./ContentBox";
 
 export const MenuOption = ({
   children,
@@ -31,12 +32,14 @@ type MenuOption = {
 
 export const MenuBox = ({
   title = "menu",
+  text = "Please choose an option:",
   onAccept,
   onCancel,
   options,
   keyboardFocus = true
 }: {
   title?: string;
+  text?: string;
   onAccept?: (value: MenuOption) => void;
   onCancel?: () => void;
   options: MenuOption[];
@@ -112,44 +115,42 @@ export const MenuBox = ({
   }, [selected, onAccept, onCancel, confirmState]);
 
   return (
-    <div className="box" style={{ marginTop: "50px" }}>
-      <div className="content">
-        <span className="title">{title}</span>
-        <p>Please choose an option:</p>
-        <ul className="menu">
-          {(options || []).map((opt) => (
-            <MenuOption
-              key={opt.value}
-              active={selected === opt.value}
-              onSelect={() => setSelected(opt.value)}
+    <ContentBox title={title}>
+      {" "}
+      <p>{text}</p>
+      <ul className="menu">
+        {(options || []).map((opt) => (
+          <MenuOption
+            key={opt.value}
+            active={selected === opt.value}
+            onSelect={() => setSelected(opt.value)}
+          >
+            {opt.label}
+          </MenuOption>
+        ))}
+      </ul>
+      {(onAccept || onCancel) && (
+        <div className="buttons">
+          {onAccept && (
+            <a
+              href="#"
+              onClick={accept}
+              className={`btn ${confirmState === 1 ? "active" : ""}`}
             >
-              {opt.label}
-            </MenuOption>
-          ))}
-        </ul>
-        {(onAccept || onCancel) && (
-          <div className="buttons">
-            {onAccept && (
-              <a
-                href="#"
-                onClick={accept}
-                className={`btn ${confirmState === 1 ? "active" : ""}`}
-              >
-                OK
-              </a>
-            )}
-            {onCancel && (
-              <a
-                href="#"
-                onClick={cancel}
-                className={`btn ${confirmState === 0 ? "active" : ""}`}
-              >
-                Cancel
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+              OK
+            </a>
+          )}
+          {onCancel && (
+            <a
+              href="#"
+              onClick={cancel}
+              className={`btn ${confirmState === 0 ? "active" : ""}`}
+            >
+              Cancel
+            </a>
+          )}
+        </div>
+      )}
+    </ContentBox>
   );
 };

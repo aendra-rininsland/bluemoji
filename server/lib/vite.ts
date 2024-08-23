@@ -1,12 +1,11 @@
 import fs from "node:fs/promises";
 import express from "express";
-import { AppContext } from "./config";
 
 // Constants
 const isProduction = process.env.NODE_ENV === "production";
 const base = process.env.BASE || "/";
 
-export const makeRouter = async (ctx: AppContext) => {
+export const makeRouter = async () => {
   // Cached production assets
   const templateHtml = isProduction
     ? await fs.readFile("./dist/client/index.html", "utf-8")

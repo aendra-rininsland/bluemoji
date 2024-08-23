@@ -9,7 +9,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["repo", "record"],
+          "required": ["repo", "item"],
           "properties": {
             "repo": {
               "type": "string",
@@ -21,9 +21,9 @@
               "default": true,
               "description": "Can be set to 'false' to skip Lexicon schema validation of record data."
             },
-            "record": {
-              "type": "unknown",
-              "description": "The record to write."
+            "item": {
+              "type": "ref",
+              "ref": "blue.moji.collection.item#itemView"
             }
           }
         }

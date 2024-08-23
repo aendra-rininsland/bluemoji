@@ -13,36 +13,34 @@ export function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
     array.byteLength + array.byteOffset
   );
 }
+const RenderLottieParamsDefaults = {
+  autoplay: true,
+  loop: true,
+  width: 128 as const,
+  height: 128 as const,
+  player: false,
+  raw: false
+};
 
 export const renderLottie = (
   bytes: Uint8Array,
-  params: RenderLottieParams = {
-    autoplay: true,
-    loop: true,
-    width: 128,
-    height: 128,
-    player: false,
-    raw: false
-  }
+  paramUser: RenderLottieParams = RenderLottieParamsDefaults
 ) => {
+  const params = { ...RenderLottieParamsDefaults, ...paramUser };
   if (params.raw && bytes) return bytes; // noop if bytes are requested for e.g. React Native
 
-  try {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = params.width || 128;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = params.width || 128;
 
-    const ab = typedArrayToBuffer(bytes);
+  const ab = typedArrayToBuffer(bytes);
 
-    console.log(ab, bytes, params);
+  console.log(ab, bytes, params);
 
-    const player = new DotLottie({
-      ...params,
-      canvas,
-      data: ab
-    });
+  const player = new DotLottie({
+    ...params,
+    canvas,
+    data: ab
+  });
 
-    return params.player ? { canvas, player } : canvas;
-  } catch (e) {
-    console.error(e);
-  }
+  return params.player ? { canvas, player } : canvas;
 };

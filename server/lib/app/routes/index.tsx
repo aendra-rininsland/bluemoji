@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Main = () => {
   const navigate = useNavigate();
+  const loggedIn = document.cookie.match("did=");
   return (
     <>
       <MsgBox title="Welcome!">
@@ -42,9 +43,13 @@ export const Main = () => {
           navigate(`/`);
         }}
         options={[
-          { label: "Upload new Bluemoji", value: "upload" },
-          { label: "View Bluemoji collection", value: "collection" },
-          { label: "Create Bluemoji Pack", value: "make-pack" },
+          ...(loggedIn
+            ? [
+                { label: "Upload new Bluemoji", value: "upload" },
+                { label: "View Bluemoji collection", value: "collection" },
+                { label: "Create Bluemoji Pack", value: "make-pack" }
+              ]
+            : [{ label: "Login", value: "login" }]),
           { label: "Browse Bluemoji Packs", value: "browse-packs" },
           { label: "Bluemoji Workshop", value: "workshop" },
           { label: "On Bluesky: @moji.blue", value: "bsky" },

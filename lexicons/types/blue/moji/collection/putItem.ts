@@ -6,6 +6,7 @@ import { ValidationResult, BlobRef } from '@atproto/lexicon'
 import { isObj, hasProp } from '../../../../util'
 import { lexicons } from '../../../../lexicons'
 import { CID } from 'multiformats/cid'
+import * as BlueMojiCollectionItem from './item'
 
 export interface QueryParams {}
 
@@ -14,8 +15,7 @@ export interface InputSchema {
   repo: string
   /** Can be set to 'false' to skip Lexicon schema validation of record data. */
   validate?: boolean
-  /** The record to write. */
-  record: {}
+  item: BlueMojiCollectionItem.ItemView
   [k: string]: unknown
 }
 

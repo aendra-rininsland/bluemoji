@@ -4,7 +4,7 @@
   "defs": {
     "packViewBasic": {
       "type": "object",
-      "required": ["uri", "cid", "name", "description"],
+      "required": ["uri", "cid", "name"],
       "properties": {
         "uri": { "type": "string", "format": "at-uri" },
         "cid": { "type": "string", "format": "cid" },

@@ -19,15 +19,13 @@ import { AppContext, Config } from "./config";
 import wellKnown from "./well-known";
 import serveBlobs from "./routes/blob";
 import { AuthVerifier } from "./auth-verifier";
-import oAuth from "./routes/oauth";
+import OAuth from "./routes/oauth";
 import * as vite from "./vite";
-
-const isProduction = process.env.NODE_ENV === "production";
-
-const base = process.env.BASE || "/";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 export async function main(cfg: Config) {
-  const dev = process.env.NODE_ENV !== "production";
+  dotenv.config();
 
   // backend
   const firehose = new FirehoseSubscription("wss://bsky.network", db, agent);
@@ -58,6 +56,7 @@ export async function main(cfg: Config) {
   app.set("trust proxy", true);
   app.use(cors({ maxAge: DAY / SECOND }));
   app.use(loggerMiddleware);
+  app.use(cookieParser());
   app.use(compression());
 
   feedGeneration(server, ctx);
@@ -66,7 +65,7 @@ export async function main(cfg: Config) {
   app.use(server.xrpc.router);
   app.use(wellKnown(ctx));
   app.use(serveBlobs(ctx));
-  app.use(await oAuth(ctx));
+  app.use(await OAuth(ctx));
   app.use(await vite.makeRouter());
 
   return {
@@ -80,7 +79,9 @@ export async function main(cfg: Config) {
       firehose.run(cfg.subscriptionReconnectDelay);
 
       const s = app.listen(cfg.port, cfg.listenhost);
+
       await events.once(s, "listening");
+
       console.info("Running...");
       return { server: s, app, ctx };
     }

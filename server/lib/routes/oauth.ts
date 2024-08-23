@@ -1,29 +1,32 @@
 import express from "express";
-import { AppContext } from "../config";
 import {
-  NodeOAuthClientOptions,
   NodeOAuthClient,
   NodeSavedState,
-  NodeSavedSession,
+  NodeSavedSession
 } from "@atproto/oauth-client-node";
-import { JoseKey } from "@atproto/jwk-jose"; // NodeJS/Browser only
 import { randomBytes } from "crypto";
+import keysJson from "../../keys.json";
+import ngrok from "@ngrok/ngrok";
+import { JoseKey } from "@atproto/jwk-jose"; // NodeJS/Browser only
+import { AppContext } from "../config";
 
-interface NodeSavedStateStore {
-  set: (key: string, internalState: NodeSavedState) => Promise<void>;
-  get: (key: string) => Promise<NodeSavedState | undefined>;
-  del: (key: string) => Promise<void>;
-}
+const keyset = Promise.all(keysJson.map((d) => JoseKey.fromJWK(d.jwk)));
 
 const TEMP_SESSIONS = {};
 const TEMP_STATE = {};
 
-const ENDPOINT =
-  process.env.NODE_ENV !== "production"
-    ? "https://a3de-2a01-4b00-ae10-1f00-690b-426a-e160-8ec6.ngrok-free.app"
-    : "https://moji.blue";
-
 const makeRouter = async (ctx: AppContext) => {
+  const ENDPOINT =
+    process.env.NODE_ENV !== "production"
+      ? await ngrok
+          .connect({ addr: 5577, authtoken_from_env: true })
+          .then((listener) => listener.url())
+      : "https://moji.blue";
+
+  console.info(`ENDPOINT: ${ENDPOINT}`);
+
+  if (!ENDPOINT || !keyset) throw new Error("OAuth config busted");
+
   const client = new NodeOAuthClient({
     // This object will be used to build the payload of the /client-metadata.json
     // endpoint metadata, exposing the client metadata to the OAuth server.
@@ -43,16 +46,12 @@ const makeRouter = async (ctx: AppContext) => {
       token_endpoint_auth_method: "private_key_jwt",
       token_endpoint_auth_signing_alg: "ES256",
       dpop_bound_access_tokens: true,
-      jwks_uri: `${ENDPOINT}/jwks.json`,
+      jwks_uri: `${ENDPOINT}/jwks.json`
     },
 
     // Used to authenticate the client to the token endpoint. Will be used to
     // build the jwks object to be exposed on the "jwks_uri" endpoint.
-    keyset: await Promise.all(
-      Array(3)
-        .fill(0)
-        .map(() => JoseKey.generate(["ES256"], Math.random().toString()))
-    ),
+    keyset: await keyset,
 
     // Interface to store authorization state data (during authorization flows)
     stateStore: {
@@ -64,7 +63,7 @@ const makeRouter = async (ctx: AppContext) => {
       },
       async del(key: string): Promise<void> {
         delete TEMP_STATE[key];
-      },
+      }
     },
 
     // Interface to store authenticated session data
@@ -84,12 +83,15 @@ const makeRouter = async (ctx: AppContext) => {
 
       async del(sub: string) {
         delete TEMP_SESSIONS[sub];
-      },
-    },
+      }
+    }
 
     // A lock to prevent concurrent access to the session store. Optional if only one instance is running.
     //   requestLock,
   });
+
+  ctx.client = client;
+
   const router = express.Router();
   // Expose the metadata and jwks
   router.get("/client-metadata.json", (req, res) =>
@@ -98,7 +100,7 @@ const makeRouter = async (ctx: AppContext) => {
   router.get("/jwks.json", (req, res) => res.json(client.jwks));
 
   // Create an endpoint to initiate the OAuth flow
-  router.get("/login", async (req, res, next) => {
+  router.get("/redirect-oauth", async (req, res, next) => {
     try {
       const handle = req.query.handle?.toString();
       const state = req.query.state?.toString() || randomBytes(256).toString();
@@ -107,7 +109,7 @@ const makeRouter = async (ctx: AppContext) => {
         return {
           encoding: "application/json",
           body: "No handle specified",
-          statusCode: 500,
+          statusCode: 500
         };
       }
 
@@ -117,13 +119,14 @@ const makeRouter = async (ctx: AppContext) => {
 
       const url = await client.authorize(handle, {
         signal: ac.signal,
-        state,
+        state
         // Only supported if OAuth server is openid-compliant
         // ui_locales: "fr-CA fr en",
       });
 
       res.redirect(url.toString());
     } catch (err) {
+      console.log(err);
       next(err);
     }
   });
@@ -144,13 +147,12 @@ const makeRouter = async (ctx: AppContext) => {
       // Make Authenticated API calls
       const profile = await agent.getProfile({ actor: agent.did });
       console.log("Bsky profile:", profile.data);
-
-      res.json({ ok: true });
+      res.cookie("did", profile.data.did);
+      res.redirect("/");
     } catch (err) {
       next(err);
     }
   });
-  router.get("/blob/:did/:cid", async (req, res) => {});
 
   return router;
 };

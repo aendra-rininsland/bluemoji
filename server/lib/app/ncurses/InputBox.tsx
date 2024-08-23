@@ -1,34 +1,56 @@
-import React from "react";
+import React, { CSSProperties, ReactNode, ChangeEventHandler } from "react";
 
 export const InputGroup = ({
   label = "Enter some text",
-  key = "someinput"
+  id = "someinput",
+  onChange
+}: {
+  label: string;
+  id: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
 }) => (
   <div className="input-group">
-    <label htmlFor={key}>{label}</label>
-    <input type="text" className="" id={key} />
+    <label htmlFor={id}>{label}</label>
+    <input onChange={onChange} type="text" id={id} />
   </div>
 );
 
-export const ButtonGroup = ({ onAccept, onCancel }) => (
+export const ButtonGroup = ({
+  onAccept,
+  onCancel
+}: {
+  onCancel: () => void;
+  onAccept: () => void;
+}) => (
   <div className="buttons">
     {onAccept && (
-      <a href="#" onClick={onAccept} className="btn active">
+      <a href="#" onClick={() => onAccept()} className="btn active">
         OK
       </a>
     )}
     {onCancel && (
-      <a href="#" onClick={onCancel} className="btn">
+      <a href="#" onClick={() => onCancel()} className="btn">
         Cancel
       </a>
     )}
   </div>
 );
 
-export const InputBox = ({ title = "inputbox" }) => (
-  <div className="box" style={{ marginTop: "50px" }}>
-    <div className="content">
-      <span className="title">{title}</span>
+export const InputBox = ({
+  title = "inputbox",
+  children,
+  style = {}
+}: {
+  title: string;
+  children: ReactNode;
+  style: CSSProperties;
+}) => {
+  return (
+    <div className="box" style={style}>
+      <div className="content">
+        <span className="title">{title}</span>
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
+};

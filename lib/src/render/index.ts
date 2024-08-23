@@ -3,6 +3,10 @@
  * This facilitates rendering of Bluemoji in a variety of formats
  */
 
+export * as lottie from "./renderers/lottie";
+export * as png from "./renderers/apng";
+export * as blob from "./renderers/blob";
+
 import * as BlueMojiRichTextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
 import { renderLottie } from "./renderers/lottie";

@@ -35,6 +35,17 @@ main {
   font-size: 150%;
 }
 
+.box .content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+}
+
+.file-picker {
+}
+
 .backtitle {
   margin: 0;
 }
@@ -58,6 +69,42 @@ footer {
       background: white;
       color: var(--background);
     }
+  }
+}
+
+.on-drag {
+  position: fixed;
+  z-index: 99;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.6);
+  color: black;
+  font-size: 300%;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bolder;
+}
+
+.well {
+  position: relative;
+  list-style: none;
+  counter-reset: section;
+  padding: 10px 5px;
+  border-bottom: 1px solid #ffffff;
+  border-left: 1px solid #000000;
+  border-top: 1px solid #000000;
+  border-right: 1px solid #ffffff;
+
+  &.file-picker {
+    width: 3em;
+    height: 3em;
+    padding: 0;
   }
 }
 

@@ -1,3228 +1,3204 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import {
-  Client as XrpcClient,
-  FetchHandler,
-  CallOptions as FetchHandlerOptions
-} from "@atproto/xrpc";
-import { schemas } from "./lexicons";
-import { CID } from "multiformats/cid";
-import * as AppBskyActorDefs from "./types/app/bsky/actor/defs";
-import * as AppBskyActorGetPreferences from "./types/app/bsky/actor/getPreferences";
-import * as AppBskyActorGetProfile from "./types/app/bsky/actor/getProfile";
-import * as AppBskyActorGetProfiles from "./types/app/bsky/actor/getProfiles";
-import * as AppBskyActorGetSuggestions from "./types/app/bsky/actor/getSuggestions";
-import * as AppBskyActorProfile from "./types/app/bsky/actor/profile";
-import * as AppBskyActorPutPreferences from "./types/app/bsky/actor/putPreferences";
-import * as AppBskyActorSearchActors from "./types/app/bsky/actor/searchActors";
-import * as AppBskyActorSearchActorsTypeahead from "./types/app/bsky/actor/searchActorsTypeahead";
-import * as AppBskyEmbedExternal from "./types/app/bsky/embed/external";
-import * as AppBskyEmbedImages from "./types/app/bsky/embed/images";
-import * as AppBskyEmbedRecord from "./types/app/bsky/embed/record";
-import * as AppBskyEmbedRecordWithMedia from "./types/app/bsky/embed/recordWithMedia";
-import * as AppBskyFeedDefs from "./types/app/bsky/feed/defs";
-import * as AppBskyFeedDescribeFeedGenerator from "./types/app/bsky/feed/describeFeedGenerator";
-import * as AppBskyFeedGenerator from "./types/app/bsky/feed/generator";
-import * as AppBskyFeedGetActorFeeds from "./types/app/bsky/feed/getActorFeeds";
-import * as AppBskyFeedGetActorLikes from "./types/app/bsky/feed/getActorLikes";
-import * as AppBskyFeedGetAuthorFeed from "./types/app/bsky/feed/getAuthorFeed";
-import * as AppBskyFeedGetFeed from "./types/app/bsky/feed/getFeed";
-import * as AppBskyFeedGetFeedGenerator from "./types/app/bsky/feed/getFeedGenerator";
-import * as AppBskyFeedGetFeedGenerators from "./types/app/bsky/feed/getFeedGenerators";
-import * as AppBskyFeedGetFeedSkeleton from "./types/app/bsky/feed/getFeedSkeleton";
-import * as AppBskyFeedGetLikes from "./types/app/bsky/feed/getLikes";
-import * as AppBskyFeedGetListFeed from "./types/app/bsky/feed/getListFeed";
-import * as AppBskyFeedGetPostThread from "./types/app/bsky/feed/getPostThread";
-import * as AppBskyFeedGetPosts from "./types/app/bsky/feed/getPosts";
-import * as AppBskyFeedGetRepostedBy from "./types/app/bsky/feed/getRepostedBy";
-import * as AppBskyFeedGetSuggestedFeeds from "./types/app/bsky/feed/getSuggestedFeeds";
-import * as AppBskyFeedGetTimeline from "./types/app/bsky/feed/getTimeline";
-import * as AppBskyFeedLike from "./types/app/bsky/feed/like";
-import * as AppBskyFeedPost from "./types/app/bsky/feed/post";
-import * as AppBskyFeedRepost from "./types/app/bsky/feed/repost";
-import * as AppBskyFeedSearchPosts from "./types/app/bsky/feed/searchPosts";
-import * as AppBskyFeedSendInteractions from "./types/app/bsky/feed/sendInteractions";
-import * as AppBskyFeedThreadgate from "./types/app/bsky/feed/threadgate";
-import * as AppBskyGraphBlock from "./types/app/bsky/graph/block";
-import * as AppBskyGraphDefs from "./types/app/bsky/graph/defs";
-import * as AppBskyGraphFollow from "./types/app/bsky/graph/follow";
-import * as AppBskyGraphGetActorStarterPacks from "./types/app/bsky/graph/getActorStarterPacks";
-import * as AppBskyGraphGetBlocks from "./types/app/bsky/graph/getBlocks";
-import * as AppBskyGraphGetFollowers from "./types/app/bsky/graph/getFollowers";
-import * as AppBskyGraphGetFollows from "./types/app/bsky/graph/getFollows";
-import * as AppBskyGraphGetKnownFollowers from "./types/app/bsky/graph/getKnownFollowers";
-import * as AppBskyGraphGetList from "./types/app/bsky/graph/getList";
-import * as AppBskyGraphGetListBlocks from "./types/app/bsky/graph/getListBlocks";
-import * as AppBskyGraphGetListMutes from "./types/app/bsky/graph/getListMutes";
-import * as AppBskyGraphGetLists from "./types/app/bsky/graph/getLists";
-import * as AppBskyGraphGetMutes from "./types/app/bsky/graph/getMutes";
-import * as AppBskyGraphGetRelationships from "./types/app/bsky/graph/getRelationships";
-import * as AppBskyGraphGetStarterPack from "./types/app/bsky/graph/getStarterPack";
-import * as AppBskyGraphGetStarterPacks from "./types/app/bsky/graph/getStarterPacks";
-import * as AppBskyGraphGetSuggestedFollowsByActor from "./types/app/bsky/graph/getSuggestedFollowsByActor";
-import * as AppBskyGraphList from "./types/app/bsky/graph/list";
-import * as AppBskyGraphListblock from "./types/app/bsky/graph/listblock";
-import * as AppBskyGraphListitem from "./types/app/bsky/graph/listitem";
-import * as AppBskyGraphMuteActor from "./types/app/bsky/graph/muteActor";
-import * as AppBskyGraphMuteActorList from "./types/app/bsky/graph/muteActorList";
-import * as AppBskyGraphMuteThread from "./types/app/bsky/graph/muteThread";
-import * as AppBskyGraphStarterpack from "./types/app/bsky/graph/starterpack";
-import * as AppBskyGraphUnmuteActor from "./types/app/bsky/graph/unmuteActor";
-import * as AppBskyGraphUnmuteActorList from "./types/app/bsky/graph/unmuteActorList";
-import * as AppBskyGraphUnmuteThread from "./types/app/bsky/graph/unmuteThread";
-import * as AppBskyLabelerDefs from "./types/app/bsky/labeler/defs";
-import * as AppBskyLabelerGetServices from "./types/app/bsky/labeler/getServices";
-import * as AppBskyLabelerService from "./types/app/bsky/labeler/service";
-import * as AppBskyNotificationGetUnreadCount from "./types/app/bsky/notification/getUnreadCount";
-import * as AppBskyNotificationListNotifications from "./types/app/bsky/notification/listNotifications";
-import * as AppBskyNotificationPutPreferences from "./types/app/bsky/notification/putPreferences";
-import * as AppBskyNotificationRegisterPush from "./types/app/bsky/notification/registerPush";
-import * as AppBskyNotificationUpdateSeen from "./types/app/bsky/notification/updateSeen";
-import * as AppBskyRichtextFacet from "./types/app/bsky/richtext/facet";
-import * as AppBskyUnspeccedDefs from "./types/app/bsky/unspecced/defs";
-import * as AppBskyUnspeccedGetPopularFeedGenerators from "./types/app/bsky/unspecced/getPopularFeedGenerators";
-import * as AppBskyUnspeccedGetSuggestionsSkeleton from "./types/app/bsky/unspecced/getSuggestionsSkeleton";
-import * as AppBskyUnspeccedGetTaggedSuggestions from "./types/app/bsky/unspecced/getTaggedSuggestions";
-import * as AppBskyUnspeccedSearchActorsSkeleton from "./types/app/bsky/unspecced/searchActorsSkeleton";
-import * as AppBskyUnspeccedSearchPostsSkeleton from "./types/app/bsky/unspecced/searchPostsSkeleton";
-import * as ComAtprotoAdminDefs from "./types/com/atproto/admin/defs";
-import * as ComAtprotoAdminDeleteAccount from "./types/com/atproto/admin/deleteAccount";
-import * as ComAtprotoAdminDisableAccountInvites from "./types/com/atproto/admin/disableAccountInvites";
-import * as ComAtprotoAdminDisableInviteCodes from "./types/com/atproto/admin/disableInviteCodes";
-import * as ComAtprotoAdminEnableAccountInvites from "./types/com/atproto/admin/enableAccountInvites";
-import * as ComAtprotoAdminGetAccountInfo from "./types/com/atproto/admin/getAccountInfo";
-import * as ComAtprotoAdminGetAccountInfos from "./types/com/atproto/admin/getAccountInfos";
-import * as ComAtprotoAdminGetInviteCodes from "./types/com/atproto/admin/getInviteCodes";
-import * as ComAtprotoAdminGetSubjectStatus from "./types/com/atproto/admin/getSubjectStatus";
-import * as ComAtprotoAdminSearchAccounts from "./types/com/atproto/admin/searchAccounts";
-import * as ComAtprotoAdminSendEmail from "./types/com/atproto/admin/sendEmail";
-import * as ComAtprotoAdminUpdateAccountEmail from "./types/com/atproto/admin/updateAccountEmail";
-import * as ComAtprotoAdminUpdateAccountHandle from "./types/com/atproto/admin/updateAccountHandle";
-import * as ComAtprotoAdminUpdateAccountPassword from "./types/com/atproto/admin/updateAccountPassword";
-import * as ComAtprotoAdminUpdateSubjectStatus from "./types/com/atproto/admin/updateSubjectStatus";
-import * as ComAtprotoIdentityGetRecommendedDidCredentials from "./types/com/atproto/identity/getRecommendedDidCredentials";
-import * as ComAtprotoIdentityRequestPlcOperationSignature from "./types/com/atproto/identity/requestPlcOperationSignature";
-import * as ComAtprotoIdentityResolveHandle from "./types/com/atproto/identity/resolveHandle";
-import * as ComAtprotoIdentitySignPlcOperation from "./types/com/atproto/identity/signPlcOperation";
-import * as ComAtprotoIdentitySubmitPlcOperation from "./types/com/atproto/identity/submitPlcOperation";
-import * as ComAtprotoIdentityUpdateHandle from "./types/com/atproto/identity/updateHandle";
-import * as ComAtprotoLabelDefs from "./types/com/atproto/label/defs";
-import * as ComAtprotoLabelQueryLabels from "./types/com/atproto/label/queryLabels";
-import * as ComAtprotoLabelSubscribeLabels from "./types/com/atproto/label/subscribeLabels";
-import * as ComAtprotoModerationCreateReport from "./types/com/atproto/moderation/createReport";
-import * as ComAtprotoModerationDefs from "./types/com/atproto/moderation/defs";
-import * as ComAtprotoRepoApplyWrites from "./types/com/atproto/repo/applyWrites";
-import * as ComAtprotoRepoCreateRecord from "./types/com/atproto/repo/createRecord";
-import * as ComAtprotoRepoDeleteRecord from "./types/com/atproto/repo/deleteRecord";
-import * as ComAtprotoRepoDescribeRepo from "./types/com/atproto/repo/describeRepo";
-import * as ComAtprotoRepoGetRecord from "./types/com/atproto/repo/getRecord";
-import * as ComAtprotoRepoImportRepo from "./types/com/atproto/repo/importRepo";
-import * as ComAtprotoRepoListMissingBlobs from "./types/com/atproto/repo/listMissingBlobs";
-import * as ComAtprotoRepoListRecords from "./types/com/atproto/repo/listRecords";
-import * as ComAtprotoRepoPutRecord from "./types/com/atproto/repo/putRecord";
-import * as ComAtprotoRepoStrongRef from "./types/com/atproto/repo/strongRef";
-import * as ComAtprotoRepoUploadBlob from "./types/com/atproto/repo/uploadBlob";
-import * as ComAtprotoServerActivateAccount from "./types/com/atproto/server/activateAccount";
-import * as ComAtprotoServerCheckAccountStatus from "./types/com/atproto/server/checkAccountStatus";
-import * as ComAtprotoServerConfirmEmail from "./types/com/atproto/server/confirmEmail";
-import * as ComAtprotoServerCreateAccount from "./types/com/atproto/server/createAccount";
-import * as ComAtprotoServerCreateAppPassword from "./types/com/atproto/server/createAppPassword";
-import * as ComAtprotoServerCreateInviteCode from "./types/com/atproto/server/createInviteCode";
-import * as ComAtprotoServerCreateInviteCodes from "./types/com/atproto/server/createInviteCodes";
-import * as ComAtprotoServerCreateSession from "./types/com/atproto/server/createSession";
-import * as ComAtprotoServerDeactivateAccount from "./types/com/atproto/server/deactivateAccount";
-import * as ComAtprotoServerDefs from "./types/com/atproto/server/defs";
-import * as ComAtprotoServerDeleteAccount from "./types/com/atproto/server/deleteAccount";
-import * as ComAtprotoServerDeleteSession from "./types/com/atproto/server/deleteSession";
-import * as ComAtprotoServerDescribeServer from "./types/com/atproto/server/describeServer";
-import * as ComAtprotoServerGetAccountInviteCodes from "./types/com/atproto/server/getAccountInviteCodes";
-import * as ComAtprotoServerGetServiceAuth from "./types/com/atproto/server/getServiceAuth";
-import * as ComAtprotoServerGetSession from "./types/com/atproto/server/getSession";
-import * as ComAtprotoServerListAppPasswords from "./types/com/atproto/server/listAppPasswords";
-import * as ComAtprotoServerRefreshSession from "./types/com/atproto/server/refreshSession";
-import * as ComAtprotoServerRequestAccountDelete from "./types/com/atproto/server/requestAccountDelete";
-import * as ComAtprotoServerRequestEmailConfirmation from "./types/com/atproto/server/requestEmailConfirmation";
-import * as ComAtprotoServerRequestEmailUpdate from "./types/com/atproto/server/requestEmailUpdate";
-import * as ComAtprotoServerRequestPasswordReset from "./types/com/atproto/server/requestPasswordReset";
-import * as ComAtprotoServerReserveSigningKey from "./types/com/atproto/server/reserveSigningKey";
-import * as ComAtprotoServerResetPassword from "./types/com/atproto/server/resetPassword";
-import * as ComAtprotoServerRevokeAppPassword from "./types/com/atproto/server/revokeAppPassword";
-import * as ComAtprotoServerUpdateEmail from "./types/com/atproto/server/updateEmail";
-import * as ComAtprotoSyncGetBlob from "./types/com/atproto/sync/getBlob";
-import * as ComAtprotoSyncGetBlocks from "./types/com/atproto/sync/getBlocks";
-import * as ComAtprotoSyncGetCheckout from "./types/com/atproto/sync/getCheckout";
-import * as ComAtprotoSyncGetHead from "./types/com/atproto/sync/getHead";
-import * as ComAtprotoSyncGetLatestCommit from "./types/com/atproto/sync/getLatestCommit";
-import * as ComAtprotoSyncGetRecord from "./types/com/atproto/sync/getRecord";
-import * as ComAtprotoSyncGetRepo from "./types/com/atproto/sync/getRepo";
-import * as ComAtprotoSyncGetRepoStatus from "./types/com/atproto/sync/getRepoStatus";
-import * as ComAtprotoSyncListBlobs from "./types/com/atproto/sync/listBlobs";
-import * as ComAtprotoSyncListRepos from "./types/com/atproto/sync/listRepos";
-import * as ComAtprotoSyncNotifyOfUpdate from "./types/com/atproto/sync/notifyOfUpdate";
-import * as ComAtprotoSyncRequestCrawl from "./types/com/atproto/sync/requestCrawl";
-import * as ComAtprotoSyncSubscribeRepos from "./types/com/atproto/sync/subscribeRepos";
-import * as ComAtprotoTempCheckSignupQueue from "./types/com/atproto/temp/checkSignupQueue";
-import * as ComAtprotoTempFetchLabels from "./types/com/atproto/temp/fetchLabels";
-import * as ComAtprotoTempRequestPhoneVerification from "./types/com/atproto/temp/requestPhoneVerification";
-import * as BlueMojiCollectionDefs from "./types/blue/moji/collection/defs";
-import * as BlueMojiCollectionGetItem from "./types/blue/moji/collection/getItem";
-import * as BlueMojiCollectionItem from "./types/blue/moji/collection/item";
-import * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/listCollection";
-import * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem";
-import * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection";
-import * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs";
-import * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks";
-import * as BlueMojiPacksGetPack from "./types/blue/moji/packs/getPack";
-import * as BlueMojiPacksGetPacks from "./types/blue/moji/packs/getPacks";
-import * as BlueMojiPacksPack from "./types/blue/moji/packs/pack";
-import * as BlueMojiPacksPackitem from "./types/blue/moji/packs/packitem";
-import * as BlueMojiRichtextFacet from "./types/blue/moji/richtext/facet";
+import { XrpcClient, FetchHandler, FetchHandlerOptions } from '@atproto/xrpc'
+import { schemas } from './lexicons'
+import { CID } from 'multiformats/cid'
+import * as AppBskyActorDefs from './types/app/bsky/actor/defs'
+import * as AppBskyActorGetPreferences from './types/app/bsky/actor/getPreferences'
+import * as AppBskyActorGetProfile from './types/app/bsky/actor/getProfile'
+import * as AppBskyActorGetProfiles from './types/app/bsky/actor/getProfiles'
+import * as AppBskyActorGetSuggestions from './types/app/bsky/actor/getSuggestions'
+import * as AppBskyActorProfile from './types/app/bsky/actor/profile'
+import * as AppBskyActorPutPreferences from './types/app/bsky/actor/putPreferences'
+import * as AppBskyActorSearchActors from './types/app/bsky/actor/searchActors'
+import * as AppBskyActorSearchActorsTypeahead from './types/app/bsky/actor/searchActorsTypeahead'
+import * as AppBskyEmbedExternal from './types/app/bsky/embed/external'
+import * as AppBskyEmbedImages from './types/app/bsky/embed/images'
+import * as AppBskyEmbedRecord from './types/app/bsky/embed/record'
+import * as AppBskyEmbedRecordWithMedia from './types/app/bsky/embed/recordWithMedia'
+import * as AppBskyFeedDefs from './types/app/bsky/feed/defs'
+import * as AppBskyFeedDescribeFeedGenerator from './types/app/bsky/feed/describeFeedGenerator'
+import * as AppBskyFeedGenerator from './types/app/bsky/feed/generator'
+import * as AppBskyFeedGetActorFeeds from './types/app/bsky/feed/getActorFeeds'
+import * as AppBskyFeedGetActorLikes from './types/app/bsky/feed/getActorLikes'
+import * as AppBskyFeedGetAuthorFeed from './types/app/bsky/feed/getAuthorFeed'
+import * as AppBskyFeedGetFeed from './types/app/bsky/feed/getFeed'
+import * as AppBskyFeedGetFeedGenerator from './types/app/bsky/feed/getFeedGenerator'
+import * as AppBskyFeedGetFeedGenerators from './types/app/bsky/feed/getFeedGenerators'
+import * as AppBskyFeedGetFeedSkeleton from './types/app/bsky/feed/getFeedSkeleton'
+import * as AppBskyFeedGetLikes from './types/app/bsky/feed/getLikes'
+import * as AppBskyFeedGetListFeed from './types/app/bsky/feed/getListFeed'
+import * as AppBskyFeedGetPostThread from './types/app/bsky/feed/getPostThread'
+import * as AppBskyFeedGetPosts from './types/app/bsky/feed/getPosts'
+import * as AppBskyFeedGetRepostedBy from './types/app/bsky/feed/getRepostedBy'
+import * as AppBskyFeedGetSuggestedFeeds from './types/app/bsky/feed/getSuggestedFeeds'
+import * as AppBskyFeedGetTimeline from './types/app/bsky/feed/getTimeline'
+import * as AppBskyFeedLike from './types/app/bsky/feed/like'
+import * as AppBskyFeedPost from './types/app/bsky/feed/post'
+import * as AppBskyFeedRepost from './types/app/bsky/feed/repost'
+import * as AppBskyFeedSearchPosts from './types/app/bsky/feed/searchPosts'
+import * as AppBskyFeedSendInteractions from './types/app/bsky/feed/sendInteractions'
+import * as AppBskyFeedThreadgate from './types/app/bsky/feed/threadgate'
+import * as AppBskyGraphBlock from './types/app/bsky/graph/block'
+import * as AppBskyGraphDefs from './types/app/bsky/graph/defs'
+import * as AppBskyGraphFollow from './types/app/bsky/graph/follow'
+import * as AppBskyGraphGetActorStarterPacks from './types/app/bsky/graph/getActorStarterPacks'
+import * as AppBskyGraphGetBlocks from './types/app/bsky/graph/getBlocks'
+import * as AppBskyGraphGetFollowers from './types/app/bsky/graph/getFollowers'
+import * as AppBskyGraphGetFollows from './types/app/bsky/graph/getFollows'
+import * as AppBskyGraphGetKnownFollowers from './types/app/bsky/graph/getKnownFollowers'
+import * as AppBskyGraphGetList from './types/app/bsky/graph/getList'
+import * as AppBskyGraphGetListBlocks from './types/app/bsky/graph/getListBlocks'
+import * as AppBskyGraphGetListMutes from './types/app/bsky/graph/getListMutes'
+import * as AppBskyGraphGetLists from './types/app/bsky/graph/getLists'
+import * as AppBskyGraphGetMutes from './types/app/bsky/graph/getMutes'
+import * as AppBskyGraphGetRelationships from './types/app/bsky/graph/getRelationships'
+import * as AppBskyGraphGetStarterPack from './types/app/bsky/graph/getStarterPack'
+import * as AppBskyGraphGetStarterPacks from './types/app/bsky/graph/getStarterPacks'
+import * as AppBskyGraphGetSuggestedFollowsByActor from './types/app/bsky/graph/getSuggestedFollowsByActor'
+import * as AppBskyGraphList from './types/app/bsky/graph/list'
+import * as AppBskyGraphListblock from './types/app/bsky/graph/listblock'
+import * as AppBskyGraphListitem from './types/app/bsky/graph/listitem'
+import * as AppBskyGraphMuteActor from './types/app/bsky/graph/muteActor'
+import * as AppBskyGraphMuteActorList from './types/app/bsky/graph/muteActorList'
+import * as AppBskyGraphMuteThread from './types/app/bsky/graph/muteThread'
+import * as AppBskyGraphStarterpack from './types/app/bsky/graph/starterpack'
+import * as AppBskyGraphUnmuteActor from './types/app/bsky/graph/unmuteActor'
+import * as AppBskyGraphUnmuteActorList from './types/app/bsky/graph/unmuteActorList'
+import * as AppBskyGraphUnmuteThread from './types/app/bsky/graph/unmuteThread'
+import * as AppBskyLabelerDefs from './types/app/bsky/labeler/defs'
+import * as AppBskyLabelerGetServices from './types/app/bsky/labeler/getServices'
+import * as AppBskyLabelerService from './types/app/bsky/labeler/service'
+import * as AppBskyNotificationGetUnreadCount from './types/app/bsky/notification/getUnreadCount'
+import * as AppBskyNotificationListNotifications from './types/app/bsky/notification/listNotifications'
+import * as AppBskyNotificationPutPreferences from './types/app/bsky/notification/putPreferences'
+import * as AppBskyNotificationRegisterPush from './types/app/bsky/notification/registerPush'
+import * as AppBskyNotificationUpdateSeen from './types/app/bsky/notification/updateSeen'
+import * as AppBskyRichtextFacet from './types/app/bsky/richtext/facet'
+import * as AppBskyUnspeccedDefs from './types/app/bsky/unspecced/defs'
+import * as AppBskyUnspeccedGetPopularFeedGenerators from './types/app/bsky/unspecced/getPopularFeedGenerators'
+import * as AppBskyUnspeccedGetSuggestionsSkeleton from './types/app/bsky/unspecced/getSuggestionsSkeleton'
+import * as AppBskyUnspeccedGetTaggedSuggestions from './types/app/bsky/unspecced/getTaggedSuggestions'
+import * as AppBskyUnspeccedSearchActorsSkeleton from './types/app/bsky/unspecced/searchActorsSkeleton'
+import * as AppBskyUnspeccedSearchPostsSkeleton from './types/app/bsky/unspecced/searchPostsSkeleton'
+import * as ComAtprotoAdminDefs from './types/com/atproto/admin/defs'
+import * as ComAtprotoAdminDeleteAccount from './types/com/atproto/admin/deleteAccount'
+import * as ComAtprotoAdminDisableAccountInvites from './types/com/atproto/admin/disableAccountInvites'
+import * as ComAtprotoAdminDisableInviteCodes from './types/com/atproto/admin/disableInviteCodes'
+import * as ComAtprotoAdminEnableAccountInvites from './types/com/atproto/admin/enableAccountInvites'
+import * as ComAtprotoAdminGetAccountInfo from './types/com/atproto/admin/getAccountInfo'
+import * as ComAtprotoAdminGetAccountInfos from './types/com/atproto/admin/getAccountInfos'
+import * as ComAtprotoAdminGetInviteCodes from './types/com/atproto/admin/getInviteCodes'
+import * as ComAtprotoAdminGetSubjectStatus from './types/com/atproto/admin/getSubjectStatus'
+import * as ComAtprotoAdminSearchAccounts from './types/com/atproto/admin/searchAccounts'
+import * as ComAtprotoAdminSendEmail from './types/com/atproto/admin/sendEmail'
+import * as ComAtprotoAdminUpdateAccountEmail from './types/com/atproto/admin/updateAccountEmail'
+import * as ComAtprotoAdminUpdateAccountHandle from './types/com/atproto/admin/updateAccountHandle'
+import * as ComAtprotoAdminUpdateAccountPassword from './types/com/atproto/admin/updateAccountPassword'
+import * as ComAtprotoAdminUpdateSubjectStatus from './types/com/atproto/admin/updateSubjectStatus'
+import * as ComAtprotoIdentityGetRecommendedDidCredentials from './types/com/atproto/identity/getRecommendedDidCredentials'
+import * as ComAtprotoIdentityRequestPlcOperationSignature from './types/com/atproto/identity/requestPlcOperationSignature'
+import * as ComAtprotoIdentityResolveHandle from './types/com/atproto/identity/resolveHandle'
+import * as ComAtprotoIdentitySignPlcOperation from './types/com/atproto/identity/signPlcOperation'
+import * as ComAtprotoIdentitySubmitPlcOperation from './types/com/atproto/identity/submitPlcOperation'
+import * as ComAtprotoIdentityUpdateHandle from './types/com/atproto/identity/updateHandle'
+import * as ComAtprotoLabelDefs from './types/com/atproto/label/defs'
+import * as ComAtprotoLabelQueryLabels from './types/com/atproto/label/queryLabels'
+import * as ComAtprotoLabelSubscribeLabels from './types/com/atproto/label/subscribeLabels'
+import * as ComAtprotoModerationCreateReport from './types/com/atproto/moderation/createReport'
+import * as ComAtprotoModerationDefs from './types/com/atproto/moderation/defs'
+import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites'
+import * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord'
+import * as ComAtprotoRepoDeleteRecord from './types/com/atproto/repo/deleteRecord'
+import * as ComAtprotoRepoDescribeRepo from './types/com/atproto/repo/describeRepo'
+import * as ComAtprotoRepoGetRecord from './types/com/atproto/repo/getRecord'
+import * as ComAtprotoRepoImportRepo from './types/com/atproto/repo/importRepo'
+import * as ComAtprotoRepoListMissingBlobs from './types/com/atproto/repo/listMissingBlobs'
+import * as ComAtprotoRepoListRecords from './types/com/atproto/repo/listRecords'
+import * as ComAtprotoRepoPutRecord from './types/com/atproto/repo/putRecord'
+import * as ComAtprotoRepoStrongRef from './types/com/atproto/repo/strongRef'
+import * as ComAtprotoRepoUploadBlob from './types/com/atproto/repo/uploadBlob'
+import * as ComAtprotoServerActivateAccount from './types/com/atproto/server/activateAccount'
+import * as ComAtprotoServerCheckAccountStatus from './types/com/atproto/server/checkAccountStatus'
+import * as ComAtprotoServerConfirmEmail from './types/com/atproto/server/confirmEmail'
+import * as ComAtprotoServerCreateAccount from './types/com/atproto/server/createAccount'
+import * as ComAtprotoServerCreateAppPassword from './types/com/atproto/server/createAppPassword'
+import * as ComAtprotoServerCreateInviteCode from './types/com/atproto/server/createInviteCode'
+import * as ComAtprotoServerCreateInviteCodes from './types/com/atproto/server/createInviteCodes'
+import * as ComAtprotoServerCreateSession from './types/com/atproto/server/createSession'
+import * as ComAtprotoServerDeactivateAccount from './types/com/atproto/server/deactivateAccount'
+import * as ComAtprotoServerDefs from './types/com/atproto/server/defs'
+import * as ComAtprotoServerDeleteAccount from './types/com/atproto/server/deleteAccount'
+import * as ComAtprotoServerDeleteSession from './types/com/atproto/server/deleteSession'
+import * as ComAtprotoServerDescribeServer from './types/com/atproto/server/describeServer'
+import * as ComAtprotoServerGetAccountInviteCodes from './types/com/atproto/server/getAccountInviteCodes'
+import * as ComAtprotoServerGetServiceAuth from './types/com/atproto/server/getServiceAuth'
+import * as ComAtprotoServerGetSession from './types/com/atproto/server/getSession'
+import * as ComAtprotoServerListAppPasswords from './types/com/atproto/server/listAppPasswords'
+import * as ComAtprotoServerRefreshSession from './types/com/atproto/server/refreshSession'
+import * as ComAtprotoServerRequestAccountDelete from './types/com/atproto/server/requestAccountDelete'
+import * as ComAtprotoServerRequestEmailConfirmation from './types/com/atproto/server/requestEmailConfirmation'
+import * as ComAtprotoServerRequestEmailUpdate from './types/com/atproto/server/requestEmailUpdate'
+import * as ComAtprotoServerRequestPasswordReset from './types/com/atproto/server/requestPasswordReset'
+import * as ComAtprotoServerReserveSigningKey from './types/com/atproto/server/reserveSigningKey'
+import * as ComAtprotoServerResetPassword from './types/com/atproto/server/resetPassword'
+import * as ComAtprotoServerRevokeAppPassword from './types/com/atproto/server/revokeAppPassword'
+import * as ComAtprotoServerUpdateEmail from './types/com/atproto/server/updateEmail'
+import * as ComAtprotoSyncGetBlob from './types/com/atproto/sync/getBlob'
+import * as ComAtprotoSyncGetBlocks from './types/com/atproto/sync/getBlocks'
+import * as ComAtprotoSyncGetCheckout from './types/com/atproto/sync/getCheckout'
+import * as ComAtprotoSyncGetHead from './types/com/atproto/sync/getHead'
+import * as ComAtprotoSyncGetLatestCommit from './types/com/atproto/sync/getLatestCommit'
+import * as ComAtprotoSyncGetRecord from './types/com/atproto/sync/getRecord'
+import * as ComAtprotoSyncGetRepo from './types/com/atproto/sync/getRepo'
+import * as ComAtprotoSyncGetRepoStatus from './types/com/atproto/sync/getRepoStatus'
+import * as ComAtprotoSyncListBlobs from './types/com/atproto/sync/listBlobs'
+import * as ComAtprotoSyncListRepos from './types/com/atproto/sync/listRepos'
+import * as ComAtprotoSyncNotifyOfUpdate from './types/com/atproto/sync/notifyOfUpdate'
+import * as ComAtprotoSyncRequestCrawl from './types/com/atproto/sync/requestCrawl'
+import * as ComAtprotoSyncSubscribeRepos from './types/com/atproto/sync/subscribeRepos'
+import * as ComAtprotoTempCheckSignupQueue from './types/com/atproto/temp/checkSignupQueue'
+import * as ComAtprotoTempFetchLabels from './types/com/atproto/temp/fetchLabels'
+import * as ComAtprotoTempRequestPhoneVerification from './types/com/atproto/temp/requestPhoneVerification'
+import * as BlueMojiCollectionDefs from './types/blue/moji/collection/defs'
+import * as BlueMojiCollectionGetItem from './types/blue/moji/collection/getItem'
+import * as BlueMojiCollectionItem from './types/blue/moji/collection/item'
+import * as BlueMojiCollectionListCollection from './types/blue/moji/collection/listCollection'
+import * as BlueMojiCollectionPutItem from './types/blue/moji/collection/putItem'
+import * as BlueMojiCollectionSaveToCollection from './types/blue/moji/collection/saveToCollection'
+import * as BlueMojiPacksDefs from './types/blue/moji/packs/defs'
+import * as BlueMojiPacksGetActorPacks from './types/blue/moji/packs/getActorPacks'
+import * as BlueMojiPacksGetPack from './types/blue/moji/packs/getPack'
+import * as BlueMojiPacksGetPacks from './types/blue/moji/packs/getPacks'
+import * as BlueMojiPacksPack from './types/blue/moji/packs/pack'
+import * as BlueMojiPacksPackitem from './types/blue/moji/packs/packitem'
+import * as BlueMojiRichtextFacet from './types/blue/moji/richtext/facet'
 
-export * as AppBskyActorDefs from "./types/app/bsky/actor/defs";
-export * as AppBskyActorGetPreferences from "./types/app/bsky/actor/getPreferences";
-export * as AppBskyActorGetProfile from "./types/app/bsky/actor/getProfile";
-export * as AppBskyActorGetProfiles from "./types/app/bsky/actor/getProfiles";
-export * as AppBskyActorGetSuggestions from "./types/app/bsky/actor/getSuggestions";
-export * as AppBskyActorProfile from "./types/app/bsky/actor/profile";
-export * as AppBskyActorPutPreferences from "./types/app/bsky/actor/putPreferences";
-export * as AppBskyActorSearchActors from "./types/app/bsky/actor/searchActors";
-export * as AppBskyActorSearchActorsTypeahead from "./types/app/bsky/actor/searchActorsTypeahead";
-export * as AppBskyEmbedExternal from "./types/app/bsky/embed/external";
-export * as AppBskyEmbedImages from "./types/app/bsky/embed/images";
-export * as AppBskyEmbedRecord from "./types/app/bsky/embed/record";
-export * as AppBskyEmbedRecordWithMedia from "./types/app/bsky/embed/recordWithMedia";
-export * as AppBskyFeedDefs from "./types/app/bsky/feed/defs";
-export * as AppBskyFeedDescribeFeedGenerator from "./types/app/bsky/feed/describeFeedGenerator";
-export * as AppBskyFeedGenerator from "./types/app/bsky/feed/generator";
-export * as AppBskyFeedGetActorFeeds from "./types/app/bsky/feed/getActorFeeds";
-export * as AppBskyFeedGetActorLikes from "./types/app/bsky/feed/getActorLikes";
-export * as AppBskyFeedGetAuthorFeed from "./types/app/bsky/feed/getAuthorFeed";
-export * as AppBskyFeedGetFeed from "./types/app/bsky/feed/getFeed";
-export * as AppBskyFeedGetFeedGenerator from "./types/app/bsky/feed/getFeedGenerator";
-export * as AppBskyFeedGetFeedGenerators from "./types/app/bsky/feed/getFeedGenerators";
-export * as AppBskyFeedGetFeedSkeleton from "./types/app/bsky/feed/getFeedSkeleton";
-export * as AppBskyFeedGetLikes from "./types/app/bsky/feed/getLikes";
-export * as AppBskyFeedGetListFeed from "./types/app/bsky/feed/getListFeed";
-export * as AppBskyFeedGetPostThread from "./types/app/bsky/feed/getPostThread";
-export * as AppBskyFeedGetPosts from "./types/app/bsky/feed/getPosts";
-export * as AppBskyFeedGetRepostedBy from "./types/app/bsky/feed/getRepostedBy";
-export * as AppBskyFeedGetSuggestedFeeds from "./types/app/bsky/feed/getSuggestedFeeds";
-export * as AppBskyFeedGetTimeline from "./types/app/bsky/feed/getTimeline";
-export * as AppBskyFeedLike from "./types/app/bsky/feed/like";
-export * as AppBskyFeedPost from "./types/app/bsky/feed/post";
-export * as AppBskyFeedRepost from "./types/app/bsky/feed/repost";
-export * as AppBskyFeedSearchPosts from "./types/app/bsky/feed/searchPosts";
-export * as AppBskyFeedSendInteractions from "./types/app/bsky/feed/sendInteractions";
-export * as AppBskyFeedThreadgate from "./types/app/bsky/feed/threadgate";
-export * as AppBskyGraphBlock from "./types/app/bsky/graph/block";
-export * as AppBskyGraphDefs from "./types/app/bsky/graph/defs";
-export * as AppBskyGraphFollow from "./types/app/bsky/graph/follow";
-export * as AppBskyGraphGetActorStarterPacks from "./types/app/bsky/graph/getActorStarterPacks";
-export * as AppBskyGraphGetBlocks from "./types/app/bsky/graph/getBlocks";
-export * as AppBskyGraphGetFollowers from "./types/app/bsky/graph/getFollowers";
-export * as AppBskyGraphGetFollows from "./types/app/bsky/graph/getFollows";
-export * as AppBskyGraphGetKnownFollowers from "./types/app/bsky/graph/getKnownFollowers";
-export * as AppBskyGraphGetList from "./types/app/bsky/graph/getList";
-export * as AppBskyGraphGetListBlocks from "./types/app/bsky/graph/getListBlocks";
-export * as AppBskyGraphGetListMutes from "./types/app/bsky/graph/getListMutes";
-export * as AppBskyGraphGetLists from "./types/app/bsky/graph/getLists";
-export * as AppBskyGraphGetMutes from "./types/app/bsky/graph/getMutes";
-export * as AppBskyGraphGetRelationships from "./types/app/bsky/graph/getRelationships";
-export * as AppBskyGraphGetStarterPack from "./types/app/bsky/graph/getStarterPack";
-export * as AppBskyGraphGetStarterPacks from "./types/app/bsky/graph/getStarterPacks";
-export * as AppBskyGraphGetSuggestedFollowsByActor from "./types/app/bsky/graph/getSuggestedFollowsByActor";
-export * as AppBskyGraphList from "./types/app/bsky/graph/list";
-export * as AppBskyGraphListblock from "./types/app/bsky/graph/listblock";
-export * as AppBskyGraphListitem from "./types/app/bsky/graph/listitem";
-export * as AppBskyGraphMuteActor from "./types/app/bsky/graph/muteActor";
-export * as AppBskyGraphMuteActorList from "./types/app/bsky/graph/muteActorList";
-export * as AppBskyGraphMuteThread from "./types/app/bsky/graph/muteThread";
-export * as AppBskyGraphStarterpack from "./types/app/bsky/graph/starterpack";
-export * as AppBskyGraphUnmuteActor from "./types/app/bsky/graph/unmuteActor";
-export * as AppBskyGraphUnmuteActorList from "./types/app/bsky/graph/unmuteActorList";
-export * as AppBskyGraphUnmuteThread from "./types/app/bsky/graph/unmuteThread";
-export * as AppBskyLabelerDefs from "./types/app/bsky/labeler/defs";
-export * as AppBskyLabelerGetServices from "./types/app/bsky/labeler/getServices";
-export * as AppBskyLabelerService from "./types/app/bsky/labeler/service";
-export * as AppBskyNotificationGetUnreadCount from "./types/app/bsky/notification/getUnreadCount";
-export * as AppBskyNotificationListNotifications from "./types/app/bsky/notification/listNotifications";
-export * as AppBskyNotificationPutPreferences from "./types/app/bsky/notification/putPreferences";
-export * as AppBskyNotificationRegisterPush from "./types/app/bsky/notification/registerPush";
-export * as AppBskyNotificationUpdateSeen from "./types/app/bsky/notification/updateSeen";
-export * as AppBskyRichtextFacet from "./types/app/bsky/richtext/facet";
-export * as AppBskyUnspeccedDefs from "./types/app/bsky/unspecced/defs";
-export * as AppBskyUnspeccedGetPopularFeedGenerators from "./types/app/bsky/unspecced/getPopularFeedGenerators";
-export * as AppBskyUnspeccedGetSuggestionsSkeleton from "./types/app/bsky/unspecced/getSuggestionsSkeleton";
-export * as AppBskyUnspeccedGetTaggedSuggestions from "./types/app/bsky/unspecced/getTaggedSuggestions";
-export * as AppBskyUnspeccedSearchActorsSkeleton from "./types/app/bsky/unspecced/searchActorsSkeleton";
-export * as AppBskyUnspeccedSearchPostsSkeleton from "./types/app/bsky/unspecced/searchPostsSkeleton";
-export * as ComAtprotoAdminDefs from "./types/com/atproto/admin/defs";
-export * as ComAtprotoAdminDeleteAccount from "./types/com/atproto/admin/deleteAccount";
-export * as ComAtprotoAdminDisableAccountInvites from "./types/com/atproto/admin/disableAccountInvites";
-export * as ComAtprotoAdminDisableInviteCodes from "./types/com/atproto/admin/disableInviteCodes";
-export * as ComAtprotoAdminEnableAccountInvites from "./types/com/atproto/admin/enableAccountInvites";
-export * as ComAtprotoAdminGetAccountInfo from "./types/com/atproto/admin/getAccountInfo";
-export * as ComAtprotoAdminGetAccountInfos from "./types/com/atproto/admin/getAccountInfos";
-export * as ComAtprotoAdminGetInviteCodes from "./types/com/atproto/admin/getInviteCodes";
-export * as ComAtprotoAdminGetSubjectStatus from "./types/com/atproto/admin/getSubjectStatus";
-export * as ComAtprotoAdminSearchAccounts from "./types/com/atproto/admin/searchAccounts";
-export * as ComAtprotoAdminSendEmail from "./types/com/atproto/admin/sendEmail";
-export * as ComAtprotoAdminUpdateAccountEmail from "./types/com/atproto/admin/updateAccountEmail";
-export * as ComAtprotoAdminUpdateAccountHandle from "./types/com/atproto/admin/updateAccountHandle";
-export * as ComAtprotoAdminUpdateAccountPassword from "./types/com/atproto/admin/updateAccountPassword";
-export * as ComAtprotoAdminUpdateSubjectStatus from "./types/com/atproto/admin/updateSubjectStatus";
-export * as ComAtprotoIdentityGetRecommendedDidCredentials from "./types/com/atproto/identity/getRecommendedDidCredentials";
-export * as ComAtprotoIdentityRequestPlcOperationSignature from "./types/com/atproto/identity/requestPlcOperationSignature";
-export * as ComAtprotoIdentityResolveHandle from "./types/com/atproto/identity/resolveHandle";
-export * as ComAtprotoIdentitySignPlcOperation from "./types/com/atproto/identity/signPlcOperation";
-export * as ComAtprotoIdentitySubmitPlcOperation from "./types/com/atproto/identity/submitPlcOperation";
-export * as ComAtprotoIdentityUpdateHandle from "./types/com/atproto/identity/updateHandle";
-export * as ComAtprotoLabelDefs from "./types/com/atproto/label/defs";
-export * as ComAtprotoLabelQueryLabels from "./types/com/atproto/label/queryLabels";
-export * as ComAtprotoLabelSubscribeLabels from "./types/com/atproto/label/subscribeLabels";
-export * as ComAtprotoModerationCreateReport from "./types/com/atproto/moderation/createReport";
-export * as ComAtprotoModerationDefs from "./types/com/atproto/moderation/defs";
-export * as ComAtprotoRepoApplyWrites from "./types/com/atproto/repo/applyWrites";
-export * as ComAtprotoRepoCreateRecord from "./types/com/atproto/repo/createRecord";
-export * as ComAtprotoRepoDeleteRecord from "./types/com/atproto/repo/deleteRecord";
-export * as ComAtprotoRepoDescribeRepo from "./types/com/atproto/repo/describeRepo";
-export * as ComAtprotoRepoGetRecord from "./types/com/atproto/repo/getRecord";
-export * as ComAtprotoRepoImportRepo from "./types/com/atproto/repo/importRepo";
-export * as ComAtprotoRepoListMissingBlobs from "./types/com/atproto/repo/listMissingBlobs";
-export * as ComAtprotoRepoListRecords from "./types/com/atproto/repo/listRecords";
-export * as ComAtprotoRepoPutRecord from "./types/com/atproto/repo/putRecord";
-export * as ComAtprotoRepoStrongRef from "./types/com/atproto/repo/strongRef";
-export * as ComAtprotoRepoUploadBlob from "./types/com/atproto/repo/uploadBlob";
-export * as ComAtprotoServerActivateAccount from "./types/com/atproto/server/activateAccount";
-export * as ComAtprotoServerCheckAccountStatus from "./types/com/atproto/server/checkAccountStatus";
-export * as ComAtprotoServerConfirmEmail from "./types/com/atproto/server/confirmEmail";
-export * as ComAtprotoServerCreateAccount from "./types/com/atproto/server/createAccount";
-export * as ComAtprotoServerCreateAppPassword from "./types/com/atproto/server/createAppPassword";
-export * as ComAtprotoServerCreateInviteCode from "./types/com/atproto/server/createInviteCode";
-export * as ComAtprotoServerCreateInviteCodes from "./types/com/atproto/server/createInviteCodes";
-export * as ComAtprotoServerCreateSession from "./types/com/atproto/server/createSession";
-export * as ComAtprotoServerDeactivateAccount from "./types/com/atproto/server/deactivateAccount";
-export * as ComAtprotoServerDefs from "./types/com/atproto/server/defs";
-export * as ComAtprotoServerDeleteAccount from "./types/com/atproto/server/deleteAccount";
-export * as ComAtprotoServerDeleteSession from "./types/com/atproto/server/deleteSession";
-export * as ComAtprotoServerDescribeServer from "./types/com/atproto/server/describeServer";
-export * as ComAtprotoServerGetAccountInviteCodes from "./types/com/atproto/server/getAccountInviteCodes";
-export * as ComAtprotoServerGetServiceAuth from "./types/com/atproto/server/getServiceAuth";
-export * as ComAtprotoServerGetSession from "./types/com/atproto/server/getSession";
-export * as ComAtprotoServerListAppPasswords from "./types/com/atproto/server/listAppPasswords";
-export * as ComAtprotoServerRefreshSession from "./types/com/atproto/server/refreshSession";
-export * as ComAtprotoServerRequestAccountDelete from "./types/com/atproto/server/requestAccountDelete";
-export * as ComAtprotoServerRequestEmailConfirmation from "./types/com/atproto/server/requestEmailConfirmation";
-export * as ComAtprotoServerRequestEmailUpdate from "./types/com/atproto/server/requestEmailUpdate";
-export * as ComAtprotoServerRequestPasswordReset from "./types/com/atproto/server/requestPasswordReset";
-export * as ComAtprotoServerReserveSigningKey from "./types/com/atproto/server/reserveSigningKey";
-export * as ComAtprotoServerResetPassword from "./types/com/atproto/server/resetPassword";
-export * as ComAtprotoServerRevokeAppPassword from "./types/com/atproto/server/revokeAppPassword";
-export * as ComAtprotoServerUpdateEmail from "./types/com/atproto/server/updateEmail";
-export * as ComAtprotoSyncGetBlob from "./types/com/atproto/sync/getBlob";
-export * as ComAtprotoSyncGetBlocks from "./types/com/atproto/sync/getBlocks";
-export * as ComAtprotoSyncGetCheckout from "./types/com/atproto/sync/getCheckout";
-export * as ComAtprotoSyncGetHead from "./types/com/atproto/sync/getHead";
-export * as ComAtprotoSyncGetLatestCommit from "./types/com/atproto/sync/getLatestCommit";
-export * as ComAtprotoSyncGetRecord from "./types/com/atproto/sync/getRecord";
-export * as ComAtprotoSyncGetRepo from "./types/com/atproto/sync/getRepo";
-export * as ComAtprotoSyncGetRepoStatus from "./types/com/atproto/sync/getRepoStatus";
-export * as ComAtprotoSyncListBlobs from "./types/com/atproto/sync/listBlobs";
-export * as ComAtprotoSyncListRepos from "./types/com/atproto/sync/listRepos";
-export * as ComAtprotoSyncNotifyOfUpdate from "./types/com/atproto/sync/notifyOfUpdate";
-export * as ComAtprotoSyncRequestCrawl from "./types/com/atproto/sync/requestCrawl";
-export * as ComAtprotoSyncSubscribeRepos from "./types/com/atproto/sync/subscribeRepos";
-export * as ComAtprotoTempCheckSignupQueue from "./types/com/atproto/temp/checkSignupQueue";
-export * as ComAtprotoTempFetchLabels from "./types/com/atproto/temp/fetchLabels";
-export * as ComAtprotoTempRequestPhoneVerification from "./types/com/atproto/temp/requestPhoneVerification";
-export * as BlueMojiCollectionDefs from "./types/blue/moji/collection/defs";
-export * as BlueMojiCollectionGetItem from "./types/blue/moji/collection/getItem";
-export * as BlueMojiCollectionItem from "./types/blue/moji/collection/item";
-export * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/listCollection";
-export * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem";
-export * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection";
-export * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs";
-export * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks";
-export * as BlueMojiPacksGetPack from "./types/blue/moji/packs/getPack";
-export * as BlueMojiPacksGetPacks from "./types/blue/moji/packs/getPacks";
-export * as BlueMojiPacksPack from "./types/blue/moji/packs/pack";
-export * as BlueMojiPacksPackitem from "./types/blue/moji/packs/packitem";
-export * as BlueMojiRichtextFacet from "./types/blue/moji/richtext/facet";
+export * as AppBskyActorDefs from './types/app/bsky/actor/defs'
+export * as AppBskyActorGetPreferences from './types/app/bsky/actor/getPreferences'
+export * as AppBskyActorGetProfile from './types/app/bsky/actor/getProfile'
+export * as AppBskyActorGetProfiles from './types/app/bsky/actor/getProfiles'
+export * as AppBskyActorGetSuggestions from './types/app/bsky/actor/getSuggestions'
+export * as AppBskyActorProfile from './types/app/bsky/actor/profile'
+export * as AppBskyActorPutPreferences from './types/app/bsky/actor/putPreferences'
+export * as AppBskyActorSearchActors from './types/app/bsky/actor/searchActors'
+export * as AppBskyActorSearchActorsTypeahead from './types/app/bsky/actor/searchActorsTypeahead'
+export * as AppBskyEmbedExternal from './types/app/bsky/embed/external'
+export * as AppBskyEmbedImages from './types/app/bsky/embed/images'
+export * as AppBskyEmbedRecord from './types/app/bsky/embed/record'
+export * as AppBskyEmbedRecordWithMedia from './types/app/bsky/embed/recordWithMedia'
+export * as AppBskyFeedDefs from './types/app/bsky/feed/defs'
+export * as AppBskyFeedDescribeFeedGenerator from './types/app/bsky/feed/describeFeedGenerator'
+export * as AppBskyFeedGenerator from './types/app/bsky/feed/generator'
+export * as AppBskyFeedGetActorFeeds from './types/app/bsky/feed/getActorFeeds'
+export * as AppBskyFeedGetActorLikes from './types/app/bsky/feed/getActorLikes'
+export * as AppBskyFeedGetAuthorFeed from './types/app/bsky/feed/getAuthorFeed'
+export * as AppBskyFeedGetFeed from './types/app/bsky/feed/getFeed'
+export * as AppBskyFeedGetFeedGenerator from './types/app/bsky/feed/getFeedGenerator'
+export * as AppBskyFeedGetFeedGenerators from './types/app/bsky/feed/getFeedGenerators'
+export * as AppBskyFeedGetFeedSkeleton from './types/app/bsky/feed/getFeedSkeleton'
+export * as AppBskyFeedGetLikes from './types/app/bsky/feed/getLikes'
+export * as AppBskyFeedGetListFeed from './types/app/bsky/feed/getListFeed'
+export * as AppBskyFeedGetPostThread from './types/app/bsky/feed/getPostThread'
+export * as AppBskyFeedGetPosts from './types/app/bsky/feed/getPosts'
+export * as AppBskyFeedGetRepostedBy from './types/app/bsky/feed/getRepostedBy'
+export * as AppBskyFeedGetSuggestedFeeds from './types/app/bsky/feed/getSuggestedFeeds'
+export * as AppBskyFeedGetTimeline from './types/app/bsky/feed/getTimeline'
+export * as AppBskyFeedLike from './types/app/bsky/feed/like'
+export * as AppBskyFeedPost from './types/app/bsky/feed/post'
+export * as AppBskyFeedRepost from './types/app/bsky/feed/repost'
+export * as AppBskyFeedSearchPosts from './types/app/bsky/feed/searchPosts'
+export * as AppBskyFeedSendInteractions from './types/app/bsky/feed/sendInteractions'
+export * as AppBskyFeedThreadgate from './types/app/bsky/feed/threadgate'
+export * as AppBskyGraphBlock from './types/app/bsky/graph/block'
+export * as AppBskyGraphDefs from './types/app/bsky/graph/defs'
+export * as AppBskyGraphFollow from './types/app/bsky/graph/follow'
+export * as AppBskyGraphGetActorStarterPacks from './types/app/bsky/graph/getActorStarterPacks'
+export * as AppBskyGraphGetBlocks from './types/app/bsky/graph/getBlocks'
+export * as AppBskyGraphGetFollowers from './types/app/bsky/graph/getFollowers'
+export * as AppBskyGraphGetFollows from './types/app/bsky/graph/getFollows'
+export * as AppBskyGraphGetKnownFollowers from './types/app/bsky/graph/getKnownFollowers'
+export * as AppBskyGraphGetList from './types/app/bsky/graph/getList'
+export * as AppBskyGraphGetListBlocks from './types/app/bsky/graph/getListBlocks'
+export * as AppBskyGraphGetListMutes from './types/app/bsky/graph/getListMutes'
+export * as AppBskyGraphGetLists from './types/app/bsky/graph/getLists'
+export * as AppBskyGraphGetMutes from './types/app/bsky/graph/getMutes'
+export * as AppBskyGraphGetRelationships from './types/app/bsky/graph/getRelationships'
+export * as AppBskyGraphGetStarterPack from './types/app/bsky/graph/getStarterPack'
+export * as AppBskyGraphGetStarterPacks from './types/app/bsky/graph/getStarterPacks'
+export * as AppBskyGraphGetSuggestedFollowsByActor from './types/app/bsky/graph/getSuggestedFollowsByActor'
+export * as AppBskyGraphList from './types/app/bsky/graph/list'
+export * as AppBskyGraphListblock from './types/app/bsky/graph/listblock'
+export * as AppBskyGraphListitem from './types/app/bsky/graph/listitem'
+export * as AppBskyGraphMuteActor from './types/app/bsky/graph/muteActor'
+export * as AppBskyGraphMuteActorList from './types/app/bsky/graph/muteActorList'
+export * as AppBskyGraphMuteThread from './types/app/bsky/graph/muteThread'
+export * as AppBskyGraphStarterpack from './types/app/bsky/graph/starterpack'
+export * as AppBskyGraphUnmuteActor from './types/app/bsky/graph/unmuteActor'
+export * as AppBskyGraphUnmuteActorList from './types/app/bsky/graph/unmuteActorList'
+export * as AppBskyGraphUnmuteThread from './types/app/bsky/graph/unmuteThread'
+export * as AppBskyLabelerDefs from './types/app/bsky/labeler/defs'
+export * as AppBskyLabelerGetServices from './types/app/bsky/labeler/getServices'
+export * as AppBskyLabelerService from './types/app/bsky/labeler/service'
+export * as AppBskyNotificationGetUnreadCount from './types/app/bsky/notification/getUnreadCount'
+export * as AppBskyNotificationListNotifications from './types/app/bsky/notification/listNotifications'
+export * as AppBskyNotificationPutPreferences from './types/app/bsky/notification/putPreferences'
+export * as AppBskyNotificationRegisterPush from './types/app/bsky/notification/registerPush'
+export * as AppBskyNotificationUpdateSeen from './types/app/bsky/notification/updateSeen'
+export * as AppBskyRichtextFacet from './types/app/bsky/richtext/facet'
+export * as AppBskyUnspeccedDefs from './types/app/bsky/unspecced/defs'
+export * as AppBskyUnspeccedGetPopularFeedGenerators from './types/app/bsky/unspecced/getPopularFeedGenerators'
+export * as AppBskyUnspeccedGetSuggestionsSkeleton from './types/app/bsky/unspecced/getSuggestionsSkeleton'
+export * as AppBskyUnspeccedGetTaggedSuggestions from './types/app/bsky/unspecced/getTaggedSuggestions'
+export * as AppBskyUnspeccedSearchActorsSkeleton from './types/app/bsky/unspecced/searchActorsSkeleton'
+export * as AppBskyUnspeccedSearchPostsSkeleton from './types/app/bsky/unspecced/searchPostsSkeleton'
+export * as ComAtprotoAdminDefs from './types/com/atproto/admin/defs'
+export * as ComAtprotoAdminDeleteAccount from './types/com/atproto/admin/deleteAccount'
+export * as ComAtprotoAdminDisableAccountInvites from './types/com/atproto/admin/disableAccountInvites'
+export * as ComAtprotoAdminDisableInviteCodes from './types/com/atproto/admin/disableInviteCodes'
+export * as ComAtprotoAdminEnableAccountInvites from './types/com/atproto/admin/enableAccountInvites'
+export * as ComAtprotoAdminGetAccountInfo from './types/com/atproto/admin/getAccountInfo'
+export * as ComAtprotoAdminGetAccountInfos from './types/com/atproto/admin/getAccountInfos'
+export * as ComAtprotoAdminGetInviteCodes from './types/com/atproto/admin/getInviteCodes'
+export * as ComAtprotoAdminGetSubjectStatus from './types/com/atproto/admin/getSubjectStatus'
+export * as ComAtprotoAdminSearchAccounts from './types/com/atproto/admin/searchAccounts'
+export * as ComAtprotoAdminSendEmail from './types/com/atproto/admin/sendEmail'
+export * as ComAtprotoAdminUpdateAccountEmail from './types/com/atproto/admin/updateAccountEmail'
+export * as ComAtprotoAdminUpdateAccountHandle from './types/com/atproto/admin/updateAccountHandle'
+export * as ComAtprotoAdminUpdateAccountPassword from './types/com/atproto/admin/updateAccountPassword'
+export * as ComAtprotoAdminUpdateSubjectStatus from './types/com/atproto/admin/updateSubjectStatus'
+export * as ComAtprotoIdentityGetRecommendedDidCredentials from './types/com/atproto/identity/getRecommendedDidCredentials'
+export * as ComAtprotoIdentityRequestPlcOperationSignature from './types/com/atproto/identity/requestPlcOperationSignature'
+export * as ComAtprotoIdentityResolveHandle from './types/com/atproto/identity/resolveHandle'
+export * as ComAtprotoIdentitySignPlcOperation from './types/com/atproto/identity/signPlcOperation'
+export * as ComAtprotoIdentitySubmitPlcOperation from './types/com/atproto/identity/submitPlcOperation'
+export * as ComAtprotoIdentityUpdateHandle from './types/com/atproto/identity/updateHandle'
+export * as ComAtprotoLabelDefs from './types/com/atproto/label/defs'
+export * as ComAtprotoLabelQueryLabels from './types/com/atproto/label/queryLabels'
+export * as ComAtprotoLabelSubscribeLabels from './types/com/atproto/label/subscribeLabels'
+export * as ComAtprotoModerationCreateReport from './types/com/atproto/moderation/createReport'
+export * as ComAtprotoModerationDefs from './types/com/atproto/moderation/defs'
+export * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites'
+export * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord'
+export * as ComAtprotoRepoDeleteRecord from './types/com/atproto/repo/deleteRecord'
+export * as ComAtprotoRepoDescribeRepo from './types/com/atproto/repo/describeRepo'
+export * as ComAtprotoRepoGetRecord from './types/com/atproto/repo/getRecord'
+export * as ComAtprotoRepoImportRepo from './types/com/atproto/repo/importRepo'
+export * as ComAtprotoRepoListMissingBlobs from './types/com/atproto/repo/listMissingBlobs'
+export * as ComAtprotoRepoListRecords from './types/com/atproto/repo/listRecords'
+export * as ComAtprotoRepoPutRecord from './types/com/atproto/repo/putRecord'
+export * as ComAtprotoRepoStrongRef from './types/com/atproto/repo/strongRef'
+export * as ComAtprotoRepoUploadBlob from './types/com/atproto/repo/uploadBlob'
+export * as ComAtprotoServerActivateAccount from './types/com/atproto/server/activateAccount'
+export * as ComAtprotoServerCheckAccountStatus from './types/com/atproto/server/checkAccountStatus'
+export * as ComAtprotoServerConfirmEmail from './types/com/atproto/server/confirmEmail'
+export * as ComAtprotoServerCreateAccount from './types/com/atproto/server/createAccount'
+export * as ComAtprotoServerCreateAppPassword from './types/com/atproto/server/createAppPassword'
+export * as ComAtprotoServerCreateInviteCode from './types/com/atproto/server/createInviteCode'
+export * as ComAtprotoServerCreateInviteCodes from './types/com/atproto/server/createInviteCodes'
+export * as ComAtprotoServerCreateSession from './types/com/atproto/server/createSession'
+export * as ComAtprotoServerDeactivateAccount from './types/com/atproto/server/deactivateAccount'
+export * as ComAtprotoServerDefs from './types/com/atproto/server/defs'
+export * as ComAtprotoServerDeleteAccount from './types/com/atproto/server/deleteAccount'
+export * as ComAtprotoServerDeleteSession from './types/com/atproto/server/deleteSession'
+export * as ComAtprotoServerDescribeServer from './types/com/atproto/server/describeServer'
+export * as ComAtprotoServerGetAccountInviteCodes from './types/com/atproto/server/getAccountInviteCodes'
+export * as ComAtprotoServerGetServiceAuth from './types/com/atproto/server/getServiceAuth'
+export * as ComAtprotoServerGetSession from './types/com/atproto/server/getSession'
+export * as ComAtprotoServerListAppPasswords from './types/com/atproto/server/listAppPasswords'
+export * as ComAtprotoServerRefreshSession from './types/com/atproto/server/refreshSession'
+export * as ComAtprotoServerRequestAccountDelete from './types/com/atproto/server/requestAccountDelete'
+export * as ComAtprotoServerRequestEmailConfirmation from './types/com/atproto/server/requestEmailConfirmation'
+export * as ComAtprotoServerRequestEmailUpdate from './types/com/atproto/server/requestEmailUpdate'
+export * as ComAtprotoServerRequestPasswordReset from './types/com/atproto/server/requestPasswordReset'
+export * as ComAtprotoServerReserveSigningKey from './types/com/atproto/server/reserveSigningKey'
+export * as ComAtprotoServerResetPassword from './types/com/atproto/server/resetPassword'
+export * as ComAtprotoServerRevokeAppPassword from './types/com/atproto/server/revokeAppPassword'
+export * as ComAtprotoServerUpdateEmail from './types/com/atproto/server/updateEmail'
+export * as ComAtprotoSyncGetBlob from './types/com/atproto/sync/getBlob'
+export * as ComAtprotoSyncGetBlocks from './types/com/atproto/sync/getBlocks'
+export * as ComAtprotoSyncGetCheckout from './types/com/atproto/sync/getCheckout'
+export * as ComAtprotoSyncGetHead from './types/com/atproto/sync/getHead'
+export * as ComAtprotoSyncGetLatestCommit from './types/com/atproto/sync/getLatestCommit'
+export * as ComAtprotoSyncGetRecord from './types/com/atproto/sync/getRecord'
+export * as ComAtprotoSyncGetRepo from './types/com/atproto/sync/getRepo'
+export * as ComAtprotoSyncGetRepoStatus from './types/com/atproto/sync/getRepoStatus'
+export * as ComAtprotoSyncListBlobs from './types/com/atproto/sync/listBlobs'
+export * as ComAtprotoSyncListRepos from './types/com/atproto/sync/listRepos'
+export * as ComAtprotoSyncNotifyOfUpdate from './types/com/atproto/sync/notifyOfUpdate'
+export * as ComAtprotoSyncRequestCrawl from './types/com/atproto/sync/requestCrawl'
+export * as ComAtprotoSyncSubscribeRepos from './types/com/atproto/sync/subscribeRepos'
+export * as ComAtprotoTempCheckSignupQueue from './types/com/atproto/temp/checkSignupQueue'
+export * as ComAtprotoTempFetchLabels from './types/com/atproto/temp/fetchLabels'
+export * as ComAtprotoTempRequestPhoneVerification from './types/com/atproto/temp/requestPhoneVerification'
+export * as BlueMojiCollectionDefs from './types/blue/moji/collection/defs'
+export * as BlueMojiCollectionGetItem from './types/blue/moji/collection/getItem'
+export * as BlueMojiCollectionItem from './types/blue/moji/collection/item'
+export * as BlueMojiCollectionListCollection from './types/blue/moji/collection/listCollection'
+export * as BlueMojiCollectionPutItem from './types/blue/moji/collection/putItem'
+export * as BlueMojiCollectionSaveToCollection from './types/blue/moji/collection/saveToCollection'
+export * as BlueMojiPacksDefs from './types/blue/moji/packs/defs'
+export * as BlueMojiPacksGetActorPacks from './types/blue/moji/packs/getActorPacks'
+export * as BlueMojiPacksGetPack from './types/blue/moji/packs/getPack'
+export * as BlueMojiPacksGetPacks from './types/blue/moji/packs/getPacks'
+export * as BlueMojiPacksPack from './types/blue/moji/packs/pack'
+export * as BlueMojiPacksPackitem from './types/blue/moji/packs/packitem'
+export * as BlueMojiRichtextFacet from './types/blue/moji/richtext/facet'
 
 export const APP_BSKY_FEED = {
-  DefsRequestLess: "app.bsky.feed.defs#requestLess",
-  DefsRequestMore: "app.bsky.feed.defs#requestMore",
-  DefsClickthroughItem: "app.bsky.feed.defs#clickthroughItem",
-  DefsClickthroughAuthor: "app.bsky.feed.defs#clickthroughAuthor",
-  DefsClickthroughReposter: "app.bsky.feed.defs#clickthroughReposter",
-  DefsClickthroughEmbed: "app.bsky.feed.defs#clickthroughEmbed",
-  DefsInteractionSeen: "app.bsky.feed.defs#interactionSeen",
-  DefsInteractionLike: "app.bsky.feed.defs#interactionLike",
-  DefsInteractionRepost: "app.bsky.feed.defs#interactionRepost",
-  DefsInteractionReply: "app.bsky.feed.defs#interactionReply",
-  DefsInteractionQuote: "app.bsky.feed.defs#interactionQuote",
-  DefsInteractionShare: "app.bsky.feed.defs#interactionShare"
-};
+  DefsRequestLess: 'app.bsky.feed.defs#requestLess',
+  DefsRequestMore: 'app.bsky.feed.defs#requestMore',
+  DefsClickthroughItem: 'app.bsky.feed.defs#clickthroughItem',
+  DefsClickthroughAuthor: 'app.bsky.feed.defs#clickthroughAuthor',
+  DefsClickthroughReposter: 'app.bsky.feed.defs#clickthroughReposter',
+  DefsClickthroughEmbed: 'app.bsky.feed.defs#clickthroughEmbed',
+  DefsInteractionSeen: 'app.bsky.feed.defs#interactionSeen',
+  DefsInteractionLike: 'app.bsky.feed.defs#interactionLike',
+  DefsInteractionRepost: 'app.bsky.feed.defs#interactionRepost',
+  DefsInteractionReply: 'app.bsky.feed.defs#interactionReply',
+  DefsInteractionQuote: 'app.bsky.feed.defs#interactionQuote',
+  DefsInteractionShare: 'app.bsky.feed.defs#interactionShare',
+}
 export const APP_BSKY_GRAPH = {
-  DefsModlist: "app.bsky.graph.defs#modlist",
-  DefsCuratelist: "app.bsky.graph.defs#curatelist",
-  DefsReferencelist: "app.bsky.graph.defs#referencelist"
-};
+  DefsModlist: 'app.bsky.graph.defs#modlist',
+  DefsCuratelist: 'app.bsky.graph.defs#curatelist',
+  DefsReferencelist: 'app.bsky.graph.defs#referencelist',
+}
 export const COM_ATPROTO_MODERATION = {
-  DefsReasonSpam: "com.atproto.moderation.defs#reasonSpam",
-  DefsReasonViolation: "com.atproto.moderation.defs#reasonViolation",
-  DefsReasonMisleading: "com.atproto.moderation.defs#reasonMisleading",
-  DefsReasonSexual: "com.atproto.moderation.defs#reasonSexual",
-  DefsReasonRude: "com.atproto.moderation.defs#reasonRude",
-  DefsReasonOther: "com.atproto.moderation.defs#reasonOther",
-  DefsReasonAppeal: "com.atproto.moderation.defs#reasonAppeal"
-};
+  DefsReasonSpam: 'com.atproto.moderation.defs#reasonSpam',
+  DefsReasonViolation: 'com.atproto.moderation.defs#reasonViolation',
+  DefsReasonMisleading: 'com.atproto.moderation.defs#reasonMisleading',
+  DefsReasonSexual: 'com.atproto.moderation.defs#reasonSexual',
+  DefsReasonRude: 'com.atproto.moderation.defs#reasonRude',
+  DefsReasonOther: 'com.atproto.moderation.defs#reasonOther',
+  DefsReasonAppeal: 'com.atproto.moderation.defs#reasonAppeal',
+}
 
 export class AtpBaseClient extends XrpcClient {
-  app: AppNS;
-  com: ComNS;
-  blue: BlueNS;
+  app: AppNS
+  com: ComNS
+  blue: BlueNS
 
   constructor(options: FetchHandler | FetchHandlerOptions) {
-    super(options, schemas);
-    this.app = new AppNS(this);
-    this.com = new ComNS(this);
-    this.blue = new BlueNS(this);
+    super(options, schemas)
+    this.app = new AppNS(this)
+    this.com = new ComNS(this)
+    this.blue = new BlueNS(this)
   }
 
   /** @deprecated use `this` instead */
   get xrpc(): XrpcClient {
-    return this;
+    return this
   }
 }
 
 export class AppNS {
-  _client: XrpcClient;
-  bsky: AppBskyNS;
+  _client: XrpcClient
+  bsky: AppBskyNS
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.bsky = new AppBskyNS(client);
+    this._client = client
+    this.bsky = new AppBskyNS(client)
   }
 }
 
 export class AppBskyNS {
-  _client: XrpcClient;
-  actor: AppBskyActorNS;
-  embed: AppBskyEmbedNS;
-  feed: AppBskyFeedNS;
-  graph: AppBskyGraphNS;
-  labeler: AppBskyLabelerNS;
-  notification: AppBskyNotificationNS;
-  richtext: AppBskyRichtextNS;
-  unspecced: AppBskyUnspeccedNS;
+  _client: XrpcClient
+  actor: AppBskyActorNS
+  embed: AppBskyEmbedNS
+  feed: AppBskyFeedNS
+  graph: AppBskyGraphNS
+  labeler: AppBskyLabelerNS
+  notification: AppBskyNotificationNS
+  richtext: AppBskyRichtextNS
+  unspecced: AppBskyUnspeccedNS
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.actor = new AppBskyActorNS(client);
-    this.embed = new AppBskyEmbedNS(client);
-    this.feed = new AppBskyFeedNS(client);
-    this.graph = new AppBskyGraphNS(client);
-    this.labeler = new AppBskyLabelerNS(client);
-    this.notification = new AppBskyNotificationNS(client);
-    this.richtext = new AppBskyRichtextNS(client);
-    this.unspecced = new AppBskyUnspeccedNS(client);
+    this._client = client
+    this.actor = new AppBskyActorNS(client)
+    this.embed = new AppBskyEmbedNS(client)
+    this.feed = new AppBskyFeedNS(client)
+    this.graph = new AppBskyGraphNS(client)
+    this.labeler = new AppBskyLabelerNS(client)
+    this.notification = new AppBskyNotificationNS(client)
+    this.richtext = new AppBskyRichtextNS(client)
+    this.unspecced = new AppBskyUnspeccedNS(client)
   }
 }
 
 export class AppBskyActorNS {
-  _client: XrpcClient;
-  profile: ProfileRecord;
+  _client: XrpcClient
+  profile: ProfileRecord
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.profile = new ProfileRecord(client);
+    this._client = client
+    this.profile = new ProfileRecord(client)
   }
 
   getPreferences(
     params?: AppBskyActorGetPreferences.QueryParams,
-    opts?: AppBskyActorGetPreferences.CallOptions
+    opts?: AppBskyActorGetPreferences.CallOptions,
   ): Promise<AppBskyActorGetPreferences.Response> {
     return this._client.call(
-      "app.bsky.actor.getPreferences",
+      'app.bsky.actor.getPreferences',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getProfile(
     params?: AppBskyActorGetProfile.QueryParams,
-    opts?: AppBskyActorGetProfile.CallOptions
+    opts?: AppBskyActorGetProfile.CallOptions,
   ): Promise<AppBskyActorGetProfile.Response> {
     return this._client.call(
-      "app.bsky.actor.getProfile",
+      'app.bsky.actor.getProfile',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getProfiles(
     params?: AppBskyActorGetProfiles.QueryParams,
-    opts?: AppBskyActorGetProfiles.CallOptions
+    opts?: AppBskyActorGetProfiles.CallOptions,
   ): Promise<AppBskyActorGetProfiles.Response> {
     return this._client.call(
-      "app.bsky.actor.getProfiles",
+      'app.bsky.actor.getProfiles',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getSuggestions(
     params?: AppBskyActorGetSuggestions.QueryParams,
-    opts?: AppBskyActorGetSuggestions.CallOptions
+    opts?: AppBskyActorGetSuggestions.CallOptions,
   ): Promise<AppBskyActorGetSuggestions.Response> {
     return this._client.call(
-      "app.bsky.actor.getSuggestions",
+      'app.bsky.actor.getSuggestions',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   putPreferences(
     data?: AppBskyActorPutPreferences.InputSchema,
-    opts?: AppBskyActorPutPreferences.CallOptions
+    opts?: AppBskyActorPutPreferences.CallOptions,
   ): Promise<AppBskyActorPutPreferences.Response> {
     return this._client.call(
-      "app.bsky.actor.putPreferences",
+      'app.bsky.actor.putPreferences',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   searchActors(
     params?: AppBskyActorSearchActors.QueryParams,
-    opts?: AppBskyActorSearchActors.CallOptions
+    opts?: AppBskyActorSearchActors.CallOptions,
   ): Promise<AppBskyActorSearchActors.Response> {
     return this._client.call(
-      "app.bsky.actor.searchActors",
+      'app.bsky.actor.searchActors',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   searchActorsTypeahead(
     params?: AppBskyActorSearchActorsTypeahead.QueryParams,
-    opts?: AppBskyActorSearchActorsTypeahead.CallOptions
+    opts?: AppBskyActorSearchActorsTypeahead.CallOptions,
   ): Promise<AppBskyActorSearchActorsTypeahead.Response> {
     return this._client.call(
-      "app.bsky.actor.searchActorsTypeahead",
+      'app.bsky.actor.searchActorsTypeahead',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ProfileRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyActorProfile.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyActorProfile.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.actor.profile",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.actor.profile',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyActorProfile.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.actor.profile",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.actor.profile',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyActorProfile.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.actor.profile";
+    record.$type = 'app.bsky.actor.profile'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.actor.profile", rkey: "self", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.actor.profile', rkey: 'self', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.actor.profile", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.actor.profile', ...params },
+      { headers },
+    )
   }
 }
 
 export class AppBskyEmbedNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 }
 
 export class AppBskyFeedNS {
-  _client: XrpcClient;
-  generator: GeneratorRecord;
-  like: LikeRecord;
-  post: PostRecord;
-  repost: RepostRecord;
-  threadgate: ThreadgateRecord;
+  _client: XrpcClient
+  generator: GeneratorRecord
+  like: LikeRecord
+  post: PostRecord
+  repost: RepostRecord
+  threadgate: ThreadgateRecord
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.generator = new GeneratorRecord(client);
-    this.like = new LikeRecord(client);
-    this.post = new PostRecord(client);
-    this.repost = new RepostRecord(client);
-    this.threadgate = new ThreadgateRecord(client);
+    this._client = client
+    this.generator = new GeneratorRecord(client)
+    this.like = new LikeRecord(client)
+    this.post = new PostRecord(client)
+    this.repost = new RepostRecord(client)
+    this.threadgate = new ThreadgateRecord(client)
   }
 
   describeFeedGenerator(
     params?: AppBskyFeedDescribeFeedGenerator.QueryParams,
-    opts?: AppBskyFeedDescribeFeedGenerator.CallOptions
+    opts?: AppBskyFeedDescribeFeedGenerator.CallOptions,
   ): Promise<AppBskyFeedDescribeFeedGenerator.Response> {
     return this._client.call(
-      "app.bsky.feed.describeFeedGenerator",
+      'app.bsky.feed.describeFeedGenerator',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getActorFeeds(
     params?: AppBskyFeedGetActorFeeds.QueryParams,
-    opts?: AppBskyFeedGetActorFeeds.CallOptions
+    opts?: AppBskyFeedGetActorFeeds.CallOptions,
   ): Promise<AppBskyFeedGetActorFeeds.Response> {
     return this._client.call(
-      "app.bsky.feed.getActorFeeds",
+      'app.bsky.feed.getActorFeeds',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getActorLikes(
     params?: AppBskyFeedGetActorLikes.QueryParams,
-    opts?: AppBskyFeedGetActorLikes.CallOptions
+    opts?: AppBskyFeedGetActorLikes.CallOptions,
   ): Promise<AppBskyFeedGetActorLikes.Response> {
     return this._client
-      .call("app.bsky.feed.getActorLikes", params, undefined, opts)
+      .call('app.bsky.feed.getActorLikes', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyFeedGetActorLikes.toKnownErr(e);
-      });
+        throw AppBskyFeedGetActorLikes.toKnownErr(e)
+      })
   }
 
   getAuthorFeed(
     params?: AppBskyFeedGetAuthorFeed.QueryParams,
-    opts?: AppBskyFeedGetAuthorFeed.CallOptions
+    opts?: AppBskyFeedGetAuthorFeed.CallOptions,
   ): Promise<AppBskyFeedGetAuthorFeed.Response> {
     return this._client
-      .call("app.bsky.feed.getAuthorFeed", params, undefined, opts)
+      .call('app.bsky.feed.getAuthorFeed', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyFeedGetAuthorFeed.toKnownErr(e);
-      });
+        throw AppBskyFeedGetAuthorFeed.toKnownErr(e)
+      })
   }
 
   getFeed(
     params?: AppBskyFeedGetFeed.QueryParams,
-    opts?: AppBskyFeedGetFeed.CallOptions
+    opts?: AppBskyFeedGetFeed.CallOptions,
   ): Promise<AppBskyFeedGetFeed.Response> {
     return this._client
-      .call("app.bsky.feed.getFeed", params, undefined, opts)
+      .call('app.bsky.feed.getFeed', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyFeedGetFeed.toKnownErr(e);
-      });
+        throw AppBskyFeedGetFeed.toKnownErr(e)
+      })
   }
 
   getFeedGenerator(
     params?: AppBskyFeedGetFeedGenerator.QueryParams,
-    opts?: AppBskyFeedGetFeedGenerator.CallOptions
+    opts?: AppBskyFeedGetFeedGenerator.CallOptions,
   ): Promise<AppBskyFeedGetFeedGenerator.Response> {
     return this._client.call(
-      "app.bsky.feed.getFeedGenerator",
+      'app.bsky.feed.getFeedGenerator',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getFeedGenerators(
     params?: AppBskyFeedGetFeedGenerators.QueryParams,
-    opts?: AppBskyFeedGetFeedGenerators.CallOptions
+    opts?: AppBskyFeedGetFeedGenerators.CallOptions,
   ): Promise<AppBskyFeedGetFeedGenerators.Response> {
     return this._client.call(
-      "app.bsky.feed.getFeedGenerators",
+      'app.bsky.feed.getFeedGenerators',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getFeedSkeleton(
     params?: AppBskyFeedGetFeedSkeleton.QueryParams,
-    opts?: AppBskyFeedGetFeedSkeleton.CallOptions
+    opts?: AppBskyFeedGetFeedSkeleton.CallOptions,
   ): Promise<AppBskyFeedGetFeedSkeleton.Response> {
     return this._client
-      .call("app.bsky.feed.getFeedSkeleton", params, undefined, opts)
+      .call('app.bsky.feed.getFeedSkeleton', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyFeedGetFeedSkeleton.toKnownErr(e);
-      });
+        throw AppBskyFeedGetFeedSkeleton.toKnownErr(e)
+      })
   }
 
   getLikes(
     params?: AppBskyFeedGetLikes.QueryParams,
-    opts?: AppBskyFeedGetLikes.CallOptions
+    opts?: AppBskyFeedGetLikes.CallOptions,
   ): Promise<AppBskyFeedGetLikes.Response> {
-    return this._client.call("app.bsky.feed.getLikes", params, undefined, opts);
+    return this._client.call('app.bsky.feed.getLikes', params, undefined, opts)
   }
 
   getListFeed(
     params?: AppBskyFeedGetListFeed.QueryParams,
-    opts?: AppBskyFeedGetListFeed.CallOptions
+    opts?: AppBskyFeedGetListFeed.CallOptions,
   ): Promise<AppBskyFeedGetListFeed.Response> {
     return this._client
-      .call("app.bsky.feed.getListFeed", params, undefined, opts)
+      .call('app.bsky.feed.getListFeed', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyFeedGetListFeed.toKnownErr(e);
-      });
+        throw AppBskyFeedGetListFeed.toKnownErr(e)
+      })
   }
 
   getPostThread(
     params?: AppBskyFeedGetPostThread.QueryParams,
-    opts?: AppBskyFeedGetPostThread.CallOptions
+    opts?: AppBskyFeedGetPostThread.CallOptions,
   ): Promise<AppBskyFeedGetPostThread.Response> {
     return this._client
-      .call("app.bsky.feed.getPostThread", params, undefined, opts)
+      .call('app.bsky.feed.getPostThread', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyFeedGetPostThread.toKnownErr(e);
-      });
+        throw AppBskyFeedGetPostThread.toKnownErr(e)
+      })
   }
 
   getPosts(
     params?: AppBskyFeedGetPosts.QueryParams,
-    opts?: AppBskyFeedGetPosts.CallOptions
+    opts?: AppBskyFeedGetPosts.CallOptions,
   ): Promise<AppBskyFeedGetPosts.Response> {
-    return this._client.call("app.bsky.feed.getPosts", params, undefined, opts);
+    return this._client.call('app.bsky.feed.getPosts', params, undefined, opts)
   }
 
   getRepostedBy(
     params?: AppBskyFeedGetRepostedBy.QueryParams,
-    opts?: AppBskyFeedGetRepostedBy.CallOptions
+    opts?: AppBskyFeedGetRepostedBy.CallOptions,
   ): Promise<AppBskyFeedGetRepostedBy.Response> {
     return this._client.call(
-      "app.bsky.feed.getRepostedBy",
+      'app.bsky.feed.getRepostedBy',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getSuggestedFeeds(
     params?: AppBskyFeedGetSuggestedFeeds.QueryParams,
-    opts?: AppBskyFeedGetSuggestedFeeds.CallOptions
+    opts?: AppBskyFeedGetSuggestedFeeds.CallOptions,
   ): Promise<AppBskyFeedGetSuggestedFeeds.Response> {
     return this._client.call(
-      "app.bsky.feed.getSuggestedFeeds",
+      'app.bsky.feed.getSuggestedFeeds',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getTimeline(
     params?: AppBskyFeedGetTimeline.QueryParams,
-    opts?: AppBskyFeedGetTimeline.CallOptions
+    opts?: AppBskyFeedGetTimeline.CallOptions,
   ): Promise<AppBskyFeedGetTimeline.Response> {
     return this._client.call(
-      "app.bsky.feed.getTimeline",
+      'app.bsky.feed.getTimeline',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   searchPosts(
     params?: AppBskyFeedSearchPosts.QueryParams,
-    opts?: AppBskyFeedSearchPosts.CallOptions
+    opts?: AppBskyFeedSearchPosts.CallOptions,
   ): Promise<AppBskyFeedSearchPosts.Response> {
     return this._client
-      .call("app.bsky.feed.searchPosts", params, undefined, opts)
+      .call('app.bsky.feed.searchPosts', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyFeedSearchPosts.toKnownErr(e);
-      });
+        throw AppBskyFeedSearchPosts.toKnownErr(e)
+      })
   }
 
   sendInteractions(
     data?: AppBskyFeedSendInteractions.InputSchema,
-    opts?: AppBskyFeedSendInteractions.CallOptions
+    opts?: AppBskyFeedSendInteractions.CallOptions,
   ): Promise<AppBskyFeedSendInteractions.Response> {
     return this._client.call(
-      "app.bsky.feed.sendInteractions",
+      'app.bsky.feed.sendInteractions',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class GeneratorRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyFeedGenerator.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyFeedGenerator.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.feed.generator",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.feed.generator',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedGenerator.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.feed.generator",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.feed.generator',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyFeedGenerator.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.feed.generator";
+    record.$type = 'app.bsky.feed.generator'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.feed.generator", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.feed.generator', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.feed.generator", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.feed.generator', ...params },
+      { headers },
+    )
   }
 }
 
 export class LikeRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyFeedLike.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyFeedLike.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.feed.like",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.feed.like',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedLike.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.feed.like",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.feed.like',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyFeedLike.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.feed.like";
+    record.$type = 'app.bsky.feed.like'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.feed.like", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.feed.like', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.feed.like", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.feed.like', ...params },
+      { headers },
+    )
   }
 }
 
 export class PostRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyFeedPost.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyFeedPost.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.feed.post",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.feed.post',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedPost.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.feed.post",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.feed.post',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyFeedPost.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.feed.post";
+    record.$type = 'app.bsky.feed.post'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.feed.post", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.feed.post', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.feed.post", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.feed.post', ...params },
+      { headers },
+    )
   }
 }
 
 export class RepostRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyFeedRepost.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyFeedRepost.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.feed.repost",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.feed.repost',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyFeedRepost.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.feed.repost",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.feed.repost',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyFeedRepost.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.feed.repost";
+    record.$type = 'app.bsky.feed.repost'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.feed.repost", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.feed.repost', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.feed.repost", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.feed.repost', ...params },
+      { headers },
+    )
   }
 }
 
 export class ThreadgateRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyFeedThreadgate.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyFeedThreadgate.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.feed.threadgate",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.feed.threadgate',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{
-    uri: string;
-    cid: string;
-    value: AppBskyFeedThreadgate.Record;
+    uri: string
+    cid: string
+    value: AppBskyFeedThreadgate.Record
   }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.feed.threadgate",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.feed.threadgate',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyFeedThreadgate.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.feed.threadgate";
+    record.$type = 'app.bsky.feed.threadgate'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.feed.threadgate", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.feed.threadgate', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.feed.threadgate", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.feed.threadgate', ...params },
+      { headers },
+    )
   }
 }
 
 export class AppBskyGraphNS {
-  _client: XrpcClient;
-  block: BlockRecord;
-  follow: FollowRecord;
-  list: ListRecord;
-  listblock: ListblockRecord;
-  listitem: ListitemRecord;
-  starterpack: StarterpackRecord;
+  _client: XrpcClient
+  block: BlockRecord
+  follow: FollowRecord
+  list: ListRecord
+  listblock: ListblockRecord
+  listitem: ListitemRecord
+  starterpack: StarterpackRecord
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.block = new BlockRecord(client);
-    this.follow = new FollowRecord(client);
-    this.list = new ListRecord(client);
-    this.listblock = new ListblockRecord(client);
-    this.listitem = new ListitemRecord(client);
-    this.starterpack = new StarterpackRecord(client);
+    this._client = client
+    this.block = new BlockRecord(client)
+    this.follow = new FollowRecord(client)
+    this.list = new ListRecord(client)
+    this.listblock = new ListblockRecord(client)
+    this.listitem = new ListitemRecord(client)
+    this.starterpack = new StarterpackRecord(client)
   }
 
   getActorStarterPacks(
     params?: AppBskyGraphGetActorStarterPacks.QueryParams,
-    opts?: AppBskyGraphGetActorStarterPacks.CallOptions
+    opts?: AppBskyGraphGetActorStarterPacks.CallOptions,
   ): Promise<AppBskyGraphGetActorStarterPacks.Response> {
     return this._client.call(
-      "app.bsky.graph.getActorStarterPacks",
+      'app.bsky.graph.getActorStarterPacks',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getBlocks(
     params?: AppBskyGraphGetBlocks.QueryParams,
-    opts?: AppBskyGraphGetBlocks.CallOptions
+    opts?: AppBskyGraphGetBlocks.CallOptions,
   ): Promise<AppBskyGraphGetBlocks.Response> {
     return this._client.call(
-      "app.bsky.graph.getBlocks",
+      'app.bsky.graph.getBlocks',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getFollowers(
     params?: AppBskyGraphGetFollowers.QueryParams,
-    opts?: AppBskyGraphGetFollowers.CallOptions
+    opts?: AppBskyGraphGetFollowers.CallOptions,
   ): Promise<AppBskyGraphGetFollowers.Response> {
     return this._client.call(
-      "app.bsky.graph.getFollowers",
+      'app.bsky.graph.getFollowers',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getFollows(
     params?: AppBskyGraphGetFollows.QueryParams,
-    opts?: AppBskyGraphGetFollows.CallOptions
+    opts?: AppBskyGraphGetFollows.CallOptions,
   ): Promise<AppBskyGraphGetFollows.Response> {
     return this._client.call(
-      "app.bsky.graph.getFollows",
+      'app.bsky.graph.getFollows',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getKnownFollowers(
     params?: AppBskyGraphGetKnownFollowers.QueryParams,
-    opts?: AppBskyGraphGetKnownFollowers.CallOptions
+    opts?: AppBskyGraphGetKnownFollowers.CallOptions,
   ): Promise<AppBskyGraphGetKnownFollowers.Response> {
     return this._client.call(
-      "app.bsky.graph.getKnownFollowers",
+      'app.bsky.graph.getKnownFollowers',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getList(
     params?: AppBskyGraphGetList.QueryParams,
-    opts?: AppBskyGraphGetList.CallOptions
+    opts?: AppBskyGraphGetList.CallOptions,
   ): Promise<AppBskyGraphGetList.Response> {
-    return this._client.call("app.bsky.graph.getList", params, undefined, opts);
+    return this._client.call('app.bsky.graph.getList', params, undefined, opts)
   }
 
   getListBlocks(
     params?: AppBskyGraphGetListBlocks.QueryParams,
-    opts?: AppBskyGraphGetListBlocks.CallOptions
+    opts?: AppBskyGraphGetListBlocks.CallOptions,
   ): Promise<AppBskyGraphGetListBlocks.Response> {
     return this._client.call(
-      "app.bsky.graph.getListBlocks",
+      'app.bsky.graph.getListBlocks',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getListMutes(
     params?: AppBskyGraphGetListMutes.QueryParams,
-    opts?: AppBskyGraphGetListMutes.CallOptions
+    opts?: AppBskyGraphGetListMutes.CallOptions,
   ): Promise<AppBskyGraphGetListMutes.Response> {
     return this._client.call(
-      "app.bsky.graph.getListMutes",
+      'app.bsky.graph.getListMutes',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getLists(
     params?: AppBskyGraphGetLists.QueryParams,
-    opts?: AppBskyGraphGetLists.CallOptions
+    opts?: AppBskyGraphGetLists.CallOptions,
   ): Promise<AppBskyGraphGetLists.Response> {
-    return this._client.call(
-      "app.bsky.graph.getLists",
-      params,
-      undefined,
-      opts
-    );
+    return this._client.call('app.bsky.graph.getLists', params, undefined, opts)
   }
 
   getMutes(
     params?: AppBskyGraphGetMutes.QueryParams,
-    opts?: AppBskyGraphGetMutes.CallOptions
+    opts?: AppBskyGraphGetMutes.CallOptions,
   ): Promise<AppBskyGraphGetMutes.Response> {
-    return this._client.call(
-      "app.bsky.graph.getMutes",
-      params,
-      undefined,
-      opts
-    );
+    return this._client.call('app.bsky.graph.getMutes', params, undefined, opts)
   }
 
   getRelationships(
     params?: AppBskyGraphGetRelationships.QueryParams,
-    opts?: AppBskyGraphGetRelationships.CallOptions
+    opts?: AppBskyGraphGetRelationships.CallOptions,
   ): Promise<AppBskyGraphGetRelationships.Response> {
     return this._client
-      .call("app.bsky.graph.getRelationships", params, undefined, opts)
+      .call('app.bsky.graph.getRelationships', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyGraphGetRelationships.toKnownErr(e);
-      });
+        throw AppBskyGraphGetRelationships.toKnownErr(e)
+      })
   }
 
   getStarterPack(
     params?: AppBskyGraphGetStarterPack.QueryParams,
-    opts?: AppBskyGraphGetStarterPack.CallOptions
+    opts?: AppBskyGraphGetStarterPack.CallOptions,
   ): Promise<AppBskyGraphGetStarterPack.Response> {
     return this._client.call(
-      "app.bsky.graph.getStarterPack",
+      'app.bsky.graph.getStarterPack',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getStarterPacks(
     params?: AppBskyGraphGetStarterPacks.QueryParams,
-    opts?: AppBskyGraphGetStarterPacks.CallOptions
+    opts?: AppBskyGraphGetStarterPacks.CallOptions,
   ): Promise<AppBskyGraphGetStarterPacks.Response> {
     return this._client.call(
-      "app.bsky.graph.getStarterPacks",
+      'app.bsky.graph.getStarterPacks',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getSuggestedFollowsByActor(
     params?: AppBskyGraphGetSuggestedFollowsByActor.QueryParams,
-    opts?: AppBskyGraphGetSuggestedFollowsByActor.CallOptions
+    opts?: AppBskyGraphGetSuggestedFollowsByActor.CallOptions,
   ): Promise<AppBskyGraphGetSuggestedFollowsByActor.Response> {
     return this._client.call(
-      "app.bsky.graph.getSuggestedFollowsByActor",
+      'app.bsky.graph.getSuggestedFollowsByActor',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   muteActor(
     data?: AppBskyGraphMuteActor.InputSchema,
-    opts?: AppBskyGraphMuteActor.CallOptions
+    opts?: AppBskyGraphMuteActor.CallOptions,
   ): Promise<AppBskyGraphMuteActor.Response> {
-    return this._client.call("app.bsky.graph.muteActor", opts?.qp, data, opts);
+    return this._client.call('app.bsky.graph.muteActor', opts?.qp, data, opts)
   }
 
   muteActorList(
     data?: AppBskyGraphMuteActorList.InputSchema,
-    opts?: AppBskyGraphMuteActorList.CallOptions
+    opts?: AppBskyGraphMuteActorList.CallOptions,
   ): Promise<AppBskyGraphMuteActorList.Response> {
     return this._client.call(
-      "app.bsky.graph.muteActorList",
+      'app.bsky.graph.muteActorList',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   muteThread(
     data?: AppBskyGraphMuteThread.InputSchema,
-    opts?: AppBskyGraphMuteThread.CallOptions
+    opts?: AppBskyGraphMuteThread.CallOptions,
   ): Promise<AppBskyGraphMuteThread.Response> {
-    return this._client.call("app.bsky.graph.muteThread", opts?.qp, data, opts);
+    return this._client.call('app.bsky.graph.muteThread', opts?.qp, data, opts)
   }
 
   unmuteActor(
     data?: AppBskyGraphUnmuteActor.InputSchema,
-    opts?: AppBskyGraphUnmuteActor.CallOptions
+    opts?: AppBskyGraphUnmuteActor.CallOptions,
   ): Promise<AppBskyGraphUnmuteActor.Response> {
-    return this._client.call(
-      "app.bsky.graph.unmuteActor",
-      opts?.qp,
-      data,
-      opts
-    );
+    return this._client.call('app.bsky.graph.unmuteActor', opts?.qp, data, opts)
   }
 
   unmuteActorList(
     data?: AppBskyGraphUnmuteActorList.InputSchema,
-    opts?: AppBskyGraphUnmuteActorList.CallOptions
+    opts?: AppBskyGraphUnmuteActorList.CallOptions,
   ): Promise<AppBskyGraphUnmuteActorList.Response> {
     return this._client.call(
-      "app.bsky.graph.unmuteActorList",
+      'app.bsky.graph.unmuteActorList',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   unmuteThread(
     data?: AppBskyGraphUnmuteThread.InputSchema,
-    opts?: AppBskyGraphUnmuteThread.CallOptions
+    opts?: AppBskyGraphUnmuteThread.CallOptions,
   ): Promise<AppBskyGraphUnmuteThread.Response> {
     return this._client.call(
-      "app.bsky.graph.unmuteThread",
+      'app.bsky.graph.unmuteThread',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class BlockRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyGraphBlock.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyGraphBlock.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.graph.block",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.graph.block',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphBlock.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.graph.block",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.graph.block',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyGraphBlock.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.graph.block";
+    record.$type = 'app.bsky.graph.block'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.graph.block", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.graph.block', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.graph.block", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.graph.block', ...params },
+      { headers },
+    )
   }
 }
 
 export class FollowRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyGraphFollow.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyGraphFollow.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.graph.follow",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.graph.follow',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphFollow.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.graph.follow",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.graph.follow',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyGraphFollow.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.graph.follow";
+    record.$type = 'app.bsky.graph.follow'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.graph.follow", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.graph.follow', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.graph.follow", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.graph.follow', ...params },
+      { headers },
+    )
   }
 }
 
 export class ListRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyGraphList.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyGraphList.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.graph.list",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.graph.list',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphList.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.graph.list",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.graph.list',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyGraphList.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.graph.list";
+    record.$type = 'app.bsky.graph.list'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.graph.list", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.graph.list', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.graph.list", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.graph.list', ...params },
+      { headers },
+    )
   }
 }
 
 export class ListblockRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyGraphListblock.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyGraphListblock.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.graph.listblock",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.graph.listblock',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{
-    uri: string;
-    cid: string;
-    value: AppBskyGraphListblock.Record;
+    uri: string
+    cid: string
+    value: AppBskyGraphListblock.Record
   }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.graph.listblock",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.graph.listblock',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyGraphListblock.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.graph.listblock";
+    record.$type = 'app.bsky.graph.listblock'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.graph.listblock", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.graph.listblock', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.graph.listblock", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.graph.listblock', ...params },
+      { headers },
+    )
   }
 }
 
 export class ListitemRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyGraphListitem.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyGraphListitem.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.graph.listitem",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.graph.listitem',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: AppBskyGraphListitem.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.graph.listitem",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.graph.listitem',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyGraphListitem.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.graph.listitem";
+    record.$type = 'app.bsky.graph.listitem'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.graph.listitem", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.graph.listitem', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.graph.listitem", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.graph.listitem', ...params },
+      { headers },
+    )
   }
 }
 
 export class StarterpackRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyGraphStarterpack.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyGraphStarterpack.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.graph.starterpack",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.graph.starterpack',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{
-    uri: string;
-    cid: string;
-    value: AppBskyGraphStarterpack.Record;
+    uri: string
+    cid: string
+    value: AppBskyGraphStarterpack.Record
   }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.graph.starterpack",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.graph.starterpack',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyGraphStarterpack.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.graph.starterpack";
+    record.$type = 'app.bsky.graph.starterpack'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "app.bsky.graph.starterpack", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'app.bsky.graph.starterpack', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.graph.starterpack", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.graph.starterpack', ...params },
+      { headers },
+    )
   }
 }
 
 export class AppBskyLabelerNS {
-  _client: XrpcClient;
-  service: ServiceRecord;
+  _client: XrpcClient
+  service: ServiceRecord
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.service = new ServiceRecord(client);
+    this._client = client
+    this.service = new ServiceRecord(client)
   }
 
   getServices(
     params?: AppBskyLabelerGetServices.QueryParams,
-    opts?: AppBskyLabelerGetServices.CallOptions
+    opts?: AppBskyLabelerGetServices.CallOptions,
   ): Promise<AppBskyLabelerGetServices.Response> {
     return this._client.call(
-      "app.bsky.labeler.getServices",
+      'app.bsky.labeler.getServices',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ServiceRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: AppBskyLabelerService.Record }[];
+    cursor?: string
+    records: { uri: string; value: AppBskyLabelerService.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "app.bsky.labeler.service",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'app.bsky.labeler.service',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{
-    uri: string;
-    cid: string;
-    value: AppBskyLabelerService.Record;
+    uri: string
+    cid: string
+    value: AppBskyLabelerService.Record
   }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "app.bsky.labeler.service",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'app.bsky.labeler.service',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: AppBskyLabelerService.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "app.bsky.labeler.service";
+    record.$type = 'app.bsky.labeler.service'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
       {
-        collection: "app.bsky.labeler.service",
-        rkey: "self",
+        collection: 'app.bsky.labeler.service',
+        rkey: 'self',
         ...params,
-        record
+        record,
       },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "app.bsky.labeler.service", ...params },
-      { headers }
-    );
+      { collection: 'app.bsky.labeler.service', ...params },
+      { headers },
+    )
   }
 }
 
 export class AppBskyNotificationNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   getUnreadCount(
     params?: AppBskyNotificationGetUnreadCount.QueryParams,
-    opts?: AppBskyNotificationGetUnreadCount.CallOptions
+    opts?: AppBskyNotificationGetUnreadCount.CallOptions,
   ): Promise<AppBskyNotificationGetUnreadCount.Response> {
     return this._client.call(
-      "app.bsky.notification.getUnreadCount",
+      'app.bsky.notification.getUnreadCount',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   listNotifications(
     params?: AppBskyNotificationListNotifications.QueryParams,
-    opts?: AppBskyNotificationListNotifications.CallOptions
+    opts?: AppBskyNotificationListNotifications.CallOptions,
   ): Promise<AppBskyNotificationListNotifications.Response> {
     return this._client.call(
-      "app.bsky.notification.listNotifications",
+      'app.bsky.notification.listNotifications',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   putPreferences(
     data?: AppBskyNotificationPutPreferences.InputSchema,
-    opts?: AppBskyNotificationPutPreferences.CallOptions
+    opts?: AppBskyNotificationPutPreferences.CallOptions,
   ): Promise<AppBskyNotificationPutPreferences.Response> {
     return this._client.call(
-      "app.bsky.notification.putPreferences",
+      'app.bsky.notification.putPreferences',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   registerPush(
     data?: AppBskyNotificationRegisterPush.InputSchema,
-    opts?: AppBskyNotificationRegisterPush.CallOptions
+    opts?: AppBskyNotificationRegisterPush.CallOptions,
   ): Promise<AppBskyNotificationRegisterPush.Response> {
     return this._client.call(
-      "app.bsky.notification.registerPush",
+      'app.bsky.notification.registerPush',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   updateSeen(
     data?: AppBskyNotificationUpdateSeen.InputSchema,
-    opts?: AppBskyNotificationUpdateSeen.CallOptions
+    opts?: AppBskyNotificationUpdateSeen.CallOptions,
   ): Promise<AppBskyNotificationUpdateSeen.Response> {
     return this._client.call(
-      "app.bsky.notification.updateSeen",
+      'app.bsky.notification.updateSeen',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class AppBskyRichtextNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 }
 
 export class AppBskyUnspeccedNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   getPopularFeedGenerators(
     params?: AppBskyUnspeccedGetPopularFeedGenerators.QueryParams,
-    opts?: AppBskyUnspeccedGetPopularFeedGenerators.CallOptions
+    opts?: AppBskyUnspeccedGetPopularFeedGenerators.CallOptions,
   ): Promise<AppBskyUnspeccedGetPopularFeedGenerators.Response> {
     return this._client.call(
-      "app.bsky.unspecced.getPopularFeedGenerators",
+      'app.bsky.unspecced.getPopularFeedGenerators',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getSuggestionsSkeleton(
     params?: AppBskyUnspeccedGetSuggestionsSkeleton.QueryParams,
-    opts?: AppBskyUnspeccedGetSuggestionsSkeleton.CallOptions
+    opts?: AppBskyUnspeccedGetSuggestionsSkeleton.CallOptions,
   ): Promise<AppBskyUnspeccedGetSuggestionsSkeleton.Response> {
     return this._client.call(
-      "app.bsky.unspecced.getSuggestionsSkeleton",
+      'app.bsky.unspecced.getSuggestionsSkeleton',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getTaggedSuggestions(
     params?: AppBskyUnspeccedGetTaggedSuggestions.QueryParams,
-    opts?: AppBskyUnspeccedGetTaggedSuggestions.CallOptions
+    opts?: AppBskyUnspeccedGetTaggedSuggestions.CallOptions,
   ): Promise<AppBskyUnspeccedGetTaggedSuggestions.Response> {
     return this._client.call(
-      "app.bsky.unspecced.getTaggedSuggestions",
+      'app.bsky.unspecced.getTaggedSuggestions',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   searchActorsSkeleton(
     params?: AppBskyUnspeccedSearchActorsSkeleton.QueryParams,
-    opts?: AppBskyUnspeccedSearchActorsSkeleton.CallOptions
+    opts?: AppBskyUnspeccedSearchActorsSkeleton.CallOptions,
   ): Promise<AppBskyUnspeccedSearchActorsSkeleton.Response> {
     return this._client
-      .call("app.bsky.unspecced.searchActorsSkeleton", params, undefined, opts)
+      .call('app.bsky.unspecced.searchActorsSkeleton', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyUnspeccedSearchActorsSkeleton.toKnownErr(e);
-      });
+        throw AppBskyUnspeccedSearchActorsSkeleton.toKnownErr(e)
+      })
   }
 
   searchPostsSkeleton(
     params?: AppBskyUnspeccedSearchPostsSkeleton.QueryParams,
-    opts?: AppBskyUnspeccedSearchPostsSkeleton.CallOptions
+    opts?: AppBskyUnspeccedSearchPostsSkeleton.CallOptions,
   ): Promise<AppBskyUnspeccedSearchPostsSkeleton.Response> {
     return this._client
-      .call("app.bsky.unspecced.searchPostsSkeleton", params, undefined, opts)
+      .call('app.bsky.unspecced.searchPostsSkeleton', params, undefined, opts)
       .catch((e) => {
-        throw AppBskyUnspeccedSearchPostsSkeleton.toKnownErr(e);
-      });
+        throw AppBskyUnspeccedSearchPostsSkeleton.toKnownErr(e)
+      })
   }
 }
 
 export class ComNS {
-  _client: XrpcClient;
-  atproto: ComAtprotoNS;
+  _client: XrpcClient
+  atproto: ComAtprotoNS
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.atproto = new ComAtprotoNS(client);
+    this._client = client
+    this.atproto = new ComAtprotoNS(client)
   }
 }
 
 export class ComAtprotoNS {
-  _client: XrpcClient;
-  admin: ComAtprotoAdminNS;
-  identity: ComAtprotoIdentityNS;
-  label: ComAtprotoLabelNS;
-  moderation: ComAtprotoModerationNS;
-  repo: ComAtprotoRepoNS;
-  server: ComAtprotoServerNS;
-  sync: ComAtprotoSyncNS;
-  temp: ComAtprotoTempNS;
+  _client: XrpcClient
+  admin: ComAtprotoAdminNS
+  identity: ComAtprotoIdentityNS
+  label: ComAtprotoLabelNS
+  moderation: ComAtprotoModerationNS
+  repo: ComAtprotoRepoNS
+  server: ComAtprotoServerNS
+  sync: ComAtprotoSyncNS
+  temp: ComAtprotoTempNS
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.admin = new ComAtprotoAdminNS(client);
-    this.identity = new ComAtprotoIdentityNS(client);
-    this.label = new ComAtprotoLabelNS(client);
-    this.moderation = new ComAtprotoModerationNS(client);
-    this.repo = new ComAtprotoRepoNS(client);
-    this.server = new ComAtprotoServerNS(client);
-    this.sync = new ComAtprotoSyncNS(client);
-    this.temp = new ComAtprotoTempNS(client);
+    this._client = client
+    this.admin = new ComAtprotoAdminNS(client)
+    this.identity = new ComAtprotoIdentityNS(client)
+    this.label = new ComAtprotoLabelNS(client)
+    this.moderation = new ComAtprotoModerationNS(client)
+    this.repo = new ComAtprotoRepoNS(client)
+    this.server = new ComAtprotoServerNS(client)
+    this.sync = new ComAtprotoSyncNS(client)
+    this.temp = new ComAtprotoTempNS(client)
   }
 }
 
 export class ComAtprotoAdminNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   deleteAccount(
     data?: ComAtprotoAdminDeleteAccount.InputSchema,
-    opts?: ComAtprotoAdminDeleteAccount.CallOptions
+    opts?: ComAtprotoAdminDeleteAccount.CallOptions,
   ): Promise<ComAtprotoAdminDeleteAccount.Response> {
     return this._client.call(
-      "com.atproto.admin.deleteAccount",
+      'com.atproto.admin.deleteAccount',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   disableAccountInvites(
     data?: ComAtprotoAdminDisableAccountInvites.InputSchema,
-    opts?: ComAtprotoAdminDisableAccountInvites.CallOptions
+    opts?: ComAtprotoAdminDisableAccountInvites.CallOptions,
   ): Promise<ComAtprotoAdminDisableAccountInvites.Response> {
     return this._client.call(
-      "com.atproto.admin.disableAccountInvites",
+      'com.atproto.admin.disableAccountInvites',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   disableInviteCodes(
     data?: ComAtprotoAdminDisableInviteCodes.InputSchema,
-    opts?: ComAtprotoAdminDisableInviteCodes.CallOptions
+    opts?: ComAtprotoAdminDisableInviteCodes.CallOptions,
   ): Promise<ComAtprotoAdminDisableInviteCodes.Response> {
     return this._client.call(
-      "com.atproto.admin.disableInviteCodes",
+      'com.atproto.admin.disableInviteCodes',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   enableAccountInvites(
     data?: ComAtprotoAdminEnableAccountInvites.InputSchema,
-    opts?: ComAtprotoAdminEnableAccountInvites.CallOptions
+    opts?: ComAtprotoAdminEnableAccountInvites.CallOptions,
   ): Promise<ComAtprotoAdminEnableAccountInvites.Response> {
     return this._client.call(
-      "com.atproto.admin.enableAccountInvites",
+      'com.atproto.admin.enableAccountInvites',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   getAccountInfo(
     params?: ComAtprotoAdminGetAccountInfo.QueryParams,
-    opts?: ComAtprotoAdminGetAccountInfo.CallOptions
+    opts?: ComAtprotoAdminGetAccountInfo.CallOptions,
   ): Promise<ComAtprotoAdminGetAccountInfo.Response> {
     return this._client.call(
-      "com.atproto.admin.getAccountInfo",
+      'com.atproto.admin.getAccountInfo',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getAccountInfos(
     params?: ComAtprotoAdminGetAccountInfos.QueryParams,
-    opts?: ComAtprotoAdminGetAccountInfos.CallOptions
+    opts?: ComAtprotoAdminGetAccountInfos.CallOptions,
   ): Promise<ComAtprotoAdminGetAccountInfos.Response> {
     return this._client.call(
-      "com.atproto.admin.getAccountInfos",
+      'com.atproto.admin.getAccountInfos',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getInviteCodes(
     params?: ComAtprotoAdminGetInviteCodes.QueryParams,
-    opts?: ComAtprotoAdminGetInviteCodes.CallOptions
+    opts?: ComAtprotoAdminGetInviteCodes.CallOptions,
   ): Promise<ComAtprotoAdminGetInviteCodes.Response> {
     return this._client.call(
-      "com.atproto.admin.getInviteCodes",
+      'com.atproto.admin.getInviteCodes',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getSubjectStatus(
     params?: ComAtprotoAdminGetSubjectStatus.QueryParams,
-    opts?: ComAtprotoAdminGetSubjectStatus.CallOptions
+    opts?: ComAtprotoAdminGetSubjectStatus.CallOptions,
   ): Promise<ComAtprotoAdminGetSubjectStatus.Response> {
     return this._client.call(
-      "com.atproto.admin.getSubjectStatus",
+      'com.atproto.admin.getSubjectStatus',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   searchAccounts(
     params?: ComAtprotoAdminSearchAccounts.QueryParams,
-    opts?: ComAtprotoAdminSearchAccounts.CallOptions
+    opts?: ComAtprotoAdminSearchAccounts.CallOptions,
   ): Promise<ComAtprotoAdminSearchAccounts.Response> {
     return this._client.call(
-      "com.atproto.admin.searchAccounts",
+      'com.atproto.admin.searchAccounts',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   sendEmail(
     data?: ComAtprotoAdminSendEmail.InputSchema,
-    opts?: ComAtprotoAdminSendEmail.CallOptions
+    opts?: ComAtprotoAdminSendEmail.CallOptions,
   ): Promise<ComAtprotoAdminSendEmail.Response> {
     return this._client.call(
-      "com.atproto.admin.sendEmail",
+      'com.atproto.admin.sendEmail',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   updateAccountEmail(
     data?: ComAtprotoAdminUpdateAccountEmail.InputSchema,
-    opts?: ComAtprotoAdminUpdateAccountEmail.CallOptions
+    opts?: ComAtprotoAdminUpdateAccountEmail.CallOptions,
   ): Promise<ComAtprotoAdminUpdateAccountEmail.Response> {
     return this._client.call(
-      "com.atproto.admin.updateAccountEmail",
+      'com.atproto.admin.updateAccountEmail',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   updateAccountHandle(
     data?: ComAtprotoAdminUpdateAccountHandle.InputSchema,
-    opts?: ComAtprotoAdminUpdateAccountHandle.CallOptions
+    opts?: ComAtprotoAdminUpdateAccountHandle.CallOptions,
   ): Promise<ComAtprotoAdminUpdateAccountHandle.Response> {
     return this._client.call(
-      "com.atproto.admin.updateAccountHandle",
+      'com.atproto.admin.updateAccountHandle',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   updateAccountPassword(
     data?: ComAtprotoAdminUpdateAccountPassword.InputSchema,
-    opts?: ComAtprotoAdminUpdateAccountPassword.CallOptions
+    opts?: ComAtprotoAdminUpdateAccountPassword.CallOptions,
   ): Promise<ComAtprotoAdminUpdateAccountPassword.Response> {
     return this._client.call(
-      "com.atproto.admin.updateAccountPassword",
+      'com.atproto.admin.updateAccountPassword',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   updateSubjectStatus(
     data?: ComAtprotoAdminUpdateSubjectStatus.InputSchema,
-    opts?: ComAtprotoAdminUpdateSubjectStatus.CallOptions
+    opts?: ComAtprotoAdminUpdateSubjectStatus.CallOptions,
   ): Promise<ComAtprotoAdminUpdateSubjectStatus.Response> {
     return this._client.call(
-      "com.atproto.admin.updateSubjectStatus",
+      'com.atproto.admin.updateSubjectStatus',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ComAtprotoIdentityNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   getRecommendedDidCredentials(
     params?: ComAtprotoIdentityGetRecommendedDidCredentials.QueryParams,
-    opts?: ComAtprotoIdentityGetRecommendedDidCredentials.CallOptions
+    opts?: ComAtprotoIdentityGetRecommendedDidCredentials.CallOptions,
   ): Promise<ComAtprotoIdentityGetRecommendedDidCredentials.Response> {
     return this._client.call(
-      "com.atproto.identity.getRecommendedDidCredentials",
+      'com.atproto.identity.getRecommendedDidCredentials',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   requestPlcOperationSignature(
     data?: ComAtprotoIdentityRequestPlcOperationSignature.InputSchema,
-    opts?: ComAtprotoIdentityRequestPlcOperationSignature.CallOptions
+    opts?: ComAtprotoIdentityRequestPlcOperationSignature.CallOptions,
   ): Promise<ComAtprotoIdentityRequestPlcOperationSignature.Response> {
     return this._client.call(
-      "com.atproto.identity.requestPlcOperationSignature",
+      'com.atproto.identity.requestPlcOperationSignature',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   resolveHandle(
     params?: ComAtprotoIdentityResolveHandle.QueryParams,
-    opts?: ComAtprotoIdentityResolveHandle.CallOptions
+    opts?: ComAtprotoIdentityResolveHandle.CallOptions,
   ): Promise<ComAtprotoIdentityResolveHandle.Response> {
     return this._client.call(
-      "com.atproto.identity.resolveHandle",
+      'com.atproto.identity.resolveHandle',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   signPlcOperation(
     data?: ComAtprotoIdentitySignPlcOperation.InputSchema,
-    opts?: ComAtprotoIdentitySignPlcOperation.CallOptions
+    opts?: ComAtprotoIdentitySignPlcOperation.CallOptions,
   ): Promise<ComAtprotoIdentitySignPlcOperation.Response> {
     return this._client.call(
-      "com.atproto.identity.signPlcOperation",
+      'com.atproto.identity.signPlcOperation',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   submitPlcOperation(
     data?: ComAtprotoIdentitySubmitPlcOperation.InputSchema,
-    opts?: ComAtprotoIdentitySubmitPlcOperation.CallOptions
+    opts?: ComAtprotoIdentitySubmitPlcOperation.CallOptions,
   ): Promise<ComAtprotoIdentitySubmitPlcOperation.Response> {
     return this._client.call(
-      "com.atproto.identity.submitPlcOperation",
+      'com.atproto.identity.submitPlcOperation',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   updateHandle(
     data?: ComAtprotoIdentityUpdateHandle.InputSchema,
-    opts?: ComAtprotoIdentityUpdateHandle.CallOptions
+    opts?: ComAtprotoIdentityUpdateHandle.CallOptions,
   ): Promise<ComAtprotoIdentityUpdateHandle.Response> {
     return this._client.call(
-      "com.atproto.identity.updateHandle",
+      'com.atproto.identity.updateHandle',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ComAtprotoLabelNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   queryLabels(
     params?: ComAtprotoLabelQueryLabels.QueryParams,
-    opts?: ComAtprotoLabelQueryLabels.CallOptions
+    opts?: ComAtprotoLabelQueryLabels.CallOptions,
   ): Promise<ComAtprotoLabelQueryLabels.Response> {
     return this._client.call(
-      "com.atproto.label.queryLabels",
+      'com.atproto.label.queryLabels',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ComAtprotoModerationNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   createReport(
     data?: ComAtprotoModerationCreateReport.InputSchema,
-    opts?: ComAtprotoModerationCreateReport.CallOptions
+    opts?: ComAtprotoModerationCreateReport.CallOptions,
   ): Promise<ComAtprotoModerationCreateReport.Response> {
     return this._client.call(
-      "com.atproto.moderation.createReport",
+      'com.atproto.moderation.createReport',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ComAtprotoRepoNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   applyWrites(
     data?: ComAtprotoRepoApplyWrites.InputSchema,
-    opts?: ComAtprotoRepoApplyWrites.CallOptions
+    opts?: ComAtprotoRepoApplyWrites.CallOptions,
   ): Promise<ComAtprotoRepoApplyWrites.Response> {
     return this._client
-      .call("com.atproto.repo.applyWrites", opts?.qp, data, opts)
+      .call('com.atproto.repo.applyWrites', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoRepoApplyWrites.toKnownErr(e);
-      });
+        throw ComAtprotoRepoApplyWrites.toKnownErr(e)
+      })
   }
 
   createRecord(
     data?: ComAtprotoRepoCreateRecord.InputSchema,
-    opts?: ComAtprotoRepoCreateRecord.CallOptions
+    opts?: ComAtprotoRepoCreateRecord.CallOptions,
   ): Promise<ComAtprotoRepoCreateRecord.Response> {
     return this._client
-      .call("com.atproto.repo.createRecord", opts?.qp, data, opts)
+      .call('com.atproto.repo.createRecord', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoRepoCreateRecord.toKnownErr(e);
-      });
+        throw ComAtprotoRepoCreateRecord.toKnownErr(e)
+      })
   }
 
   deleteRecord(
     data?: ComAtprotoRepoDeleteRecord.InputSchema,
-    opts?: ComAtprotoRepoDeleteRecord.CallOptions
+    opts?: ComAtprotoRepoDeleteRecord.CallOptions,
   ): Promise<ComAtprotoRepoDeleteRecord.Response> {
     return this._client
-      .call("com.atproto.repo.deleteRecord", opts?.qp, data, opts)
+      .call('com.atproto.repo.deleteRecord', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoRepoDeleteRecord.toKnownErr(e);
-      });
+        throw ComAtprotoRepoDeleteRecord.toKnownErr(e)
+      })
   }
 
   describeRepo(
     params?: ComAtprotoRepoDescribeRepo.QueryParams,
-    opts?: ComAtprotoRepoDescribeRepo.CallOptions
+    opts?: ComAtprotoRepoDescribeRepo.CallOptions,
   ): Promise<ComAtprotoRepoDescribeRepo.Response> {
     return this._client.call(
-      "com.atproto.repo.describeRepo",
+      'com.atproto.repo.describeRepo',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getRecord(
     params?: ComAtprotoRepoGetRecord.QueryParams,
-    opts?: ComAtprotoRepoGetRecord.CallOptions
+    opts?: ComAtprotoRepoGetRecord.CallOptions,
   ): Promise<ComAtprotoRepoGetRecord.Response> {
     return this._client.call(
-      "com.atproto.repo.getRecord",
+      'com.atproto.repo.getRecord',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   importRepo(
     data?: ComAtprotoRepoImportRepo.InputSchema,
-    opts?: ComAtprotoRepoImportRepo.CallOptions
+    opts?: ComAtprotoRepoImportRepo.CallOptions,
   ): Promise<ComAtprotoRepoImportRepo.Response> {
     return this._client.call(
-      "com.atproto.repo.importRepo",
+      'com.atproto.repo.importRepo',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   listMissingBlobs(
     params?: ComAtprotoRepoListMissingBlobs.QueryParams,
-    opts?: ComAtprotoRepoListMissingBlobs.CallOptions
+    opts?: ComAtprotoRepoListMissingBlobs.CallOptions,
   ): Promise<ComAtprotoRepoListMissingBlobs.Response> {
     return this._client.call(
-      "com.atproto.repo.listMissingBlobs",
+      'com.atproto.repo.listMissingBlobs',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   listRecords(
     params?: ComAtprotoRepoListRecords.QueryParams,
-    opts?: ComAtprotoRepoListRecords.CallOptions
+    opts?: ComAtprotoRepoListRecords.CallOptions,
   ): Promise<ComAtprotoRepoListRecords.Response> {
     return this._client.call(
-      "com.atproto.repo.listRecords",
+      'com.atproto.repo.listRecords',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   putRecord(
     data?: ComAtprotoRepoPutRecord.InputSchema,
-    opts?: ComAtprotoRepoPutRecord.CallOptions
+    opts?: ComAtprotoRepoPutRecord.CallOptions,
   ): Promise<ComAtprotoRepoPutRecord.Response> {
     return this._client
-      .call("com.atproto.repo.putRecord", opts?.qp, data, opts)
+      .call('com.atproto.repo.putRecord', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoRepoPutRecord.toKnownErr(e);
-      });
+        throw ComAtprotoRepoPutRecord.toKnownErr(e)
+      })
   }
 
   uploadBlob(
     data?: ComAtprotoRepoUploadBlob.InputSchema,
-    opts?: ComAtprotoRepoUploadBlob.CallOptions
+    opts?: ComAtprotoRepoUploadBlob.CallOptions,
   ): Promise<ComAtprotoRepoUploadBlob.Response> {
     return this._client.call(
-      "com.atproto.repo.uploadBlob",
+      'com.atproto.repo.uploadBlob',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ComAtprotoServerNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   activateAccount(
     data?: ComAtprotoServerActivateAccount.InputSchema,
-    opts?: ComAtprotoServerActivateAccount.CallOptions
+    opts?: ComAtprotoServerActivateAccount.CallOptions,
   ): Promise<ComAtprotoServerActivateAccount.Response> {
     return this._client.call(
-      "com.atproto.server.activateAccount",
+      'com.atproto.server.activateAccount',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   checkAccountStatus(
     params?: ComAtprotoServerCheckAccountStatus.QueryParams,
-    opts?: ComAtprotoServerCheckAccountStatus.CallOptions
+    opts?: ComAtprotoServerCheckAccountStatus.CallOptions,
   ): Promise<ComAtprotoServerCheckAccountStatus.Response> {
     return this._client.call(
-      "com.atproto.server.checkAccountStatus",
+      'com.atproto.server.checkAccountStatus',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   confirmEmail(
     data?: ComAtprotoServerConfirmEmail.InputSchema,
-    opts?: ComAtprotoServerConfirmEmail.CallOptions
+    opts?: ComAtprotoServerConfirmEmail.CallOptions,
   ): Promise<ComAtprotoServerConfirmEmail.Response> {
     return this._client
-      .call("com.atproto.server.confirmEmail", opts?.qp, data, opts)
+      .call('com.atproto.server.confirmEmail', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerConfirmEmail.toKnownErr(e);
-      });
+        throw ComAtprotoServerConfirmEmail.toKnownErr(e)
+      })
   }
 
   createAccount(
     data?: ComAtprotoServerCreateAccount.InputSchema,
-    opts?: ComAtprotoServerCreateAccount.CallOptions
+    opts?: ComAtprotoServerCreateAccount.CallOptions,
   ): Promise<ComAtprotoServerCreateAccount.Response> {
     return this._client
-      .call("com.atproto.server.createAccount", opts?.qp, data, opts)
+      .call('com.atproto.server.createAccount', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerCreateAccount.toKnownErr(e);
-      });
+        throw ComAtprotoServerCreateAccount.toKnownErr(e)
+      })
   }
 
   createAppPassword(
     data?: ComAtprotoServerCreateAppPassword.InputSchema,
-    opts?: ComAtprotoServerCreateAppPassword.CallOptions
+    opts?: ComAtprotoServerCreateAppPassword.CallOptions,
   ): Promise<ComAtprotoServerCreateAppPassword.Response> {
     return this._client
-      .call("com.atproto.server.createAppPassword", opts?.qp, data, opts)
+      .call('com.atproto.server.createAppPassword', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerCreateAppPassword.toKnownErr(e);
-      });
+        throw ComAtprotoServerCreateAppPassword.toKnownErr(e)
+      })
   }
 
   createInviteCode(
     data?: ComAtprotoServerCreateInviteCode.InputSchema,
-    opts?: ComAtprotoServerCreateInviteCode.CallOptions
+    opts?: ComAtprotoServerCreateInviteCode.CallOptions,
   ): Promise<ComAtprotoServerCreateInviteCode.Response> {
     return this._client.call(
-      "com.atproto.server.createInviteCode",
+      'com.atproto.server.createInviteCode',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   createInviteCodes(
     data?: ComAtprotoServerCreateInviteCodes.InputSchema,
-    opts?: ComAtprotoServerCreateInviteCodes.CallOptions
+    opts?: ComAtprotoServerCreateInviteCodes.CallOptions,
   ): Promise<ComAtprotoServerCreateInviteCodes.Response> {
     return this._client.call(
-      "com.atproto.server.createInviteCodes",
+      'com.atproto.server.createInviteCodes',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   createSession(
     data?: ComAtprotoServerCreateSession.InputSchema,
-    opts?: ComAtprotoServerCreateSession.CallOptions
+    opts?: ComAtprotoServerCreateSession.CallOptions,
   ): Promise<ComAtprotoServerCreateSession.Response> {
     return this._client
-      .call("com.atproto.server.createSession", opts?.qp, data, opts)
+      .call('com.atproto.server.createSession', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerCreateSession.toKnownErr(e);
-      });
+        throw ComAtprotoServerCreateSession.toKnownErr(e)
+      })
   }
 
   deactivateAccount(
     data?: ComAtprotoServerDeactivateAccount.InputSchema,
-    opts?: ComAtprotoServerDeactivateAccount.CallOptions
+    opts?: ComAtprotoServerDeactivateAccount.CallOptions,
   ): Promise<ComAtprotoServerDeactivateAccount.Response> {
     return this._client.call(
-      "com.atproto.server.deactivateAccount",
+      'com.atproto.server.deactivateAccount',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   deleteAccount(
     data?: ComAtprotoServerDeleteAccount.InputSchema,
-    opts?: ComAtprotoServerDeleteAccount.CallOptions
+    opts?: ComAtprotoServerDeleteAccount.CallOptions,
   ): Promise<ComAtprotoServerDeleteAccount.Response> {
     return this._client
-      .call("com.atproto.server.deleteAccount", opts?.qp, data, opts)
+      .call('com.atproto.server.deleteAccount', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerDeleteAccount.toKnownErr(e);
-      });
+        throw ComAtprotoServerDeleteAccount.toKnownErr(e)
+      })
   }
 
   deleteSession(
     data?: ComAtprotoServerDeleteSession.InputSchema,
-    opts?: ComAtprotoServerDeleteSession.CallOptions
+    opts?: ComAtprotoServerDeleteSession.CallOptions,
   ): Promise<ComAtprotoServerDeleteSession.Response> {
     return this._client.call(
-      "com.atproto.server.deleteSession",
+      'com.atproto.server.deleteSession',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   describeServer(
     params?: ComAtprotoServerDescribeServer.QueryParams,
-    opts?: ComAtprotoServerDescribeServer.CallOptions
+    opts?: ComAtprotoServerDescribeServer.CallOptions,
   ): Promise<ComAtprotoServerDescribeServer.Response> {
     return this._client.call(
-      "com.atproto.server.describeServer",
+      'com.atproto.server.describeServer',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getAccountInviteCodes(
     params?: ComAtprotoServerGetAccountInviteCodes.QueryParams,
-    opts?: ComAtprotoServerGetAccountInviteCodes.CallOptions
+    opts?: ComAtprotoServerGetAccountInviteCodes.CallOptions,
   ): Promise<ComAtprotoServerGetAccountInviteCodes.Response> {
     return this._client
-      .call("com.atproto.server.getAccountInviteCodes", params, undefined, opts)
+      .call('com.atproto.server.getAccountInviteCodes', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoServerGetAccountInviteCodes.toKnownErr(e);
-      });
+        throw ComAtprotoServerGetAccountInviteCodes.toKnownErr(e)
+      })
   }
 
   getServiceAuth(
     params?: ComAtprotoServerGetServiceAuth.QueryParams,
-    opts?: ComAtprotoServerGetServiceAuth.CallOptions
+    opts?: ComAtprotoServerGetServiceAuth.CallOptions,
   ): Promise<ComAtprotoServerGetServiceAuth.Response> {
     return this._client
-      .call("com.atproto.server.getServiceAuth", params, undefined, opts)
+      .call('com.atproto.server.getServiceAuth', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoServerGetServiceAuth.toKnownErr(e);
-      });
+        throw ComAtprotoServerGetServiceAuth.toKnownErr(e)
+      })
   }
 
   getSession(
     params?: ComAtprotoServerGetSession.QueryParams,
-    opts?: ComAtprotoServerGetSession.CallOptions
+    opts?: ComAtprotoServerGetSession.CallOptions,
   ): Promise<ComAtprotoServerGetSession.Response> {
     return this._client.call(
-      "com.atproto.server.getSession",
+      'com.atproto.server.getSession',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   listAppPasswords(
     params?: ComAtprotoServerListAppPasswords.QueryParams,
-    opts?: ComAtprotoServerListAppPasswords.CallOptions
+    opts?: ComAtprotoServerListAppPasswords.CallOptions,
   ): Promise<ComAtprotoServerListAppPasswords.Response> {
     return this._client
-      .call("com.atproto.server.listAppPasswords", params, undefined, opts)
+      .call('com.atproto.server.listAppPasswords', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoServerListAppPasswords.toKnownErr(e);
-      });
+        throw ComAtprotoServerListAppPasswords.toKnownErr(e)
+      })
   }
 
   refreshSession(
     data?: ComAtprotoServerRefreshSession.InputSchema,
-    opts?: ComAtprotoServerRefreshSession.CallOptions
+    opts?: ComAtprotoServerRefreshSession.CallOptions,
   ): Promise<ComAtprotoServerRefreshSession.Response> {
     return this._client
-      .call("com.atproto.server.refreshSession", opts?.qp, data, opts)
+      .call('com.atproto.server.refreshSession', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerRefreshSession.toKnownErr(e);
-      });
+        throw ComAtprotoServerRefreshSession.toKnownErr(e)
+      })
   }
 
   requestAccountDelete(
     data?: ComAtprotoServerRequestAccountDelete.InputSchema,
-    opts?: ComAtprotoServerRequestAccountDelete.CallOptions
+    opts?: ComAtprotoServerRequestAccountDelete.CallOptions,
   ): Promise<ComAtprotoServerRequestAccountDelete.Response> {
     return this._client.call(
-      "com.atproto.server.requestAccountDelete",
+      'com.atproto.server.requestAccountDelete',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   requestEmailConfirmation(
     data?: ComAtprotoServerRequestEmailConfirmation.InputSchema,
-    opts?: ComAtprotoServerRequestEmailConfirmation.CallOptions
+    opts?: ComAtprotoServerRequestEmailConfirmation.CallOptions,
   ): Promise<ComAtprotoServerRequestEmailConfirmation.Response> {
     return this._client.call(
-      "com.atproto.server.requestEmailConfirmation",
+      'com.atproto.server.requestEmailConfirmation',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   requestEmailUpdate(
     data?: ComAtprotoServerRequestEmailUpdate.InputSchema,
-    opts?: ComAtprotoServerRequestEmailUpdate.CallOptions
+    opts?: ComAtprotoServerRequestEmailUpdate.CallOptions,
   ): Promise<ComAtprotoServerRequestEmailUpdate.Response> {
     return this._client.call(
-      "com.atproto.server.requestEmailUpdate",
+      'com.atproto.server.requestEmailUpdate',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   requestPasswordReset(
     data?: ComAtprotoServerRequestPasswordReset.InputSchema,
-    opts?: ComAtprotoServerRequestPasswordReset.CallOptions
+    opts?: ComAtprotoServerRequestPasswordReset.CallOptions,
   ): Promise<ComAtprotoServerRequestPasswordReset.Response> {
     return this._client.call(
-      "com.atproto.server.requestPasswordReset",
+      'com.atproto.server.requestPasswordReset',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   reserveSigningKey(
     data?: ComAtprotoServerReserveSigningKey.InputSchema,
-    opts?: ComAtprotoServerReserveSigningKey.CallOptions
+    opts?: ComAtprotoServerReserveSigningKey.CallOptions,
   ): Promise<ComAtprotoServerReserveSigningKey.Response> {
     return this._client.call(
-      "com.atproto.server.reserveSigningKey",
+      'com.atproto.server.reserveSigningKey',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   resetPassword(
     data?: ComAtprotoServerResetPassword.InputSchema,
-    opts?: ComAtprotoServerResetPassword.CallOptions
+    opts?: ComAtprotoServerResetPassword.CallOptions,
   ): Promise<ComAtprotoServerResetPassword.Response> {
     return this._client
-      .call("com.atproto.server.resetPassword", opts?.qp, data, opts)
+      .call('com.atproto.server.resetPassword', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerResetPassword.toKnownErr(e);
-      });
+        throw ComAtprotoServerResetPassword.toKnownErr(e)
+      })
   }
 
   revokeAppPassword(
     data?: ComAtprotoServerRevokeAppPassword.InputSchema,
-    opts?: ComAtprotoServerRevokeAppPassword.CallOptions
+    opts?: ComAtprotoServerRevokeAppPassword.CallOptions,
   ): Promise<ComAtprotoServerRevokeAppPassword.Response> {
     return this._client.call(
-      "com.atproto.server.revokeAppPassword",
+      'com.atproto.server.revokeAppPassword',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   updateEmail(
     data?: ComAtprotoServerUpdateEmail.InputSchema,
-    opts?: ComAtprotoServerUpdateEmail.CallOptions
+    opts?: ComAtprotoServerUpdateEmail.CallOptions,
   ): Promise<ComAtprotoServerUpdateEmail.Response> {
     return this._client
-      .call("com.atproto.server.updateEmail", opts?.qp, data, opts)
+      .call('com.atproto.server.updateEmail', opts?.qp, data, opts)
       .catch((e) => {
-        throw ComAtprotoServerUpdateEmail.toKnownErr(e);
-      });
+        throw ComAtprotoServerUpdateEmail.toKnownErr(e)
+      })
   }
 }
 
 export class ComAtprotoSyncNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   getBlob(
     params?: ComAtprotoSyncGetBlob.QueryParams,
-    opts?: ComAtprotoSyncGetBlob.CallOptions
+    opts?: ComAtprotoSyncGetBlob.CallOptions,
   ): Promise<ComAtprotoSyncGetBlob.Response> {
     return this._client
-      .call("com.atproto.sync.getBlob", params, undefined, opts)
+      .call('com.atproto.sync.getBlob', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncGetBlob.toKnownErr(e);
-      });
+        throw ComAtprotoSyncGetBlob.toKnownErr(e)
+      })
   }
 
   getBlocks(
     params?: ComAtprotoSyncGetBlocks.QueryParams,
-    opts?: ComAtprotoSyncGetBlocks.CallOptions
+    opts?: ComAtprotoSyncGetBlocks.CallOptions,
   ): Promise<ComAtprotoSyncGetBlocks.Response> {
     return this._client
-      .call("com.atproto.sync.getBlocks", params, undefined, opts)
+      .call('com.atproto.sync.getBlocks', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncGetBlocks.toKnownErr(e);
-      });
+        throw ComAtprotoSyncGetBlocks.toKnownErr(e)
+      })
   }
 
   getCheckout(
     params?: ComAtprotoSyncGetCheckout.QueryParams,
-    opts?: ComAtprotoSyncGetCheckout.CallOptions
+    opts?: ComAtprotoSyncGetCheckout.CallOptions,
   ): Promise<ComAtprotoSyncGetCheckout.Response> {
     return this._client.call(
-      "com.atproto.sync.getCheckout",
+      'com.atproto.sync.getCheckout',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getHead(
     params?: ComAtprotoSyncGetHead.QueryParams,
-    opts?: ComAtprotoSyncGetHead.CallOptions
+    opts?: ComAtprotoSyncGetHead.CallOptions,
   ): Promise<ComAtprotoSyncGetHead.Response> {
     return this._client
-      .call("com.atproto.sync.getHead", params, undefined, opts)
+      .call('com.atproto.sync.getHead', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncGetHead.toKnownErr(e);
-      });
+        throw ComAtprotoSyncGetHead.toKnownErr(e)
+      })
   }
 
   getLatestCommit(
     params?: ComAtprotoSyncGetLatestCommit.QueryParams,
-    opts?: ComAtprotoSyncGetLatestCommit.CallOptions
+    opts?: ComAtprotoSyncGetLatestCommit.CallOptions,
   ): Promise<ComAtprotoSyncGetLatestCommit.Response> {
     return this._client
-      .call("com.atproto.sync.getLatestCommit", params, undefined, opts)
+      .call('com.atproto.sync.getLatestCommit', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncGetLatestCommit.toKnownErr(e);
-      });
+        throw ComAtprotoSyncGetLatestCommit.toKnownErr(e)
+      })
   }
 
   getRecord(
     params?: ComAtprotoSyncGetRecord.QueryParams,
-    opts?: ComAtprotoSyncGetRecord.CallOptions
+    opts?: ComAtprotoSyncGetRecord.CallOptions,
   ): Promise<ComAtprotoSyncGetRecord.Response> {
     return this._client
-      .call("com.atproto.sync.getRecord", params, undefined, opts)
+      .call('com.atproto.sync.getRecord', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncGetRecord.toKnownErr(e);
-      });
+        throw ComAtprotoSyncGetRecord.toKnownErr(e)
+      })
   }
 
   getRepo(
     params?: ComAtprotoSyncGetRepo.QueryParams,
-    opts?: ComAtprotoSyncGetRepo.CallOptions
+    opts?: ComAtprotoSyncGetRepo.CallOptions,
   ): Promise<ComAtprotoSyncGetRepo.Response> {
     return this._client
-      .call("com.atproto.sync.getRepo", params, undefined, opts)
+      .call('com.atproto.sync.getRepo', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncGetRepo.toKnownErr(e);
-      });
+        throw ComAtprotoSyncGetRepo.toKnownErr(e)
+      })
   }
 
   getRepoStatus(
     params?: ComAtprotoSyncGetRepoStatus.QueryParams,
-    opts?: ComAtprotoSyncGetRepoStatus.CallOptions
+    opts?: ComAtprotoSyncGetRepoStatus.CallOptions,
   ): Promise<ComAtprotoSyncGetRepoStatus.Response> {
     return this._client
-      .call("com.atproto.sync.getRepoStatus", params, undefined, opts)
+      .call('com.atproto.sync.getRepoStatus', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncGetRepoStatus.toKnownErr(e);
-      });
+        throw ComAtprotoSyncGetRepoStatus.toKnownErr(e)
+      })
   }
 
   listBlobs(
     params?: ComAtprotoSyncListBlobs.QueryParams,
-    opts?: ComAtprotoSyncListBlobs.CallOptions
+    opts?: ComAtprotoSyncListBlobs.CallOptions,
   ): Promise<ComAtprotoSyncListBlobs.Response> {
     return this._client
-      .call("com.atproto.sync.listBlobs", params, undefined, opts)
+      .call('com.atproto.sync.listBlobs', params, undefined, opts)
       .catch((e) => {
-        throw ComAtprotoSyncListBlobs.toKnownErr(e);
-      });
+        throw ComAtprotoSyncListBlobs.toKnownErr(e)
+      })
   }
 
   listRepos(
     params?: ComAtprotoSyncListRepos.QueryParams,
-    opts?: ComAtprotoSyncListRepos.CallOptions
+    opts?: ComAtprotoSyncListRepos.CallOptions,
   ): Promise<ComAtprotoSyncListRepos.Response> {
     return this._client.call(
-      "com.atproto.sync.listRepos",
+      'com.atproto.sync.listRepos',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   notifyOfUpdate(
     data?: ComAtprotoSyncNotifyOfUpdate.InputSchema,
-    opts?: ComAtprotoSyncNotifyOfUpdate.CallOptions
+    opts?: ComAtprotoSyncNotifyOfUpdate.CallOptions,
   ): Promise<ComAtprotoSyncNotifyOfUpdate.Response> {
     return this._client.call(
-      "com.atproto.sync.notifyOfUpdate",
+      'com.atproto.sync.notifyOfUpdate',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   requestCrawl(
     data?: ComAtprotoSyncRequestCrawl.InputSchema,
-    opts?: ComAtprotoSyncRequestCrawl.CallOptions
+    opts?: ComAtprotoSyncRequestCrawl.CallOptions,
   ): Promise<ComAtprotoSyncRequestCrawl.Response> {
     return this._client.call(
-      "com.atproto.sync.requestCrawl",
+      'com.atproto.sync.requestCrawl',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class ComAtprotoTempNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   checkSignupQueue(
     params?: ComAtprotoTempCheckSignupQueue.QueryParams,
-    opts?: ComAtprotoTempCheckSignupQueue.CallOptions
+    opts?: ComAtprotoTempCheckSignupQueue.CallOptions,
   ): Promise<ComAtprotoTempCheckSignupQueue.Response> {
     return this._client.call(
-      "com.atproto.temp.checkSignupQueue",
+      'com.atproto.temp.checkSignupQueue',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   fetchLabels(
     params?: ComAtprotoTempFetchLabels.QueryParams,
-    opts?: ComAtprotoTempFetchLabels.CallOptions
+    opts?: ComAtprotoTempFetchLabels.CallOptions,
   ): Promise<ComAtprotoTempFetchLabels.Response> {
     return this._client.call(
-      "com.atproto.temp.fetchLabels",
+      'com.atproto.temp.fetchLabels',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   requestPhoneVerification(
     data?: ComAtprotoTempRequestPhoneVerification.InputSchema,
-    opts?: ComAtprotoTempRequestPhoneVerification.CallOptions
+    opts?: ComAtprotoTempRequestPhoneVerification.CallOptions,
   ): Promise<ComAtprotoTempRequestPhoneVerification.Response> {
     return this._client.call(
-      "com.atproto.temp.requestPhoneVerification",
+      'com.atproto.temp.requestPhoneVerification',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class BlueNS {
-  _client: XrpcClient;
-  moji: BlueMojiNS;
+  _client: XrpcClient
+  moji: BlueMojiNS
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.moji = new BlueMojiNS(client);
+    this._client = client
+    this.moji = new BlueMojiNS(client)
   }
 }
 
 export class BlueMojiNS {
-  _client: XrpcClient;
-  collection: BlueMojiCollectionNS;
-  packs: BlueMojiPacksNS;
-  richtext: BlueMojiRichtextNS;
+  _client: XrpcClient
+  collection: BlueMojiCollectionNS
+  packs: BlueMojiPacksNS
+  richtext: BlueMojiRichtextNS
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.collection = new BlueMojiCollectionNS(client);
-    this.packs = new BlueMojiPacksNS(client);
-    this.richtext = new BlueMojiRichtextNS(client);
+    this._client = client
+    this.collection = new BlueMojiCollectionNS(client)
+    this.packs = new BlueMojiPacksNS(client)
+    this.richtext = new BlueMojiRichtextNS(client)
   }
 }
 
 export class BlueMojiCollectionNS {
-  _client: XrpcClient;
-  item: ItemRecord;
+  _client: XrpcClient
+  item: ItemRecord
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.item = new ItemRecord(client);
+    this._client = client
+    this.item = new ItemRecord(client)
   }
 
   getItem(
     params?: BlueMojiCollectionGetItem.QueryParams,
-    opts?: BlueMojiCollectionGetItem.CallOptions
+    opts?: BlueMojiCollectionGetItem.CallOptions,
   ): Promise<BlueMojiCollectionGetItem.Response> {
     return this._client.call(
-      "blue.moji.collection.getItem",
+      'blue.moji.collection.getItem',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   listCollection(
     params?: BlueMojiCollectionListCollection.QueryParams,
-    opts?: BlueMojiCollectionListCollection.CallOptions
+    opts?: BlueMojiCollectionListCollection.CallOptions,
   ): Promise<BlueMojiCollectionListCollection.Response> {
     return this._client.call(
-      "blue.moji.collection.listCollection",
+      'blue.moji.collection.listCollection',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   putItem(
     data?: BlueMojiCollectionPutItem.InputSchema,
-    opts?: BlueMojiCollectionPutItem.CallOptions
+    opts?: BlueMojiCollectionPutItem.CallOptions,
   ): Promise<BlueMojiCollectionPutItem.Response> {
     return this._client.call(
-      "blue.moji.collection.putItem",
+      'blue.moji.collection.putItem',
       opts?.qp,
       data,
-      opts
-    );
+      opts,
+    )
   }
 
   saveToCollection(
     data?: BlueMojiCollectionSaveToCollection.InputSchema,
-    opts?: BlueMojiCollectionSaveToCollection.CallOptions
+    opts?: BlueMojiCollectionSaveToCollection.CallOptions,
   ): Promise<BlueMojiCollectionSaveToCollection.Response> {
     return this._client
-      .call("blue.moji.collection.saveToCollection", opts?.qp, data, opts)
+      .call('blue.moji.collection.saveToCollection', opts?.qp, data, opts)
       .catch((e) => {
-        throw BlueMojiCollectionSaveToCollection.toKnownErr(e);
-      });
+        throw BlueMojiCollectionSaveToCollection.toKnownErr(e)
+      })
   }
 }
 
 export class ItemRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: BlueMojiCollectionItem.Record }[];
+    cursor?: string
+    records: { uri: string; value: BlueMojiCollectionItem.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "blue.moji.collection.item",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'blue.moji.collection.item',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{
-    uri: string;
-    cid: string;
-    value: BlueMojiCollectionItem.Record;
+    uri: string
+    cid: string
+    value: BlueMojiCollectionItem.Record
   }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "blue.moji.collection.item",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'blue.moji.collection.item',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: BlueMojiCollectionItem.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "blue.moji.collection.item";
+    record.$type = 'blue.moji.collection.item'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "blue.moji.collection.item", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'blue.moji.collection.item', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "blue.moji.collection.item", ...params },
-      { headers }
-    );
+      { collection: 'blue.moji.collection.item', ...params },
+      { headers },
+    )
   }
 }
 
 export class BlueMojiPacksNS {
-  _client: XrpcClient;
-  pack: PackRecord;
-  packitem: PackitemRecord;
+  _client: XrpcClient
+  pack: PackRecord
+  packitem: PackitemRecord
 
   constructor(client: XrpcClient) {
-    this._client = client;
-    this.pack = new PackRecord(client);
-    this.packitem = new PackitemRecord(client);
+    this._client = client
+    this.pack = new PackRecord(client)
+    this.packitem = new PackitemRecord(client)
   }
 
   getActorPacks(
     params?: BlueMojiPacksGetActorPacks.QueryParams,
-    opts?: BlueMojiPacksGetActorPacks.CallOptions
+    opts?: BlueMojiPacksGetActorPacks.CallOptions,
   ): Promise<BlueMojiPacksGetActorPacks.Response> {
     return this._client.call(
-      "blue.moji.packs.getActorPacks",
+      'blue.moji.packs.getActorPacks',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 
   getPack(
     params?: BlueMojiPacksGetPack.QueryParams,
-    opts?: BlueMojiPacksGetPack.CallOptions
+    opts?: BlueMojiPacksGetPack.CallOptions,
   ): Promise<BlueMojiPacksGetPack.Response> {
-    return this._client.call(
-      "blue.moji.packs.getPack",
-      params,
-      undefined,
-      opts
-    );
+    return this._client.call('blue.moji.packs.getPack', params, undefined, opts)
   }
 
   getPacks(
     params?: BlueMojiPacksGetPacks.QueryParams,
-    opts?: BlueMojiPacksGetPacks.CallOptions
+    opts?: BlueMojiPacksGetPacks.CallOptions,
   ): Promise<BlueMojiPacksGetPacks.Response> {
     return this._client.call(
-      "blue.moji.packs.getPacks",
+      'blue.moji.packs.getPacks',
       params,
       undefined,
-      opts
-    );
+      opts,
+    )
   }
 }
 
 export class PackRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: BlueMojiPacksPack.Record }[];
+    cursor?: string
+    records: { uri: string; value: BlueMojiPacksPack.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "blue.moji.packs.pack",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'blue.moji.packs.pack',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{ uri: string; cid: string; value: BlueMojiPacksPack.Record }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "blue.moji.packs.pack",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'blue.moji.packs.pack',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: BlueMojiPacksPack.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "blue.moji.packs.pack";
+    record.$type = 'blue.moji.packs.pack'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "blue.moji.packs.pack", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'blue.moji.packs.pack', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "blue.moji.packs.pack", ...params },
-      { headers }
-    );
+      { collection: 'blue.moji.packs.pack', ...params },
+      { headers },
+    )
   }
 }
 
 export class PackitemRecord {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 
   async list(
-    params: Omit<ComAtprotoRepoListRecords.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
-    cursor?: string;
-    records: { uri: string; value: BlueMojiPacksPackitem.Record }[];
+    cursor?: string
+    records: { uri: string; value: BlueMojiPacksPackitem.Record }[]
   }> {
-    const res = await this._client.call("com.atproto.repo.listRecords", {
-      collection: "blue.moji.packs.packitem",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'blue.moji.packs.packitem',
+      ...params,
+    })
+    return res.data
   }
 
   async get(
-    params: Omit<ComAtprotoRepoGetRecord.QueryParams, "collection">
+    params: Omit<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
   ): Promise<{
-    uri: string;
-    cid: string;
-    value: BlueMojiPacksPackitem.Record;
+    uri: string
+    cid: string
+    value: BlueMojiPacksPackitem.Record
   }> {
-    const res = await this._client.call("com.atproto.repo.getRecord", {
-      collection: "blue.moji.packs.packitem",
-      ...params
-    });
-    return res.data;
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'blue.moji.packs.packitem',
+      ...params,
+    })
+    return res.data
   }
 
   async create(
     params: Omit<
       ComAtprotoRepoCreateRecord.InputSchema,
-      "collection" | "record"
+      'collection' | 'record'
     >,
     record: BlueMojiPacksPackitem.Record,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    record.$type = "blue.moji.packs.packitem";
+    record.$type = 'blue.moji.packs.packitem'
     const res = await this._client.call(
-      "com.atproto.repo.createRecord",
+      'com.atproto.repo.createRecord',
       undefined,
-      { collection: "blue.moji.packs.packitem", ...params, record },
-      { encoding: "application/json", headers }
-    );
-    return res.data;
+      { collection: 'blue.moji.packs.packitem', ...params, record },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
   }
 
   async delete(
-    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
-    headers?: Record<string, string>
+    params: Omit<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
   ): Promise<void> {
     await this._client.call(
-      "com.atproto.repo.deleteRecord",
+      'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: "blue.moji.packs.packitem", ...params },
-      { headers }
-    );
+      { collection: 'blue.moji.packs.packitem', ...params },
+      { headers },
+    )
   }
 }
 
 export class BlueMojiRichtextNS {
-  _client: XrpcClient;
+  _client: XrpcClient
 
   constructor(client: XrpcClient) {
-    this._client = client;
+    this._client = client
   }
 }

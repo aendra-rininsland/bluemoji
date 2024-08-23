@@ -1815,7 +1815,7 @@ export const schemaDict = {
       main: {
         type: 'query',
         description:
-          'Get a list of posts liked by an actor. Does not require auth.',
+          'Get a list of posts liked by an actor. Requires auth, actor must be the requesting account.',
         parameters: {
           type: 'params',
           required: ['actor'],
@@ -9344,7 +9344,7 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['repo', 'record'],
+            required: ['repo', 'item'],
             properties: {
               repo: {
                 type: 'string',
@@ -9358,9 +9358,9 @@ export const schemaDict = {
                 description:
                   "Can be set to 'false' to skip Lexicon schema validation of record data.",
               },
-              record: {
-                type: 'unknown',
-                description: 'The record to write.',
+              item: {
+                type: 'ref',
+                ref: 'lex:blue.moji.collection.item#itemView',
               },
             },
           },
@@ -9425,7 +9425,7 @@ export const schemaDict = {
               },
               item: {
                 type: 'ref',
-                ref: 'lex:blue.moji.collection.item',
+                ref: 'lex:blue.moji.collection.item#itemView',
               },
             },
           },
@@ -9451,7 +9451,7 @@ export const schemaDict = {
     defs: {
       packViewBasic: {
         type: 'object',
-        required: ['uri', 'cid', 'name', 'description'],
+        required: ['uri', 'cid', 'name'],
         properties: {
           uri: {
             type: 'string',

@@ -15,7 +15,7 @@ export interface PackViewBasic {
   uri: string
   cid: string
   name: string
-  description: string
+  description?: string
   descriptionFacets?: BlueMojiRichtextFacet.Main[]
   avatar?: string
   itemCount?: number

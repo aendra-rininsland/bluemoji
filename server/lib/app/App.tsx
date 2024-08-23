@@ -1,10 +1,11 @@
 import React from "react";
-import { Routes, Route, Outlet, Link } from "react-router-dom";
-import { Main } from "./routes/main";
+import { Routes, Route, Outlet } from "react-router-dom";
+import { Main } from "./routes";
 import { BrowsePacks } from "./routes/browse-packs";
 import { Upload } from "./routes/upload";
 import { Workshop } from "./routes/workshop";
 import { MakePack } from "./routes/make-pack";
+import { Login } from "./routes/login";
 
 const Layout = () => {
   return (
@@ -32,14 +33,17 @@ const Layout = () => {
   );
 };
 
-export const App = () => (
-  <Routes>
-    <Route path="/" element={<Layout />}>
-      <Route index element={<Main />} />
-      <Route path="browse-packs" element={<BrowsePacks />} />
-      <Route path="make-pack" element={<MakePack />} />
-      <Route path="workshop" element={<Workshop />} />
-      <Route path="upload" element={<Upload />} />
-    </Route>
-  </Routes>
-);
+export const App = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Main />} />
+        <Route path="browse-packs" element={<BrowsePacks />} />
+        <Route path="make-pack" element={<MakePack />} />
+        <Route path="workshop" element={<Workshop />} />
+        <Route path="upload" element={<Upload />} />,
+        <Route path="login" element={<Login />} />
+      </Route>
+    </Routes>
+  );
+};
