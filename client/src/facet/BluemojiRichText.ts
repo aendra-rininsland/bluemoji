@@ -8,8 +8,8 @@ import AtpAgent, {
   RichTextProps,
   RichTextOpts
 } from "@atproto/api";
-import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
+import * as BlueMojiRichtextFacet from "../../lexicon/types/blue/moji/richtext/facet";
+import * as BlueMojiCollectionItem from "../../lexicon/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
 
 export const BLUEMOJI_REGEX = new RegExp(

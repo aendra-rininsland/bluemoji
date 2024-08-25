@@ -6,8 +6,8 @@ import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, AccessibilityInfo } from "react-native";
 import LottieView from "lottie-react-native";
 
-import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
+import * as BlueMojiRichtextFacet from "../../../lexicon/types/blue/moji/richtext/facet";
+import * as BlueMojiCollectionItem from "../../../lexicon/types/blue/moji/collection/item";
 
 const styles = StyleSheet.create({
   emoji16: {

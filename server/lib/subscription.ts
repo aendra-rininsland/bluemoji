@@ -1,13 +1,13 @@
 import { Subscription } from "@atproto/xrpc-server";
 import { cborToLexRecord, readCar } from "@atproto/repo";
 import { BlobRef } from "@atproto/lexicon";
-import { ids, lexicons } from "@aendra/lexicons/lexicons";
-import { Record as BluemojiItem } from "@aendra/lexicons/types/blue/moji/collection/item";
+import { ids, lexicons } from "../lexicon/lexicons";
+import { Record as BluemojiItem } from "../lexicon/types/blue/moji/collection/item";
 import {
   Commit,
   OutputSchema as RepoEvent,
   isCommit
-} from "@aendra/lexicons/types/com/atproto/sync/subscribeRepos";
+} from "../lexicon/types/com/atproto/sync/subscribeRepos";
 import { BskyAgent, AtpAgent } from "@atproto/api";
 import { Database } from "./db";
 

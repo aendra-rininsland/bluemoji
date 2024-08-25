@@ -1,7 +1,7 @@
 import { InvalidRequestError } from "@atproto/xrpc-server";
-import { Server } from "../../lexicons";
+import { Server } from "../../lexicon";
 import { AppContext } from "../config";
-import { BlueMojiCollectionItem } from "@aendra/lexicons";
+import * as BlueMojiCollectionItem from "../../lexicon/types/blue/moji/collection/item";
 
 export default function (server: Server, ctx: AppContext) {
   server.blue.moji.collection.putItem(async ({ input, req }) => {

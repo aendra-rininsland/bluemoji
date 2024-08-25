@@ -6,6 +6,7 @@ import { Upload } from "./routes/upload";
 import { Workshop } from "./routes/workshop";
 import { MakePack } from "./routes/make-pack";
 import { Login } from "./routes/login";
+import { Collection } from "./routes/collection";
 
 const Layout = () => {
   return (
@@ -34,10 +35,15 @@ const Layout = () => {
 };
 
 export const App = () => {
+  const {
+    groups: { did }
+  } = document?.cookie?.match(/did=(?<did>[^;]+)/) ?? { groups: { did: null } };
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Main />} />
+        <Route path="collection" element={<Collection did={did} />} />
         <Route path="browse-packs" element={<BrowsePacks />} />
         <Route path="make-pack" element={<MakePack />} />
         <Route path="workshop" element={<Workshop />} />

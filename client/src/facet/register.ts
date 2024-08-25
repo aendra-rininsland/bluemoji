@@ -4,12 +4,12 @@ import {
   RichText,
   AppBskyRichtextFacet
 } from "@atproto/api";
-import * as BlueMojiRichtextFacet from "@aendra/lexicons/types/blue/moji/richtext/facet";
-import * as BlueMojiCollectionItem from "@aendra/lexicons/types/blue/moji/collection/item";
+import * as BlueMojiRichtextFacet from "../../lexicon/types/blue/moji/richtext/facet";
+import * as BlueMojiCollectionItem from "../../lexicon/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
 import { BluemojiRichTextSegment, facetSort } from "./BluemojiRichText";
 
-export const register = (did?: string) => {
+export const register = () => {
   Object.defineProperty(RichTextSegment, "bluemoji", {
     get(): BlueMojiRichtextFacet.Main | undefined {
       const bluemoji = this.facet?.features.find(BlueMojiRichtextFacet.isMain);

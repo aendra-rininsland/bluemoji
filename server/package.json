@@ -8,7 +8,7 @@
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --ssr lib/app/entry-server.tsx --outDir dist/server",
     "preview": "cross-env NODE_ENV=production node server",
-    "codegen": "lex gen-server ./lexicons  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*",
+    "codegen": "lex gen-server ./lexicon  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*",
     "genkeys": "tsx scripts/generate-keys.ts"
   },
   "dependencies": {

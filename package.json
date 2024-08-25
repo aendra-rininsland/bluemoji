@@ -9,10 +9,9 @@
     "codegen": "npm run codegen -ws"
   },
   "workspaces": [
-    "lib",
+    "client",
     "webapp",
-    "server",
-    "lexicons"
+    "server"
   ],
   "devDependencies": {
     "@atproto/lex-cli": "^0.5.0",

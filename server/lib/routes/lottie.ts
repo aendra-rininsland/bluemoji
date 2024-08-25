@@ -1,7 +1,7 @@
 import express from "express";
 import { AppContext } from "../config";
 import { agent } from "../agent";
-import { Record } from "@aendra/lexicons/types/blue/moji/collection/item";
+import { Record } from "../../lexicon/types/blue/moji/collection/item";
 
 const makeRouter = (ctx: AppContext) => {
   const router = express.Router();

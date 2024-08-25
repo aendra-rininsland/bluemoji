@@ -5,7 +5,7 @@ import { BluemojiRichText } from "./BluemojiRichText";
 import {
   Formats_v0,
   Record
-} from "@aendra/lexicons/types/blue/moji/collection/item";
+} from "../../lexicon/types/blue/moji/collection/item";
 
 const stubRecord: Record = {
   $type: "blue.moji.collection.item",
@@ -20,7 +20,8 @@ const stubRecord: Record = {
     apng_128: "apng_bytes",
     lottie: "dotlottie_bytes"
   },
-  adultOnly: false
+  adultOnly: false,
+  fallbackText: "◌"
 };
 
 describe("BluemojiRichText", () => {

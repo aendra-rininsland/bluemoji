@@ -4,7 +4,8 @@
   "scripts": {
     "test": "tsx src/**/*.test.ts",
     "build": "vite build",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "codegen": "lex gen-api ./lexicon  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
     "@atproto/api": "^0.12.28",
     "@atproto/lexicon": "^0.4.0",
     "@dotlottie/dotlottie-js": "^0.8.1",
+    "@lottiefiles/dotlottie-react": "^0.8.9",
     "@lottiefiles/dotlottie-web": "^0.30.2",
     "lottie-react-native": "^6.7.2",
     "upng-js": "^2.1.0"
@@ -40,7 +42,8 @@
     "./facet": {
       "require": "./dist/facet.cjs",
       "default": "./dist/facet.js"
-    }
+    },
+    "./components/*": "./src/components/*"
   },
   "main": "./dist/facet.cjs",
   "peerDependencies": {
