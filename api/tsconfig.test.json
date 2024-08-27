@@ -40,5 +40,5 @@
     "enable": false
   },
 
-  "include": ["./tests"]
+  "include": ["./src/**/*.test.ts"]
 }

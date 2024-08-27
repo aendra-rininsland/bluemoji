@@ -1,4 +1,5 @@
 import React, {
+  CSSProperties,
   MouseEventHandler,
   ReactNode,
   useCallback,
@@ -36,14 +37,16 @@ export const MenuBox = ({
   onAccept,
   onCancel,
   options,
-  keyboardFocus = true
+  keyboardFocus = true,
+  style = {}
 }: {
   title?: string;
   text?: string;
   onAccept?: (value: MenuOption) => void;
   onCancel?: () => void;
   options: MenuOption[];
-  keyboardFocus: boolean;
+  keyboardFocus?: boolean;
+  style?: CSSProperties;
 }) => {
   const [confirmState, setConfirmState] = useState<null | 1 | 0>(null);
   const [selected, setSelected] = useState<string | undefined>(
@@ -62,7 +65,7 @@ export const MenuBox = ({
 
   useEffect(() => {
     if (!keyboardFocus) return;
-    const handleArrows = (e) => {
+    const handleArrows = (e: KeyboardEvent) => {
       console.log(e.code.toString());
       const currentIdx = options.findIndex((d) => d.value === selected);
       switch (e.code.toString()) {
@@ -115,7 +118,7 @@ export const MenuBox = ({
   }, [selected, onAccept, onCancel, confirmState]);
 
   return (
-    <ContentBox title={title}>
+    <ContentBox style={style} title={title}>
       {" "}
       <p>{text}</p>
       <ul className="menu">

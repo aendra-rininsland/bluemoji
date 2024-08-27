@@ -46,7 +46,8 @@ export const makeRouter = async () => {
         render = (await vite.ssrLoadModule("/lib/app/entry-server.tsx")).render;
       } else {
         template = templateHtml;
-        render = (await import("../dist/server/entry-server.mjs")).render;
+        render = (await import("./app/entry-server.ts")).render;
+        // render = (await import("../dist/server/entry-server.mjs")).render; // ??
       }
 
       const rendered = await render(url, ssrManifest);
@@ -57,9 +58,11 @@ export const makeRouter = async () => {
 
       res.status(200).set({ "Content-Type": "text/html" }).send(html);
     } catch (e: unknown) {
-      vite?.ssrFixStacktrace(e);
-      console.log(e.stack);
-      res.status(500).end(e.stack);
+      if (e instanceof Error) {
+        vite?.ssrFixStacktrace(e);
+        console.log(e.stack);
+        res.status(500).end(e.stack);
+      }
     }
   });
 

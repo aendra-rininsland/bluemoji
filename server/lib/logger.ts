@@ -1,20 +1,20 @@
 import { type IncomingMessage } from "node:http";
-import pinoHttp, { stdSerializers } from "pino-http";
+import pinoHttp, { stdSerializers, StdSerializedResults } from "pino-http";
 import { obfuscateHeaders, subsystemLogger } from "@atproto/common";
 
 export const dbLogger: ReturnType<typeof subsystemLogger> =
-  subsystemLogger("ozone:db");
+  subsystemLogger("bluemoji:db");
 export const seqLogger: ReturnType<typeof subsystemLogger> =
-  subsystemLogger("ozone:sequencer");
+  subsystemLogger("bluemoji:sequencer");
 export const httpLogger: ReturnType<typeof subsystemLogger> =
-  subsystemLogger("ozone");
+  subsystemLogger("bluemoji");
 export const langLogger: ReturnType<typeof subsystemLogger> =
-  subsystemLogger("ozone:lang");
+  subsystemLogger("bluemoji:lang");
 
 export const loggerMiddleware = pinoHttp({
   logger: httpLogger,
   serializers: {
-    err: (err: unknown) => ({
+    err: (err: StdSerializedResults["err"]) => ({
       code: err?.["code"],
       message: err?.["message"]
     }),

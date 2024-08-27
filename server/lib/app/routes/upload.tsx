@@ -25,11 +25,11 @@ export const Upload = () => {
       maxFiles: 2
     });
 
-  const acceptedFileItems = acceptedFiles.map((file) => (
-    <li key={file.path}>
-      {file.path} - {file.size} bytes
-    </li>
-  ));
+  // const acceptedFileItems = acceptedFiles.map((file) => (
+  //   <li key={file.path}>
+  //     {file.path} - {file.size} bytes
+  //   </li>
+  // ));
 
   const onAccept = useCallback(() => {}, []);
   const onCancel = useCallback(() => {}, []);
@@ -59,8 +59,8 @@ export const Upload = () => {
       {asset && (
         <div style={{ marginTop: "2em" }}>
           <InputBox title="Metadata" style={{ width: "70%" }}>
-            <InputGroup id="name" label="Emoji name" />
-            <InputGroup id="alt" label="alt text" />
+            <InputGroup onChange={() => {}} id="name" label="Emoji name" />
+            <InputGroup onChange={() => {}} id="alt" label="alt text" />
             <ButtonGroup onAccept={onAccept} onCancel={onCancel} />
           </InputBox>
         </div>

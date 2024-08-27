@@ -3,7 +3,9 @@ import { MsgBox } from "../ncurses/MsgBox";
 import { Bluemoji } from "@aendra/bluemoji/components/react/index.tsx";
 import * as BlueMojiCollectionItem from "../../../lexicon/types/blue/moji/collection/item";
 
-export const Collection = ({ did }: { did: string }) => {
+export const Collection = ({ did }: { did?: string }) => {
+  if (!did) return null;
+
   const [items, setItems] = useState<BlueMojiCollectionItem.Record[]>([]);
 
   useEffect(() => {}, [did]);

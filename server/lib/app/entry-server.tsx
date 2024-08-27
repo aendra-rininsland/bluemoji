@@ -4,7 +4,7 @@ import { StaticRouter } from "react-router-dom/server";
 
 import { App } from "./App";
 
-export function render({ url }) {
+export function render({ url }: { url: string }) {
   const html = ReactDOMServer.renderToString(
     <React.StrictMode>
       <StaticRouter location={url}>

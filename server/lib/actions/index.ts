@@ -5,7 +5,7 @@ const ACTIONS = [createImagePost];
 
 const queue = new PQueue();
 
-export const addToActionsQueue = (d) => {
+export const addToActionsQueue = (d: unknown) => {
   // return queue.add(() =>
   //   ACTIONS.reduce(async (a, action) => {
   //     const results = await a;

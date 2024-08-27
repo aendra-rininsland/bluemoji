@@ -35,9 +35,9 @@ const Layout = () => {
 };
 
 export const App = () => {
-  const {
-    groups: { did }
-  } = document?.cookie?.match(/did=(?<did>[^;]+)/) ?? { groups: { did: null } };
+  const { groups } = document.cookie.match(/did=(?<did>[^;]+)/) || {};
+
+  const did = groups?.did;
 
   return (
     <Routes>
