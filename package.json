@@ -9,7 +9,7 @@
     "codegen": "npm run codegen -ws"
   },
   "workspaces": [
-    "client",
+    "api",
     "webapp",
     "server"
   ],

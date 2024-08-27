@@ -16,15 +16,23 @@ export const BluemojiNotAvailable = ({
   </abbr>
 );
 
-export const Bluemoji = (
-  item: BlueMojiCollectionItem.Record,
-  did: string,
-  width: number = 128,
-  height: number = 128,
+export const Bluemoji = ({
+  item,
+  did,
+  width = 128,
+  height = 128,
   cdnBase = "https://cdn.bsky.app/img/avatar_thumbnail/plain/",
   style = {},
   className = "bluemoji"
-) => {
+}: {
+  item: BlueMojiCollectionItem.Record;
+  did: string;
+  width?: 128;
+  height?: 128;
+  cdnBase?: string;
+  style?: CSSProperties;
+  className?: string;
+}) => {
   if (!BlueMojiCollectionItem.isRecord(item) || !did) {
     console.log("Invalid record passed to Bluemoji renderer");
     return <BluemojiNotAvailable />;

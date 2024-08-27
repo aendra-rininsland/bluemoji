@@ -12,8 +12,6 @@
     "genkeys": "tsx scripts/generate-keys.ts"
   },
   "dependencies": {
-    "@aendra/bluemoji": "^3.0.21",
-    "@aendra/lexicons": "*",
     "@atproto/api": "^0.13.1",
     "@atproto/bsky": "^0.0.51",
     "@atproto/jwk-jose": "^0.1.2",

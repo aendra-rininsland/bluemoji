@@ -8,18 +8,18 @@ import {
   OutputSchema as RepoEvent,
   isCommit
 } from "../lexicon/types/com/atproto/sync/subscribeRepos";
-import { BskyAgent, AtpAgent } from "@atproto/api";
+import { AtpAgent } from "@atproto/api";
 import { Database } from "./db";
 
 export abstract class FirehoseSubscriptionBase {
   public sub: Subscription<RepoEvent>;
   public db: Database;
-  public agent: BskyAgent;
+  public agent: AtpAgent;
 
   constructor(
     public service: string,
     db: Database,
-    agent: BskyAgent
+    agent: AtpAgent
   ) {
     this.agent = agent;
     this.db = db;

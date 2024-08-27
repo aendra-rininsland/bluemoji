@@ -5,15 +5,14 @@
     "test": "tsx src/**/*.test.ts",
     "build": "vite build",
     "prepublishOnly": "npm run build",
-    "codegen": "lex gen-api ./lexicon  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*"
+    "codegen": "lex gen-api ./src/client  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@aendra/lexicons": "^2.0.0",
-    "@atproto/api": "^0.12.28",
+    "@atproto/api": "^0.13.3",
     "@atproto/lexicon": "^0.4.0",
     "@dotlottie/dotlottie-js": "^0.8.1",
     "@lottiefiles/dotlottie-react": "^0.8.9",
