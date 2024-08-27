@@ -31,7 +31,7 @@ void (async function () {
       maybeInt(process.env.APPVIEW_SUBSCRIPTION_RECONNECT_DELAY) ?? 3000,
     hostname,
     serviceDid,
-    service: { version: 1 }
+    service: { version: "v0-prerelease" }
   });
 
   await server.start();

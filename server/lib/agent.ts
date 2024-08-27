@@ -1,9 +1,9 @@
 // import { setGlobalDispatcher, Agent } from "undici";
 // setGlobalDispatcher(new Agent({ connect: { timeout: 20_000 } }));
 
-import { AtpAgent } from "@atproto/api";
+import { BluemojiAgent } from "@aendra/bluemoji";
 
-export const agent = new AtpAgent({ service: "https://bsky.social" });
+export const agent = new BluemojiAgent({ service: "https://bsky.social" });
 
 export const login = () =>
   agent.login({

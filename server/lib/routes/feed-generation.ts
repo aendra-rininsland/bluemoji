@@ -1,5 +1,5 @@
 import { InvalidRequestError } from "@atproto/xrpc-server";
-import { Server } from "../../lexicons";
+import { Server } from "../../lexicon";
 // import { validateAuth } from "../auth";
 import { AtUri } from "@atproto/syntax";
 import { AppContext } from "../config";
@@ -32,7 +32,7 @@ export default function (server: Server, ctx: AppContext) {
     const body = await algo(ctx, params);
     return {
       encoding: "application/json",
-      body: body,
+      body: body
     };
   });
 }

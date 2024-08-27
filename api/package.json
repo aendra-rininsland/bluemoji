@@ -31,16 +31,19 @@
   },
   "exports": {
     ".": {
-      "require": "./dist/facet.cjs",
-      "default": "./dist/facet.js"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
     },
     "./render": {
       "require": "./dist/render.cjs",
-      "default": "./dist/render.js"
+      "default": "./dist/render.js",
+      "types": "./src/render/index.ts"
     },
     "./facet": {
       "require": "./dist/facet.cjs",
-      "default": "./dist/facet.js"
+      "default": "./dist/facet.js",
+      "types": "./src/facet/index.ts"
     },
     "./components/*": "./src/components/*"
   },

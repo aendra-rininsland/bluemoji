@@ -1,10 +1,5 @@
-import * as BlueMojiCollectionItem from "../../lexicons/types/blue/moji/collection/item";
-import {
-  BskyAgent,
-  RichText,
-  AppBskyFeedPost,
-  AppBskyEmbedExternal,
-} from "@atproto/api";
+import { BluemojiRichText } from "@aendra/bluemoji/facet";
+import { AppBskyFeedPost } from "@atproto/api";
 import { isLoggedIn, agent } from "../agent";
 import { CreateOp } from "../subscription";
 
@@ -22,13 +17,13 @@ export const createImagePost = async (emojiRecord: CreateOp) => {
 
   const text = "";
 
-  const rt = new RichText({ text });
+  const rt = new BluemojiRichText({ text });
   await rt.detectFacets(agent);
-  const postRecord: AppBskyFeedPost.Record = {
+
+  const record: AppBskyFeedPost.Record = {
     $type: "app.bsky.feed.post",
     text: rt.text,
     facets: rt.facets,
-    createdAt: timestamp,
-    embed,
+    createdAt: new Date().toISOString()
   };
 };

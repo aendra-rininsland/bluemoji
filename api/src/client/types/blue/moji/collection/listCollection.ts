@@ -41,7 +41,7 @@ export function toKnownErr(e: any) {
 
 export interface ItemView {
   uri: string
-  record: BlueMojiCollectionItem.Main
+  record: BlueMojiCollectionItem.ItemView
   [k: string]: unknown
 }
 

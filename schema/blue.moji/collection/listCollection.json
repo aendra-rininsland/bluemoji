@@ -45,7 +45,7 @@
       "required": ["uri", "record"],
       "properties": {
         "uri": { "type": "string", "format": "at-uri" },
-        "record": { "type": "ref", "ref": "blue.moji.collection.item" }
+        "record": { "type": "ref", "ref": "blue.moji.collection.item#itemView" }
       }
     }
   }

@@ -9,7 +9,8 @@ export default defineConfig({
     lib: {
       entry: {
         facet: "./src/facet/index.ts",
-        render: "./src/render/index.ts"
+        render: "./src/render/index.ts",
+        index: "./src/index.ts"
       },
       formats: ["es", "cjs"]
     }

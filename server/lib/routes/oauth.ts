@@ -12,8 +12,8 @@ import { AppContext } from "../config";
 
 const keyset = Promise.all(keysJson.map((d) => JoseKey.fromJWK(d.jwk)));
 
-const TEMP_SESSIONS = {};
-const TEMP_STATE = {};
+const SESSION = new Map();
+const STATE = new Map();
 
 const makeRouter = async (ctx: AppContext) => {
   const ENDPOINT =
@@ -56,20 +56,20 @@ const makeRouter = async (ctx: AppContext) => {
     // Interface to store authorization state data (during authorization flows)
     stateStore: {
       async set(key: string, internalState: NodeSavedState): Promise<void> {
-        TEMP_STATE[key] = internalState;
+        STATE.set(key, internalState);
       },
       async get(key: string): Promise<NodeSavedState | undefined> {
-        return TEMP_STATE[key];
+        return STATE.get(key);
       },
       async del(key: string): Promise<void> {
-        delete TEMP_STATE[key];
+        STATE.delete(key);
       }
     },
 
     // Interface to store authenticated session data
     sessionStore: {
       async set(sub: string, sessionData: NodeSavedSession) {
-        TEMP_SESSIONS[sub] = sessionData;
+        SESSION.set(sub, sessionData);
       },
 
       async get(sub: string) {
@@ -78,11 +78,11 @@ const makeRouter = async (ctx: AppContext) => {
         // if (!sessionData) return undefined;
 
         // return sessionData;
-        return TEMP_SESSIONS[sub] || undefined;
+        return SESSION.get(sub);
       },
 
       async del(sub: string) {
-        delete TEMP_SESSIONS[sub];
+        SESSION.delete(sub);
       }
     }
 

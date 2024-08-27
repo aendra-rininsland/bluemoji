@@ -1,6 +1,6 @@
 export type DatabaseSchema = {
   sub_state: SubState;
-  detections: Detections;
+  bluemoji: Bluemoji;
 };
 
 export type SubState = {
@@ -8,11 +8,8 @@ export type SubState = {
   cursor: number;
 };
 
-export type Detections = {
+export type Bluemoji = {
+  name: string;
   uri: string;
-  timestamp: string;
-  topLabel: string;
-  topScore: number;
-  raw: string;
-  blobCid: string;
+  indexedAt: string;
 };

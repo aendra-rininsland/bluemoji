@@ -8,18 +8,18 @@ import {
   OutputSchema as RepoEvent,
   isCommit
 } from "../lexicon/types/com/atproto/sync/subscribeRepos";
-import { AtpAgent } from "@atproto/api";
 import { Database } from "./db";
+import { BluemojiAgent } from "../../api/src/bluemoji-client";
 
 export abstract class FirehoseSubscriptionBase {
   public sub: Subscription<RepoEvent>;
   public db: Database;
-  public agent: AtpAgent;
+  public agent: BluemojiAgent;
 
   constructor(
     public service: string,
     db: Database,
-    agent: AtpAgent
+    agent: BluemojiAgent
   ) {
     this.agent = agent;
     this.db = db;
@@ -129,7 +129,7 @@ export const isBluemoji = (obj: unknown): obj is BluemojiItem => {
 const isType = (obj: unknown, nsid: string) => {
   try {
     const fixed = fixBlobRefs(obj);
-    lexicons.assertValidRecord(nsid, obj);
+    lexicons.assertValidRecord(nsid, fixed);
     return true;
   } catch (err) {
     console.log(err);

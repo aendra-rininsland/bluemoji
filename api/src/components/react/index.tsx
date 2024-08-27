@@ -1,4 +1,4 @@
-import * as BlueMojiCollectionItem from "../../../lexicon/types/blue/moji/collection/item";
+import * as BlueMojiCollectionItem from "../../client/types/blue/moji/collection/item";
 import React, { CSSProperties } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 

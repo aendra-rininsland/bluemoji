@@ -4,8 +4,8 @@ import {
   RichText,
   AppBskyRichtextFacet
 } from "@atproto/api";
-import * as BlueMojiRichtextFacet from "../../lexicon/types/blue/moji/richtext/facet";
-import * as BlueMojiCollectionItem from "../../lexicon/types/blue/moji/collection/item";
+import * as BlueMojiRichtextFacet from "../client/types/blue/moji/richtext/facet";
+import * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
 import { BluemojiRichTextSegment, facetSort } from "./BluemojiRichText";
 

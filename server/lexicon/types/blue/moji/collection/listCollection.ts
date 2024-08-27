@@ -52,7 +52,7 @@ export type Handler<HA extends HandlerAuth = never> = (
 
 export interface ItemView {
   uri: string
-  record: BlueMojiCollectionItem.Main
+  record: BlueMojiCollectionItem.ItemView
   [k: string]: unknown
 }
 

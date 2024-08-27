@@ -1,7 +1,7 @@
 import {
   Commit as RepoEvent,
-  isCommit,
-} from "../../lexicons/types/com/atproto/sync/subscribeRepos";
+  isCommit
+} from "../lexicon/types/com/atproto/sync/subscribeRepos";
 import { FirehoseSubscriptionBase, getOpsByType } from "./subscription";
 import { addToActionsQueue } from "./actions";
 

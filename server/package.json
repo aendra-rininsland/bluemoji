@@ -9,7 +9,8 @@
     "build:server": "vite build --ssr lib/app/entry-server.tsx --outDir dist/server",
     "preview": "cross-env NODE_ENV=production node server",
     "codegen": "lex gen-server ./lexicon  ../../atproto/lexicons/app/bsky/*/* ../../atproto/lexicons/com/atproto/*/* ../schema/blue.moji/*/*",
-    "genkeys": "tsx scripts/generate-keys.ts"
+    "genkeys": "tsx scripts/generate-keys.ts",
+    "check-types": "tsc"
   },
   "dependencies": {
     "@atproto/api": "^0.13.1",
@@ -25,7 +26,10 @@
     "@lottiefiles/dotlottie-react": "^0.8.8",
     "@ngrok/ngrok": "^1.4.1",
     "@types/better-sqlite3": "^7.6.10",
+    "@types/compression": "^1.7.5",
+    "@types/cookie-parser": "^1.4.7",
     "@types/csv-write-stream": "^2.0.3",
+    "@types/express-session": "^1.18.0",
     "@types/node": "^20.11.24",
     "@types/upng-js": "^2.1.5",
     "@xenova/transformers": "^2.17.1",
@@ -35,6 +39,7 @@
     "csv-write-stream": "^2.0.0",
     "dotenv": "^16.4.5",
     "execa": "^8.0.1",
+    "express-session": "^1.18.0",
     "forever": "^4.0.3",
     "kysely": "^0.27.2",
     "onnxruntime-node": "^1.17.0",
@@ -56,6 +61,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "ngrok": "^5.0.0-beta.2",
     "react": "^18.3.1",

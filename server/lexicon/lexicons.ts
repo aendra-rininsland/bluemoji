@@ -9143,7 +9143,7 @@ export const schemaDict = {
               },
               item: {
                 type: 'ref',
-                ref: 'lex:blue.moji.collection.item',
+                ref: 'lex:blue.moji.collection.item#itemView',
               },
             },
           },
@@ -9326,7 +9326,7 @@ export const schemaDict = {
           },
           record: {
             type: 'ref',
-            ref: 'lex:blue.moji.collection.item',
+            ref: 'lex:blue.moji.collection.item#itemView',
           },
         },
       },

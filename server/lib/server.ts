@@ -11,18 +11,18 @@ import express from "express";
 import { FirehoseSubscription } from "./firehose";
 import { db, migrateToLatest } from "./db";
 import { isLoggedIn, agent } from "./agent";
-import { createServer } from "../lexicons";
+import { createServer } from "../lexicon";
 import feedGeneration from "./routes/feed-generation";
 import { IdResolver, MemoryCache } from "@atproto/identity";
 import describeGenerator from "./routes/describe-generator";
 import { AppContext, Config } from "./config";
 import wellKnown from "./well-known";
 import serveBlobs from "./routes/blob";
-import { AuthVerifier } from "./auth-verifier";
 import OAuth from "./routes/oauth";
 import * as vite from "./vite";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import session from "express-session";
 
 export async function main(cfg: Config) {
   dotenv.config();
@@ -44,19 +44,25 @@ export async function main(cfg: Config) {
     }
   });
 
-  const authVerifier = new AuthVerifier(didResolver);
-
   const ctx: AppContext = {
     db,
     didResolver,
-    cfg,
-    authVerifier
+    cfg
   };
 
   app.set("trust proxy", true);
+  // app.set("trust proxy", 1); // TODO check if this works
   app.use(cors({ maxAge: DAY / SECOND }));
   app.use(loggerMiddleware);
   app.use(cookieParser());
+  app.use(
+    session({
+      secret: process.env.SERVER_SESSION_SECRET!,
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: true }
+    })
+  );
   app.use(compression());
 
   feedGeneration(server, ctx);

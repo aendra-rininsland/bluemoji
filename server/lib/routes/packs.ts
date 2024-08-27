@@ -1,8 +1,10 @@
 import { InvalidRequestError } from "@atproto/xrpc-server";
-import { Server } from "../../lexicons";
+import { Server } from "../../lexicon";
 import { AppContext } from "../config";
-import * as BlueMojiPacksPack from "../../lexicons/types/blue/moji/packs/pack";
-import * as BlueMojiPacksDefs from "../../lexicons/types/blue/moji/packs/defs";
+import * as BlueMojiPacksPack from "../../lexicon/types/blue/moji/packs/pack";
+import * as BlueMojiPacksDefs from "../../lexicon/types/blue/moji/packs/defs";
+import { HandlerOutput as GetPackHandlerOutput } from "../../lexicon/types/blue/moji/packs/getPack";
+import { HandlerOutput as GetPacksHandlerOutput } from "../../lexicon/types/blue/moji/packs/getPacks";
 
 export default function (server: Server, ctx: AppContext) {
   server.blue.moji.packs.getActorPacks(async ({ params, req }) => {
@@ -35,6 +37,14 @@ export default function (server: Server, ctx: AppContext) {
     };
   });
 
-  server.blue.moji.packs.getPack(async ({ input, req }) => {});
-  server.blue.moji.packs.getPacks(async ({ input, req }) => {});
+  server.blue.moji.packs.getPack(
+    async ({ input, req }): Promise<GetPackHandlerOutput> => {
+      return {} as GetPackHandlerOutput;
+    }
+  );
+  server.blue.moji.packs.getPacks(
+    async ({ input, req }): Promise<GetPacksHandlerOutput> => {
+      return {} as GetPacksHandlerOutput;
+    }
+  );
 }

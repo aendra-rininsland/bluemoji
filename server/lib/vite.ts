@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import express from "express";
+import { ViteDevServer } from "vite";
 
 // Constants
 const isProduction = process.env.NODE_ENV === "production";
@@ -15,7 +16,7 @@ export const makeRouter = async () => {
     : undefined;
   const router = express.Router();
   // Add Vite or respective production middlewares
-  let vite;
+  let vite: ViteDevServer;
   if (!isProduction) {
     const { createServer } = await import("vite");
     vite = await createServer({
@@ -45,7 +46,7 @@ export const makeRouter = async () => {
         render = (await vite.ssrLoadModule("/lib/app/entry-server.tsx")).render;
       } else {
         template = templateHtml;
-        render = (await import("./dist/server/entry-server.mjs")).render;
+        render = (await import("../dist/server/entry-server.mjs")).render;
       }
 
       const rendered = await render(url, ssrManifest);
@@ -55,7 +56,7 @@ export const makeRouter = async () => {
         .replace(`<!--app-html-->`, rendered.html ?? "");
 
       res.status(200).set({ "Content-Type": "text/html" }).send(html);
-    } catch (e) {
+    } catch (e: unknown) {
       vite?.ssrFixStacktrace(e);
       console.log(e.stack);
       res.status(500).end(e.stack);

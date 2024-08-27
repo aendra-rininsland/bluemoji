@@ -1,4 +1,4 @@
-import * as BlueMojiCollectionItem from "../../../lexicon/types/blue/moji/collection/item";
+import * as BlueMojiCollectionItem from "../../client/types/blue/moji/collection/item";
 
 interface RenderBlobParams {
   width: 128;

@@ -1,7 +1,7 @@
 import express from "express";
 import { AppContext } from "../config";
-import { agent } from "../agent";
-import { sharpFromApng, ImageData } from "sharp-apng";
+// import { agent } from "../agent";
+// import { sharpFromApng, ImageData } from "sharp-apng";
 
 const makeRouter = (ctx: AppContext) => {
   const router = express.Router();

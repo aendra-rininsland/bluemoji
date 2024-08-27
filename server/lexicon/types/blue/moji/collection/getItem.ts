@@ -20,7 +20,7 @@ export type InputSchema = undefined
 
 export interface OutputSchema {
   uri: string
-  item: BlueMojiCollectionItem.Main
+  item: BlueMojiCollectionItem.ItemView
   [k: string]: unknown
 }
 

@@ -1,8 +1,8 @@
 import { AppContext } from "../config";
 import {
   QueryParams,
-  OutputSchema as AlgoOutput,
-} from "../../lexicons/types/app/bsky/feed/getFeedSkeleton";
+  OutputSchema as AlgoOutput
+} from "../../lexicon/types/app/bsky/feed/getFeedSkeleton";
 import * as whatsAlf from "./emoji";
 
 type AlgoHandler = (
@@ -11,7 +11,7 @@ type AlgoHandler = (
 ) => Promise<AlgoOutput>;
 
 const algos: Record<string, AlgoHandler> = {
-  [whatsAlf.shortname]: whatsAlf.handler,
+  [whatsAlf.shortname]: whatsAlf.handler
 };
 
 export default algos;
