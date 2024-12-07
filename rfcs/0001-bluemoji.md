@@ -35,10 +35,11 @@ order of priorities.
 - _Bluemoji Alias_, _alias_, _colon-wrapped alias_, _dotted-alias_: This is how
   the Bluemoji is named, reflected in the record's `rkey`. When detected by the
   Bluemoji Facet (see below), these are decorated with metadata allowing clients
-  to render the Bluemoji. The record name itself must match `\b[a-z0-9-]+\b` and
-  does not include `:` characters; when written prior to faceting, it is written
-  wrapped in `:` character (e.g., `:alias-name:`), hereafter referred to as a
-  "colon-wrapped alias" or simply "dotted-alias".
+  to render the Bluemoji. The record name itself must match
+  `^\b(?<!-)[a-z0-9-]+(?!<-)\b$` and does not include `:` characters; when
+  written prior to faceting, it is written wrapped in `:` character (e.g.,
+  `:alias-name:`), hereafter referred to as a "colon-wrapped alias" or simply
+  "dotted-alias".
 
 - _Bluemoji Collection_: The `blue.moji.collection.item` collection; all of an
   individual user's collected Bluemoji. Not to be confused with the generic
@@ -119,11 +120,7 @@ or if ImgProxy adds support for APNG animations. See
 
 - **Accessibility concerns:** The colon-wrapped alias provides a slight amount
   of contextual information so it has been recommended as the fallback text, but
-  there's no way of enforcing that given how ATProto facets work. A suggested
-  fallback character (`◌`) has been provided to provide guide-rails for an
-  approach that may become popular as more clients begin to support Bluemoji in
-  the future, especially given that the facet contains more accessibility
-  information than the colon-wrapped alias provides.
+  there's no way of enforcing that given how ATProto facets work.
 
 # Alternatives
 
@@ -139,7 +136,8 @@ A hacked version of `@atproto/api`'s `RichText` code has been provided as
 pre-existing `RichText` class so existing implementations don't need to rewrite
 rendering code to use the new `BluemojiRichText` class.
 
-A separate proposal for enabling sharing Bluemoji between accounts is availabe at [0002-sharing](/rcs/0002-sharing.md).
+A separate proposal for enabling sharing Bluemoji between accounts is available
+at [0002-sharing](/rcs/0002-sharing.md).
 
 # Unresolved questions
 

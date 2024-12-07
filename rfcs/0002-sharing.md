@@ -4,11 +4,12 @@
 
 # Summary
 
-Sharing features for Bluemoji.
+Sharing features for Bluemoji. This proposal is non-normative.
 
 # Basic example
 
-Users are able to share Bluemoji with each other, and provide multiple Bluemoji as a "pack".
+Users are able to share Bluemoji with each other, and provide multiple Bluemoji
+as a "pack".
 
 # Motivation
 
