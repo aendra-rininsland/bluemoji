@@ -5,26 +5,30 @@
   "license": "MIT",
   "description": "Monorepo for the Bluemoji project",
   "scripts": {
-    "codegen": "lex gen-server ./lexicons/src  ../atproto/lexicons/app/bsky/*/* ../atproto/lexicons/com/atproto/*/* ./schema/blue.moji/*/* ",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "codegen": "npm run codegen -ws"
   },
   "workspaces": [
-    "lib",
+    "api",
     "webapp",
-    "server",
-    "lexicons"
+    "server"
   ],
   "devDependencies": {
-    "@atproto/lex-cli": "^0.3.2",
-    "@eslint/js": "^9.16.0",
+    "@atproto/lex-cli": "^0.5.0",
+    "@eslint/js": "^9.9.0",
     "@swc/cli": "^0.4.0",
-    "eslint": "^8.57.1",
-    "eslint-plugin-react": "^7.37.2",
-    "globals": "^15.13.0",
+    "add-js-extension": "^1.0.4",
+    "cookie-parser": "^1.4.6",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.35.0",
+    "globals": "^15.9.0",
     "multiformats": "^13.2.2",
-    "prettier": "^3.4.2",
-    "swc": "^1.0.11",
+    "prettier": "^3.3.3",
+    "server": "^1.0.39",
     "tsx": "^4.16.2",
-    "typescript-eslint": "^8.17.0"
+    "typescript-eslint": "^8.2.0"
+  },
+  "dependencies": {
+    "@types/node": "^22.4.1"
   }
 }
