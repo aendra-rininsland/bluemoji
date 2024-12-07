@@ -48,18 +48,9 @@ order of priorities.
   [`blue.moji.richtext.facet`][schema_richtext_facet], which enables text to be
   annotated as containing a reference to a Bluemoji item.
 
-- _Bluemoji Pack_: A `blue.moji.pack.record` record, which is a user's curation
-  of specific Bluemoji into a shareable pack, intended to function similarly to
-  how Starter Packs work.
-
 - _Fallback Text_, _Fallback Character_: Implementers are expected to use the
-  colon-wrapped alias (`:alias:`) as fallback text for the facet but there's no
-  way to enforce this. To that end, it is intended that if implementers do not
-  wish to use the full colon-wrapped alias as fallback text, they should use
-  U+25CC (`◌`, "Dotted Circle") as a replacement string for the colon-wrapped
-  alias during faceting. This, however, is strongly advised **against** as it
-  deprives unsupporting clients of any usage context or ability to provide
-  accessibility affordances to users.
+  colon-wrapped alias (`:alias:`) as fallback text when the referenced image is
+  not accessible.
 
 Users are supplied an interface to select an image asset (at time of writing,
 this is limited to static PNG, animated PNG and Lottie animations, though
@@ -124,8 +115,7 @@ or if ImgProxy adds support for APNG animations. See
 
 - **Copyright concerns:** While I haven't heard of copyright holders targeting
   platforms with custom emoji with legal requests, it's not unreasonable to
-  suspect that they will at some point. These would have to be handled by
-  individual PDSes given that's where the emoji asset data would reside at rest.
+  suspect that they will at some point.
 
 - **Accessibility concerns:** The colon-wrapped alias provides a slight amount
   of contextual information so it has been recommended as the fallback text, but
@@ -149,18 +139,7 @@ A hacked version of `@atproto/api`'s `RichText` code has been provided as
 pre-existing `RichText` class so existing implementations don't need to rewrite
 rendering code to use the new `BluemojiRichText` class.
 
-The [@moji.blue Bluesky user][moji.blue] is intended to provide a number of
-useful features, such as alerting whenever a new Bluemoji record has been
-created and providing a link to let users copy new record to their repos.
-Several custom feeds showing people using Bluemoji are also planned. It may
-eventually provide usage stats as well ("Weekly Top Bluemoji", "Weekly Top Emoji
-Copies", et cetera).
-
-Additionally, Bluemoji Packs are intended to let users copy curated groupings of
-Bluemoji provided by other users, similar to how Starter Packs let users follow
-individual or every user from a curated list. This is hoped to give users the
-ability to quickly and easily begin using Bluemoji without having to
-painstakingly build a collection from uploading or copying individual records.
+A separate proposal for enabling sharing Bluemoji between accounts is availabe at [0002-sharing](/rcs/0002-sharing.md).
 
 # Unresolved questions
 
