@@ -36,7 +36,7 @@ order of priorities.
   the Bluemoji is named, reflected in the record's `rkey`. When detected by the
   Bluemoji Facet (see below), these are decorated with metadata allowing clients
   to render the Bluemoji. The record name itself must match
-  `^\b(?<!-)[a-z0-9-]+(?!<-)\b$` and does not include `:` characters; when
+  `^(?!-)[a-z0-9-]+(?<!-)$` and does not include `:` characters; when
   written prior to faceting, it is written wrapped in `:` character (e.g.,
   `:alias-name:`), hereafter referred to as a "colon-wrapped alias" or simply
   "dotted-alias".
