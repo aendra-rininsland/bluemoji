@@ -1,0 +1,64 @@
+services:
+  plc:
+    build:
+      context: https://github.com/did-method-plc/did-method-plc.git
+      dockerfile: packages/server/Dockerfile
+    ports:
+      - "2582:2582"
+    environment:
+      - DATABASE_URL=postgres://plc:plc@postgres:5432/plc
+      - PORT=2582
+    command: ["dumb-init", "node", "--enable-source-maps", "../dist/bin.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:2582/_health || exit 1"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  pds:
+    image: ghcr.io/bluesky-social/pds:latest
+    ports:
+      - "2583:2583"
+    environment:
+      - PDS_HOSTNAME=localhost
+      - PDS_PORT=2583
+      - PDS_DID_PLC_URL=http://plc:2582
+      - PDS_DATA_DIRECTORY=/pds
+      - PDS_BLOBSTORE_DISK_LOCATION=/pds/blobs
+      - PDS_JWT_SECRET=dev-jwt-secret
+      - PDS_ADMIN_PASSWORD=dev-admin
+      - PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      - PDS_INVITE_REQUIRED=false
+      - PDS_DEV_MODE=true
+      - LOG_ENABLED=true
+    volumes:
+      - pds_data:/pds
+    depends_on:
+      plc:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:2583/xrpc/_health || exit 1"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=plc
+      - POSTGRES_PASSWORD=plc
+      - POSTGRES_DB=plc
+    volumes:
+      - plc_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plc"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pds_data:
+  plc_data:

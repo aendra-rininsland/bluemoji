@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "composite": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "$hatk": ["./hatk.generated.ts"],
+      "$hatk/client": ["./hatk.generated.client.ts"]
+    }
+  },
+  "include": ["server", "seeds", "hatk.generated.ts", "hatk.config.ts"]
+}

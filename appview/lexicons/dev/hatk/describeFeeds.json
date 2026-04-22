@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.describeFeeds",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List available feeds.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "feeds": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "label"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

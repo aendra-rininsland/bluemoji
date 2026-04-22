@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.getRecord",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Fetch a single record by AT URI.",
+      "parameters": {
+        "type": "params",
+        "required": ["uri"],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "record": {
+              "type": "unknown"
+            }
+          }
+        }
+      }
+    }
+  }
+}

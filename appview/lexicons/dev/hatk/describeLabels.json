@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.describeLabels",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List available label definitions.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "definitions": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "#labelDefinition" }
+            }
+          }
+        }
+      }
+    },
+    "labelDefinition": {
+      "type": "object",
+      "required": ["identifier", "severity", "blurs", "defaultSetting"],
+      "properties": {
+        "identifier": { "type": "string" },
+        "severity": { "type": "string" },
+        "blurs": { "type": "string" },
+        "defaultSetting": { "type": "string" },
+        "locales": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#labelLocale" }
+        }
+      }
+    },
+    "labelLocale": {
+      "type": "object",
+      "required": ["lang", "name", "description"],
+      "properties": {
+        "lang": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}

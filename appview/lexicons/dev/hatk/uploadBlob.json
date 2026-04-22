@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.uploadBlob",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Upload a blob via the user's PDS.",
+      "input": {
+        "encoding": "*/*"
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["blob"],
+          "properties": {
+            "blob": {
+              "type": "blob"
+            }
+          }
+        }
+      }
+    }
+  }
+}

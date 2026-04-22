@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.deleteRecord",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a record via the user's PDS.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["collection", "rkey"],
+          "properties": {
+            "collection": {
+              "type": "string"
+            },
+            "rkey": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    }
+  }
+}

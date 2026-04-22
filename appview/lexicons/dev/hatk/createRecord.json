@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.createRecord",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a record via the user's PDS.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["collection", "repo", "record"],
+          "properties": {
+            "collection": {
+              "type": "string"
+            },
+            "repo": {
+              "type": "string",
+              "format": "did"
+            },
+            "record": {
+              "type": "unknown"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            }
+          }
+        }
+      }
+    }
+  }
+}

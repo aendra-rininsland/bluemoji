@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.createReport",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Report an account or record for moderation review.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["subject", "label"],
+          "properties": {
+            "subject": {
+              "type": "union",
+              "description": "The account or record being reported.",
+              "refs": ["#repoRef", "com.atproto.repo.strongRef"]
+            },
+            "label": { "type": "string", "description": "Label identifier for the report reason." },
+            "reason": {
+              "type": "string",
+              "maxLength": 2000,
+              "description": "Optional free-text explanation."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["id", "subject", "label", "reportedBy", "createdAt"],
+          "properties": {
+            "id": { "type": "integer" },
+            "subject": { "type": "unknown" },
+            "label": { "type": "string" },
+            "reason": { "type": "string" },
+            "reportedBy": { "type": "string", "format": "did" },
+            "createdAt": { "type": "string", "format": "datetime" }
+          }
+        }
+      }
+    },
+    "repoRef": {
+      "type": "object",
+      "required": ["did"],
+      "properties": {
+        "did": { "type": "string", "format": "did" }
+      }
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.label.defs",
+  "defs": {
+    "label": {
+      "type": "object",
+      "description": "Metadata tag on an atproto resource (eg, repo or record).",
+      "required": [
+        "src",
+        "uri",
+        "val",
+        "cts"
+      ],
+      "properties": {
+        "ver": {
+          "type": "integer"
+        },
+        "src": {
+          "type": "string",
+          "format": "did"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "val": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "neg": {
+          "type": "boolean"
+        },
+        "cts": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "exp": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "sig": {
+          "type": "bytes"
+        }
+      }
+    },
+    "selfLabels": {
+      "type": "object",
+      "description": "Metadata tags on an atproto record, published by the author within the record.",
+      "required": [
+        "values"
+      ],
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#selfLabel"
+          },
+          "maxLength": 10
+        }
+      }
+    },
+    "selfLabel": {
+      "type": "object",
+      "required": [
+        "val"
+      ],
+      "properties": {
+        "val": {
+          "type": "string",
+          "maxLength": 128
+        }
+      }
+    },
+    "labelValueDefinition": {
+      "type": "object",
+      "description": "Declares a label value and its expected interpretations and behaviors.",
+      "required": [
+        "identifier",
+        "severity",
+        "blurs",
+        "locales"
+      ],
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "severity": {
+          "type": "string",
+          "knownValues": [
+            "inform",
+            "alert",
+            "none"
+          ]
+        },
+        "blurs": {
+          "type": "string",
+          "knownValues": [
+            "content",
+            "media",
+            "none"
+          ]
+        },
+        "defaultSetting": {
+          "type": "string",
+          "knownValues": [
+            "ignore",
+            "warn",
+            "hide"
+          ]
+        },
+        "adultOnly": {
+          "type": "boolean"
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#labelValueDefinitionStrings"
+          }
+        }
+      }
+    },
+    "labelValueDefinitionStrings": {
+      "type": "object",
+      "required": [
+        "lang",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "lang": {
+          "type": "string",
+          "format": "language"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 100000
+        }
+      }
+    },
+    "labelValue": {
+      "type": "string",
+      "knownValues": [
+        "!hide",
+        "!no-promote",
+        "!warn",
+        "!no-unauthenticated",
+        "dmca-violation",
+        "doxxing",
+        "porn",
+        "sexual",
+        "nudity",
+        "nsfl",
+        "gore"
+      ]
+    }
+  }
+}

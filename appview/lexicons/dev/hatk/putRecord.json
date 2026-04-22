@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.putRecord",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create or update a record via the user's PDS.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["collection", "rkey", "record"],
+          "properties": {
+            "collection": {
+              "type": "string"
+            },
+            "rkey": {
+              "type": "string"
+            },
+            "record": {
+              "type": "unknown"
+            },
+            "repo": {
+              "type": "string",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            }
+          }
+        }
+      }
+    }
+  }
+}

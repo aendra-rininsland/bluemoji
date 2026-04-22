@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "dev.hatk.describeCollections",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List indexed collections and their schemas.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "collections": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["collection"],
+                "properties": {
+                  "collection": {
+                    "type": "string"
+                  },
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["name", "originalName", "type", "required"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "originalName": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "required": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
