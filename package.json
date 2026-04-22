@@ -1,34 +1,33 @@
 {
-  "name": "bluemoji",
-  "version": "1.0.0",
-  "author": "Ændra Rininsland",
-  "license": "MIT",
-  "description": "Monorepo for the Bluemoji project",
+  "name": "bluemoji-server",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test:watch": "vitest",
-    "codegen": "npm run codegen -ws"
-  },
-  "workspaces": [
-    "api",
-    "webapp",
-    "server"
-  ],
-  "devDependencies": {
-    "@atproto/lex-cli": "^0.5.0",
-    "@eslint/js": "^9.9.0",
-    "@swc/cli": "^0.4.0",
-    "add-js-extension": "^1.0.4",
-    "cookie-parser": "^1.4.6",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.35.0",
-    "globals": "^15.9.0",
-    "multiformats": "^13.2.2",
-    "prettier": "^3.3.3",
-    "server": "^1.0.39",
-    "tsx": "^4.16.2",
-    "typescript-eslint": "^8.2.0"
+    "start": "hatk start",
+    "dev": "vp dev",
+    "build": "vp build",
+    "check": "vp check && svelte-check",
+    "format": "vp format",
+    "test": "vp test",
+    "prepare": "vp config"
   },
   "dependencies": {
-    "@types/node": "^22.4.1"
-  }
+    "@hatk/hatk": "^0.0.1-alpha.42",
+    "@sveltejs/adapter-cloudflare": "^7.2.8",
+    "@sveltejs/adapter-node": "^5.5.4",
+    "@sveltejs/kit": "^2.55.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "@voidzero-dev/vite-plus-core": "^0.1.11",
+    "svelte": "^5",
+    "svelte-check": "^4",
+    "typescript": "^5",
+    "vite-plus": "^0.1.11"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "npm@11.13.0"
 }
