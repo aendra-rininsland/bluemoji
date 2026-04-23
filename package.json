@@ -18,7 +18,7 @@
     "@sveltejs/kit": "^2.55.0"
   },
   "devDependencies": {
-    "@types/node": "^25.4.0",
+    "@types/node": "^24",
     "@voidzero-dev/vite-plus-core": "^0.1.11",
     "svelte": "^5",
     "svelte-check": "^4",
@@ -29,5 +29,8 @@
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
   },
-  "packageManager": "npm@11.13.0"
+  "packageManager": "npm@11.13.0",
+  "workspaces": [
+    "lib"
+  ]
 }

@@ -21,17 +21,34 @@ export async function render(
     raw: false,
     player: false,
     width: 128,
-    height: 128
-  }
+    height: 128,
+  },
 ) {
   try {
-    if (BlueMojiRichTextFacet.isFormats_v0(facet.formats)) {
+    if (BlueMojiRichTextFacet.isFormats_v1(facet.formats)) {
+      const { formats } = facet;
+      if (formats.lottie) {
+        return renderLottie(facet, BlobTypeEnum.LOTTIE);
+      } else if (formats.apng_128) {
+        return renderBlobAsImg(facet, BlobTypeEnum.APNG);
+      } else if (formats.gif_128) {
+        return renderBlobAsImg(facet, BlobTypeEnum.GIF);
+      } else if (formats.webp_128) {
+        return renderBlobAsImg(facet, BlobTypeEnum.WEBP);
+      } else if (formats.png_128) {
+        return renderBlobAsImg(facet, BlobTypeEnum.PNG);
+      }
+
+      throw new Error("Invalid format attempted to render");
+
+      // v0
+    } else if (BlueMojiRichTextFacet.isFormats_v0(facet.formats)) {
       const { formats } = facet;
       if (formats.lottie || formats.apng_128) {
         const { data } = await agent.com.atproto.repo.getRecord({
           repo: facet.did,
           collection: "blue.moji.collection.item",
-          rkey: facet.name.replace(/:/g, "")
+          rkey: facet.name.replace(/:/g, ""),
         });
 
         const { value: record } = data;

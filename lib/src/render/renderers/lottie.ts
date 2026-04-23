@@ -1,4 +1,5 @@
 import { DotLottie, Config } from "@lottiefiles/dotlottie-web";
+import { BlobInfo } from "./blob";
 
 interface RenderLottieParams extends Omit<Config, "canvas" | "src"> {
   width: 128;
@@ -10,7 +11,7 @@ interface RenderLottieParams extends Omit<Config, "canvas" | "src"> {
 export function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
   return array.buffer.slice(
     array.byteOffset,
-    array.byteLength + array.byteOffset
+    array.byteLength + array.byteOffset,
   );
 }
 const RenderLottieParamsDefaults = {
@@ -19,12 +20,12 @@ const RenderLottieParamsDefaults = {
   width: 128 as const,
   height: 128 as const,
   player: false,
-  raw: false
+  raw: false,
 };
 
 export const renderLottie = (
-  bytes: Uint8Array,
-  paramUser: RenderLottieParams = RenderLottieParamsDefaults
+  item: BlobInfo,
+  paramUser: RenderLottieParams = RenderLottieParamsDefaults,
 ) => {
   const params = { ...RenderLottieParamsDefaults, ...paramUser };
   if (params.raw && bytes) return bytes; // noop if bytes are requested for e.g. React Native
@@ -39,7 +40,7 @@ export const renderLottie = (
   const player = new DotLottie({
     ...params,
     canvas,
-    data: ab
+    data: ab,
   });
 
   return params.player ? { canvas, player } : canvas;

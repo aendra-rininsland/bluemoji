@@ -32,7 +32,7 @@ export default defineConfig({
         : []),
       {
         client_id: "http://127.0.0.1:3000/oauth-client-metadata.json",
-        client_name: "my-hatk-app",
+        client_name: "bluemoji",
         scope: "atproto",
         redirect_uris: ["http://127.0.0.1:3000/oauth/callback"],
       },

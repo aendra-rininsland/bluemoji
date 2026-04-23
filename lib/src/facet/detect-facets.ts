@@ -1,10 +1,9 @@
 import { detectFacets as detectFacetsOriginal } from "@atproto/api/src/rich-text/detection";
-// This is broken between the src/ and dist/ versions of this
-// import { UnicodeString } from "@atproto/api/src/rich-text/unicode";
+import { UnicodeString } from "@atproto/api/src/rich-text/unicode";
 import { Facet } from "@atproto/api";
 import { BLUEMOJI_REGEX } from "./BluemojiRichText";
 
-export function detectFacets(text: any /*UnicodeString*/): Facet[] | undefined {
+export function detectFacets(text: UnicodeString): Facet[] | undefined {
   let match: any;
   const facets: Facet[] = detectFacetsOriginal(text) || [];
   {
@@ -15,14 +14,14 @@ export function detectFacets(text: any /*UnicodeString*/): Facet[] | undefined {
         $type: "app.bsky.richtext.facet",
         index: {
           byteStart: text.utf16IndexToUtf8Index(start),
-          byteEnd: text.utf16IndexToUtf8Index(start + match[0].length + 1)
+          byteEnd: text.utf16IndexToUtf8Index(start + match[0].length + 1),
         },
         features: [
           {
             $type: "blue.moji.richtext.facet",
-            name: match[0]
-          }
-        ]
+            name: match[0],
+          },
+        ],
       });
     }
   }

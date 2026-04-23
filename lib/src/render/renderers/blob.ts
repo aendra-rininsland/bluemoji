@@ -9,10 +9,12 @@ interface RenderBlobParams {
 export enum BlobTypeEnum {
   PNG = "png",
   GIF = "gif",
-  WEBP = "webp"
+  WEBP = "webp",
+  LOTTIE = "lottie",
+  APNG = "apng",
 }
 
-type BlobInfo = {
+export type BlobInfo = {
   did: string;
   record?: BlueMojiCollectionItem.Record;
   cid?: string;
@@ -24,8 +26,8 @@ export const renderBlobAsImg = (
   params: RenderBlobParams = {
     width: 128,
     height: 128,
-    cdnBase: "https://cdn.bsky.app/img/avatar_thumbnail/plain/"
-  }
+    cdnBase: "https://cdn.bsky.app/img/avatar_thumbnail/plain/",
+  },
 ) => {
   try {
     if (!Object.values(BlobTypeEnum).includes(type)) {

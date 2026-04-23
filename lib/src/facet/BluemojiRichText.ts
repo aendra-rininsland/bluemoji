@@ -6,7 +6,7 @@ import AtpAgent, {
   UnicodeString,
   Entity,
   RichTextProps,
-  RichTextOpts
+  RichTextOpts,
 } from "@atproto/api";
 import * as BlueMojiRichtextFacet from "../client/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
@@ -14,7 +14,7 @@ import { detectFacets } from "./detect-facets";
 
 export const BLUEMOJI_REGEX = new RegExp(
   ":((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):",
-  "gim"
+  "gim",
 );
 
 export class BluemojiRichTextSegment extends RichTextSegment {
@@ -48,7 +48,7 @@ export class BluemojiRichText extends RichText {
   clone() {
     return new BluemojiRichText({
       text: this.unicodeText.utf16,
-      facets: cloneDeep(this.facets)
+      facets: cloneDeep(this.facets),
     });
   }
 
@@ -65,7 +65,7 @@ export class BluemojiRichText extends RichText {
       const currFacet = facets[facetCursor];
       if (textCursor < currFacet.index.byteStart) {
         yield new BluemojiRichTextSegment(
-          this.unicodeText.slice(textCursor, currFacet.index.byteStart)
+          this.unicodeText.slice(textCursor, currFacet.index.byteStart),
         );
       } else if (textCursor > currFacet.index.byteStart) {
         facetCursor++;
@@ -74,7 +74,7 @@ export class BluemojiRichText extends RichText {
       if (currFacet.index.byteStart < currFacet.index.byteEnd) {
         const subtext = this.unicodeText.slice(
           currFacet.index.byteStart,
-          currFacet.index.byteEnd
+          currFacet.index.byteEnd,
         );
         if (!subtext.trim()) {
           // dont empty string entities
@@ -88,7 +88,7 @@ export class BluemojiRichText extends RichText {
     } while (facetCursor < facets.length);
     if (textCursor < this.unicodeText.length) {
       yield new BluemojiRichTextSegment(
-        this.unicodeText.slice(textCursor, this.unicodeText.length)
+        this.unicodeText.slice(textCursor, this.unicodeText.length),
       );
     }
   }
@@ -109,14 +109,14 @@ export class BluemojiRichText extends RichText {
             const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
               rkey: feature.name.replace(/:/g, ""),
-              collection: "blue.moji.collection.item"
+              collection: "blue.moji.collection.item",
             });
 
             if (BlueMojiCollectionItem.isRecord(record.value)) {
               feature.alt = record.value.alt;
               feature.did = repo;
               feature.formats = {
-                $type: "blue.moji.richtext.facet#formats_v0"
+                $type: "blue.moji.richtext.facet#formats_v0",
               };
               if (BlueMojiCollectionItem.isFormats_v0(record.value.formats)) {
                 if (record.value.formats.png_128) {
@@ -161,25 +161,27 @@ function entitiesToFacets(text: UnicodeString, entities: Entity[]): Facet[] {
         $type: "app.bsky.richtext.facet",
         index: {
           byteStart: text.utf16IndexToUtf8Index(ent.index.start),
-          byteEnd: text.utf16IndexToUtf8Index(ent.index.end)
+          byteEnd: text.utf16IndexToUtf8Index(ent.index.end),
         },
-        features: [{ $type: "app.bsky.richtext.facet#link", uri: ent.value }]
+        features: [{ $type: "app.bsky.richtext.facet#link", uri: ent.value }],
       });
     } else if (ent.type === "mention") {
       facets.push({
         $type: "app.bsky.richtext.facet",
         index: {
           byteStart: text.utf16IndexToUtf8Index(ent.index.start),
-          byteEnd: text.utf16IndexToUtf8Index(ent.index.end)
+          byteEnd: text.utf16IndexToUtf8Index(ent.index.end),
         },
-        features: [{ $type: "app.bsky.richtext.facet#mention", did: ent.value }]
+        features: [
+          { $type: "app.bsky.richtext.facet#mention", did: ent.value },
+        ],
       });
     } else if (ent.type === "bluemoji") {
       facets.push({
         $type: "app.bsky.richtext.facet",
         index: {
           byteStart: text.utf16IndexToUtf8Index(ent.index.start),
-          byteEnd: text.utf16IndexToUtf8Index(ent.index.end)
+          byteEnd: text.utf16IndexToUtf8Index(ent.index.end),
         },
         features: [
           {
@@ -187,9 +189,9 @@ function entitiesToFacets(text: UnicodeString, entities: Entity[]): Facet[] {
             did: ent.did,
             name: ent.name,
             alt: ent.alt,
-            formats: ent.formats
-          }
-        ]
+            formats: ent.formats,
+          },
+        ],
       });
     }
   }
