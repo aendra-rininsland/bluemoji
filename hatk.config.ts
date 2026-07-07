@@ -9,9 +9,24 @@ export default defineConfig({
   port: 3000,
   databaseEngine: "sqlite",
   database: isProd ? "/data/hatk.db" : "data/hatk.db",
+  // Only index blue.moji.* — without this, hatk indexes every record lexicon
+  // in lexicons/ (including vendored app.bsky.feed.postgate/threadgate) and
+  // auto-backfills the full repo of every DID on the network that writes one.
+  collections: [
+    "blue.moji.collection.item",
+    "blue.moji.packs.pack",
+    "blue.moji.packs.packitem",
+    "blue.moji.feed.reaction",
+  ],
   backfill: {
-    parallelism: 5,
+    parallelism: 2,
     fullNetwork: false,
+    signalCollections: [
+      "blue.moji.collection.item",
+      "blue.moji.packs.pack",
+      "blue.moji.packs.packitem",
+      "blue.moji.feed.reaction",
+    ],
   },
   oauth: {
     issuer: isProd && prodDomain ? `https://${prodDomain}` : undefined,
