@@ -3,10 +3,7 @@
   "defs": {
     "nux": {
       "type": "object",
-      "required": [
-        "id",
-        "completed"
-      ],
+      "required": ["id", "completed"],
       "properties": {
         "id": {
           "type": "string",
@@ -32,10 +29,7 @@
     },
     "mutedWord": {
       "type": "object",
-      "required": [
-        "value",
-        "targets"
-      ],
+      "required": ["value", "targets"],
       "properties": {
         "id": {
           "type": "string"
@@ -63,33 +57,21 @@
           "type": "string",
           "default": "all",
           "description": "Groups of users to apply the muted word to. If undefined, applies to all users.",
-          "knownValues": [
-            "all",
-            "exclude-following"
-          ]
+          "knownValues": ["all", "exclude-following"]
         }
       },
       "description": "A word that the account owner has muted."
     },
     "savedFeed": {
       "type": "object",
-      "required": [
-        "id",
-        "type",
-        "value",
-        "pinned"
-      ],
+      "required": ["id", "type", "value", "pinned"],
       "properties": {
         "id": {
           "type": "string"
         },
         "type": {
           "type": "string",
-          "knownValues": [
-            "feed",
-            "list",
-            "timeline"
-          ]
+          "knownValues": ["feed", "list", "timeline"]
         },
         "value": {
           "type": "string"
@@ -101,10 +83,7 @@
     },
     "statusView": {
       "type": "object",
-      "required": [
-        "status",
-        "record"
-      ],
+      "required": ["status", "record"],
       "properties": {
         "cid": {
           "type": "string",
@@ -115,9 +94,7 @@
           "format": "at-uri"
         },
         "embed": {
-          "refs": [
-            "app.bsky.embed.external#view"
-          ],
+          "refs": ["app.bsky.embed.external#view"],
           "type": "union",
           "description": "An optional embed associated with the status."
         },
@@ -134,9 +111,7 @@
         "status": {
           "type": "string",
           "description": "The status for the account.",
-          "knownValues": [
-            "app.bsky.actor.status#live"
-          ]
+          "knownValues": ["app.bsky.actor.status#live"]
         },
         "isActive": {
           "type": "boolean",
@@ -179,10 +154,7 @@
     },
     "profileView": {
       "type": "object",
-      "required": [
-        "did",
-        "handle"
-      ],
+      "required": ["did", "handle"],
       "properties": {
         "did": {
           "type": "string",
@@ -290,9 +262,7 @@
     },
     "feedViewPref": {
       "type": "object",
-      "required": [
-        "feed"
-      ],
+      "required": ["feed"],
       "properties": {
         "feed": {
           "type": "string",
@@ -323,9 +293,7 @@
     },
     "labelersPref": {
       "type": "object",
-      "required": [
-        "labelers"
-      ],
+      "required": ["labelers"],
       "properties": {
         "labelers": {
           "type": "array",
@@ -338,9 +306,7 @@
     },
     "interestsPref": {
       "type": "object",
-      "required": [
-        "tags"
-      ],
+      "required": ["tags"],
       "properties": {
         "tags": {
           "type": "array",
@@ -356,10 +322,7 @@
     },
     "knownFollowers": {
       "type": "object",
-      "required": [
-        "count",
-        "followers"
-      ],
+      "required": ["count", "followers"],
       "properties": {
         "count": {
           "type": "integer"
@@ -378,9 +341,7 @@
     },
     "mutedWordsPref": {
       "type": "object",
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "properties": {
         "items": {
           "type": "array",
@@ -394,10 +355,7 @@
     },
     "savedFeedsPref": {
       "type": "object",
-      "required": [
-        "pinned",
-        "saved"
-      ],
+      "required": ["pinned", "saved"],
       "properties": {
         "saved": {
           "type": "array",
@@ -424,13 +382,7 @@
         "sort": {
           "type": "string",
           "description": "Sorting mode for threads.",
-          "knownValues": [
-            "oldest",
-            "newest",
-            "most-likes",
-            "random",
-            "hotness"
-          ]
+          "knownValues": ["oldest", "newest", "most-likes", "random", "hotness"]
         }
       }
     },
@@ -454,9 +406,7 @@
     },
     "hiddenPostsPref": {
       "type": "object",
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "properties": {
         "items": {
           "type": "array",
@@ -470,9 +420,7 @@
     },
     "labelerPrefItem": {
       "type": "object",
-      "required": [
-        "did"
-      ],
+      "required": ["did"],
       "properties": {
         "did": {
           "type": "string",
@@ -483,17 +431,12 @@
     "mutedWordTarget": {
       "type": "string",
       "maxLength": 640,
-      "knownValues": [
-        "content",
-        "tag"
-      ],
+      "knownValues": ["content", "tag"],
       "maxGraphemes": 64
     },
     "adultContentPref": {
       "type": "object",
-      "required": [
-        "enabled"
-      ],
+      "required": ["enabled"],
       "properties": {
         "enabled": {
           "type": "boolean",
@@ -531,10 +474,7 @@
     },
     "contentLabelPref": {
       "type": "object",
-      "required": [
-        "label",
-        "visibility"
-      ],
+      "required": ["label", "visibility"],
       "properties": {
         "label": {
           "type": "string"
@@ -546,21 +486,13 @@
         },
         "visibility": {
           "type": "string",
-          "knownValues": [
-            "ignore",
-            "show",
-            "warn",
-            "hide"
-          ]
+          "knownValues": ["ignore", "show", "warn", "hide"]
         }
       }
     },
     "profileViewBasic": {
       "type": "object",
-      "required": [
-        "did",
-        "handle"
-      ],
+      "required": ["did", "handle"],
       "properties": {
         "did": {
           "type": "string",
@@ -617,9 +549,7 @@
     },
     "savedFeedsPrefV2": {
       "type": "object",
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "properties": {
         "items": {
           "type": "array",
@@ -632,12 +562,7 @@
     },
     "verificationView": {
       "type": "object",
-      "required": [
-        "issuer",
-        "uri",
-        "isValid",
-        "createdAt"
-      ],
+      "required": ["issuer", "uri", "isValid", "createdAt"],
       "properties": {
         "uri": {
           "type": "string",
@@ -704,11 +629,7 @@
     },
     "verificationState": {
       "type": "object",
-      "required": [
-        "verifications",
-        "verifiedStatus",
-        "trustedVerifierStatus"
-      ],
+      "required": ["verifications", "verifiedStatus", "trustedVerifierStatus"],
       "properties": {
         "verifications": {
           "type": "array",
@@ -721,20 +642,12 @@
         "verifiedStatus": {
           "type": "string",
           "description": "The user's status as a verified account.",
-          "knownValues": [
-            "valid",
-            "invalid",
-            "none"
-          ]
+          "knownValues": ["valid", "invalid", "none"]
         },
         "trustedVerifierStatus": {
           "type": "string",
           "description": "The user's status as a trusted verifier.",
-          "knownValues": [
-            "valid",
-            "invalid",
-            "none"
-          ]
+          "knownValues": ["valid", "invalid", "none"]
         }
       },
       "description": "Represents the verification information about the user this object is attached to."
@@ -751,10 +664,7 @@
     },
     "profileViewDetailed": {
       "type": "object",
-      "required": [
-        "did",
-        "handle"
-      ],
+      "required": ["did", "handle"],
       "properties": {
         "did": {
           "type": "string",
@@ -845,9 +755,7 @@
     },
     "bskyAppProgressGuide": {
       "type": "object",
-      "required": [
-        "guide"
-      ],
+      "required": ["guide"],
       "properties": {
         "guide": {
           "type": "string",
@@ -876,26 +784,17 @@
     },
     "profileAssociatedChat": {
       "type": "object",
-      "required": [
-        "allowIncoming"
-      ],
+      "required": ["allowIncoming"],
       "properties": {
         "allowIncoming": {
           "type": "string",
-          "knownValues": [
-            "all",
-            "none",
-            "following"
-          ]
+          "knownValues": ["all", "none", "following"]
         }
       }
     },
     "profileAssociatedGerm": {
       "type": "object",
-      "required": [
-        "showButtonTo",
-        "messageMeUrl"
-      ],
+      "required": ["showButtonTo", "messageMeUrl"],
       "properties": {
         "messageMeUrl": {
           "type": "string",
@@ -903,10 +802,7 @@
         },
         "showButtonTo": {
           "type": "string",
-          "knownValues": [
-            "usersIFollow",
-            "everyone"
-          ]
+          "knownValues": ["usersIFollow", "everyone"]
         }
       }
     },
@@ -931,9 +827,7 @@
         "postgateEmbeddingRules": {
           "type": "array",
           "items": {
-            "refs": [
-              "app.bsky.feed.postgate#disableRule"
-            ],
+            "refs": ["app.bsky.feed.postgate#disableRule"],
             "type": "union"
           },
           "maxLength": 5,
@@ -944,17 +838,11 @@
     },
     "profileAssociatedActivitySubscription": {
       "type": "object",
-      "required": [
-        "allowSubscriptions"
-      ],
+      "required": ["allowSubscriptions"],
       "properties": {
         "allowSubscriptions": {
           "type": "string",
-          "knownValues": [
-            "followers",
-            "mutuals",
-            "none"
-          ]
+          "knownValues": ["followers", "mutuals", "none"]
         }
       }
     }

@@ -53,6 +53,16 @@
       {/each}
     </p>
 
+    {#if data.sticker}
+      <figure class="sticker">
+        {#if data.sticker.url}
+          <img src={data.sticker.url} alt={data.sticker.alt ?? data.sticker.name} title={data.sticker.name} />
+        {:else}
+          <span title={data.sticker.name}>{data.sticker.name}</span>
+        {/if}
+      </figure>
+    {/if}
+
     <footer>
       <a
         class="at-uri"
@@ -111,6 +121,16 @@
     width: 1.5em;
     height: 1.5em;
     vertical-align: middle;
+    object-fit: contain;
+  }
+
+  .sticker {
+    margin: 0;
+  }
+
+  .sticker img {
+    max-width: 256px;
+    max-height: 256px;
     object-fit: contain;
   }
 

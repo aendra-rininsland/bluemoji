@@ -15,14 +15,21 @@ export default defineConfig({
   },
   oauth: {
     issuer: isProd && prodDomain ? `https://${prodDomain}` : undefined,
-    scopes: ["atproto", "repo:blue.moji.collection.item", "blob"],
+    scopes: [
+      "atproto",
+      "repo:blue.moji.collection.item",
+      "repo:blue.moji.packs.pack",
+      "repo:blue.moji.packs.packitem",
+      "blob",
+    ],
     clients: [
       ...(prodDomain
         ? [
             {
               client_id: `https://${prodDomain}/oauth-client-metadata.json`,
               client_name: "moji.blue",
-              scope: "atproto repo:blue.moji.collection.item blob",
+              scope:
+                "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem blob",
               redirect_uris: [
                 `https://${prodDomain}/oauth/callback`,
                 `https://${prodDomain}/admin`,
@@ -33,7 +40,8 @@ export default defineConfig({
       {
         client_id: "http://127.0.0.1:3000/oauth-client-metadata.json",
         client_name: "bluemoji",
-        scope: "atproto repo:blue.moji.collection.item blob",
+        scope:
+          "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem blob",
         redirect_uris: ["http://127.0.0.1:3000/oauth/callback"],
       },
     ],

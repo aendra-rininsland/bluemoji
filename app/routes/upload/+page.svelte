@@ -8,6 +8,7 @@
   let emojiName = $state('')
   let altText = $state('')
   let adultOnly = $state(false)
+  let asSticker = $state(true)
   let loading = $state(false)
   let error = $state('')
   let successUri = $state('')
@@ -103,6 +104,20 @@
         }
       }
 
+      // Full-size sticker rendition (static raster only for now)
+      let stickerFormats: Record<string, unknown> | undefined
+      if (asSticker && (kind === 'png' || kind === 'webp')) {
+        const canvas512 = await resizeCanvas(file, 512)
+        const sticker = await canvasToBlob(canvas512, 'image/png')
+        if (sticker.size <= 512_000) {
+          const { blob: png512 } = await callXrpc('dev.hatk.uploadBlob', sticker)
+          stickerFormats = {
+            $type: 'blue.moji.collection.item#stickerFormats_v0',
+            png_512: png512,
+          }
+        }
+      }
+
       const rkey = emojiName.replace(/:/g, '')
       const result = await callXrpc('blue.moji.collection.putItem', {
         repo: v.did,
@@ -112,6 +127,7 @@
           createdAt: new Date().toISOString(),
           adultOnly,
           formats,
+          ...(stickerFormats ? { stickerFormats } : {}),
         } as any,
       })
 
@@ -221,6 +237,12 @@
         style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text);"
       />
     </div>
+
+    <!-- Sticker -->
+    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
+      <input type="checkbox" bind:checked={asSticker} />
+      Also generate a full-size sticker (512px, shareable as a post attachment)
+    </label>
 
     <!-- Adult only -->
     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">

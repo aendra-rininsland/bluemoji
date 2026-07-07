@@ -1,0 +1,87 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.embed.sticker",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "A full-sized Bluemoji sticker attached to a post as media, in the style of app.bsky.embed.external. References a blue.moji.collection.item record in the sticker owner's repo.",
+      "required": ["sticker"],
+      "properties": {
+        "sticker": { "type": "ref", "ref": "#sticker" }
+      }
+    },
+    "sticker": {
+      "type": "object",
+      "required": ["did", "name", "formats"],
+      "properties": {
+        "record": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef",
+          "description": "Strong reference to the source blue.moji.collection.item record."
+        },
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the repo that owns the sticker record. Combined with the format CIDs to construct blob/CDN URLs without a getRecord round-trip, mirroring blue.moji.richtext.facet."
+        },
+        "name": {
+          "type": "string",
+          "description": "Colon-wrapped alias of the source Bluemoji (e.g. :blobcat:). Implementers should use this as fallback text when assets are unavailable."
+        },
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the sticker, for accessibility."
+        },
+        "aspectRatio": { "type": "ref", "ref": "app.bsky.embed.defs#aspectRatio" },
+        "formats": {
+          "type": "union",
+          "description": "CIDs of the full-size sticker renditions. Open union to allow future formats.",
+          "refs": ["#formats_v0"],
+          "closed": false
+        }
+      }
+    },
+    "formats_v0": {
+      "type": "object",
+      "description": "CIDs of the full-size (512px-class) blobs stored in the sticker owner's repo under blue.moji.collection.item stickerFormats. CID-only, like blue.moji.richtext.facet#formats_v1, because blobs cannot be referenced across repos.",
+      "properties": {
+        "png_512": { "type": "string", "format": "cid" },
+        "webp_512": { "type": "string", "format": "cid" },
+        "gif_512": { "type": "string", "format": "cid" },
+        "apng_512": { "type": "string", "format": "cid" },
+        "lottie": { "type": "string", "format": "cid" }
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": ["sticker"],
+      "properties": {
+        "sticker": { "type": "ref", "ref": "#viewSticker" }
+      }
+    },
+    "viewSticker": {
+      "type": "object",
+      "required": ["fullsize", "name"],
+      "properties": {
+        "fullsize": {
+          "type": "string",
+          "format": "uri",
+          "description": "Fully-qualified URL of the full-size sticker asset."
+        },
+        "thumb": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the 128px inline-emoji rendition, if available."
+        },
+        "name": { "type": "string" },
+        "alt": { "type": "string" },
+        "aspectRatio": { "type": "ref", "ref": "app.bsky.embed.defs#aspectRatio" },
+        "record": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
+        "labels": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
+        }
+      }
+    }
+  }
+}

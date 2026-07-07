@@ -1,9 +1,4 @@
-import {
-  AtpAgent,
-  RichTextSegment,
-  RichText,
-  AppBskyRichtextFacet
-} from "@atproto/api";
+import { AtpAgent, RichTextSegment, RichText, AppBskyRichtextFacet } from "@atproto/api";
 import * as BlueMojiRichtextFacet from "../client/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
@@ -17,13 +12,12 @@ export const register = () => {
         return bluemoji;
       }
       return undefined;
-    }
+    },
   });
 
-  (RichTextSegment as unknown as BluemojiRichTextSegment).isBluemoji =
-    function () {
-      return !!this.bluemoji;
-    };
+  (RichTextSegment as unknown as BluemojiRichTextSegment).isBluemoji = function () {
+    return !!this.bluemoji;
+  };
 
   RichText.prototype.detectFacets = async function (agent: AtpAgent) {
     this.facets = detectFacets(this.unicodeText);
@@ -41,19 +35,18 @@ export const register = () => {
             const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
               rkey: feature.name.replace(/:/g, ""),
-              collection: "blue.moji.collection.item"
+              collection: "blue.moji.collection.item",
             });
 
             if (BlueMojiCollectionItem.isRecord(record.value)) {
               feature.alt = record.value.alt;
               feature.did = repo;
               feature.formats = {
-                $type: "blue.moji.richtext.facet#formats_v0"
+                $type: "blue.moji.richtext.facet#formats_v0",
               };
               if (BlueMojiCollectionItem.isFormats_v0(record.value.formats)) {
                 if (record.value.formats.png_128) {
-                  feature.formats.png_128 =
-                    record.value.formats.png_128.ref.toString();
+                  feature.formats.png_128 = record.value.formats.png_128.ref.toString();
                 }
 
                 if (record.value.formats.apng_128) {

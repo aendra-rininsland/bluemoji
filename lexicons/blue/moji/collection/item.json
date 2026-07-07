@@ -22,6 +22,12 @@
             "refs": ["#formats_v0", "#formats_v1"],
             "closed": false
           },
+          "stickerFormats": {
+            "type": "union",
+            "description": "Optional full-size renditions for use as a sticker (post attachment via blue.moji.embed.sticker). Presence of this field marks the item as sticker-capable; items with only 'formats' are inline emoji.",
+            "refs": ["#stickerFormats_v0"],
+            "closed": false
+          },
           "adultOnly": { "type": "boolean", "default": false },
           "labels": {
             "type": "union",
@@ -63,6 +69,22 @@
         "lottie": { "type": "ref", "ref": "#blob_v1" }
       }
     },
+    "stickerFormats_v0": {
+      "type": "object",
+      "description": "Full-size (up to 512×512) renditions for sharing as a sticker. Raster formats should be exactly 512px on the longest edge.",
+      "properties": {
+        "png_512": { "type": "ref", "ref": "#blob_sticker" },
+        "webp_512": { "type": "ref", "ref": "#blob_sticker" },
+        "gif_512": { "type": "ref", "ref": "#blob_sticker" },
+        "apng_512": { "type": "ref", "ref": "#blob_sticker" },
+        "lottie": { "type": "ref", "ref": "#blob_sticker" }
+      }
+    },
+    "blob_sticker": {
+      "type": "blob",
+      "maxSize": 512000,
+      "description": "Stickers render one-per-post at full size, so a larger budget than inline emoji is acceptable."
+    },
     "blob_v1": {
       "type": "blob",
       "maxSize": 128000,
@@ -82,12 +104,27 @@
       "type": "object",
       "required": ["name", "formats"],
       "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the source item record. Views need this so consumers can derive the owning DID for blob URL construction."
+        },
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the repo that owns this item's blobs."
+        },
         "name": { "type": "string" },
         "alt": { "type": "string" },
         "createdAt": { "type": "string", "format": "datetime" },
         "formats": {
           "type": "union",
           "refs": ["#formats_v0", "#formats_v1"]
+        },
+        "stickerFormats": {
+          "type": "union",
+          "refs": ["#stickerFormats_v0"],
+          "closed": false
         },
         "adultOnly": { "type": "boolean", "default": false }
       }

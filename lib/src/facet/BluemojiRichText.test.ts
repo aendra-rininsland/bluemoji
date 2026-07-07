@@ -12,33 +12,32 @@ const stubRecord: Record = {
   formats: {
     $type: "blue.moji.collection.item#formats_v0",
     png_128: {
-      ref: "123"
+      ref: "123",
     },
     apng_128: "apng_bytes",
-    lottie: "dotlottie_bytes"
+    lottie: "dotlottie_bytes",
   },
   adultOnly: false,
-  fallbackText: "◌"
+  fallbackText: "◌",
 };
 
 describe("BluemojiRichText", () => {
-  const text =
-    "Hello @aendra.com, check out this link: https://example.com :blue-kiss:";
+  const text = "Hello @aendra.com, check out this link: https://example.com :blue-kiss:";
 
   it(`detects facets in string: ${text}`, async (t) => {
     const agent = new AtpAgent({ service: "https://api.bsky.social" });
     t.mock.method(agent, "login", () => Promise.resolve(true));
     t.mock.method(agent.com.atproto.repo, "getRecord", () =>
-      Promise.resolve({ data: { value: stubRecord } })
+      Promise.resolve({ data: { value: stubRecord } }),
     );
 
     agent.session = {
-      did: "did:plc:kmzpsik7s5y5fwu7nnkngfx4"
+      did: "did:plc:kmzpsik7s5y5fwu7nnkngfx4",
     } as AtpSessionData;
 
     // creating richtext
     const rt = new BluemojiRichText({
-      text
+      text,
     });
 
     await rt.detectFacets(agent); // automatically detects mentions and links
@@ -47,7 +46,7 @@ describe("BluemojiRichText", () => {
       $type: "app.bsky.feed.post",
       text: rt.text,
       facets: rt.facets,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     const [mention, link, bluemoji] = postRecord.facets || [];
@@ -56,10 +55,7 @@ describe("BluemojiRichText", () => {
       const [mentionedUser] = mention.features;
       assert.strictEqual(mention.$type, "app.bsky.richtext.facet");
       assert.strictEqual(mentionedUser.did, "did:plc:kkf4naxqmweop7dv4l2iqqf5");
-      assert.strictEqual(
-        mentionedUser.$type,
-        "app.bsky.richtext.facet#mention"
-      );
+      assert.strictEqual(mentionedUser.$type, "app.bsky.richtext.facet#mention");
     });
 
     await t.test("still facets links", () => {
@@ -72,18 +68,9 @@ describe("BluemojiRichText", () => {
       const [bluemojiFeature] = bluemoji.features;
       assert.strictEqual(bluemojiFeature.$type, "blue.moji.richtext.facet");
       assert.strictEqual(bluemojiFeature.name, ":blue-kiss:");
-      assert.strictEqual(
-        bluemojiFeature.did,
-        "did:plc:kmzpsik7s5y5fwu7nnkngfx4"
-      );
-      assert.strictEqual(
-        (bluemojiFeature.formats as Formats_v0).png_128,
-        "123"
-      );
-      assert.strictEqual(
-        (bluemojiFeature.formats as Formats_v0).apng_128,
-        true
-      );
+      assert.strictEqual(bluemojiFeature.did, "did:plc:kmzpsik7s5y5fwu7nnkngfx4");
+      assert.strictEqual((bluemojiFeature.formats as Formats_v0).png_128, "123");
+      assert.strictEqual((bluemojiFeature.formats as Formats_v0).apng_128, true);
       assert.strictEqual((bluemojiFeature.formats as Formats_v0).lottie, true);
     });
   });

@@ -12,12 +12,12 @@ import * as BlueMojiCollectionItem from "../../../lexicon/types/blue/moji/collec
 const styles = StyleSheet.create({
   emoji16: {
     width: 16,
-    height: 16
-  }
+    height: 16,
+  },
 });
 
 export const RichTextBluemoji = ({
-  bluemoji
+  bluemoji,
 }: {
   bluemoji: BlueMojiRichtextFacet.Main;
   style?: { width: string; height: string };
@@ -29,7 +29,7 @@ export const RichTextBluemoji = ({
       "reduceMotionChanged",
       (isReduceMotionEnabled) => {
         setReduceMotionEnabled(isReduceMotionEnabled);
-      }
+      },
     );
     AccessibilityInfo.isReduceMotionEnabled().then((isReduceMotionEnabled) => {
       setReduceMotionEnabled(isReduceMotionEnabled);

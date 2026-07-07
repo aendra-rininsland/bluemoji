@@ -1,6 +1,9 @@
 {
   "name": "bluemoji-server",
   "private": true,
+  "workspaces": [
+    "lib"
+  ],
   "type": "module",
   "scripts": {
     "start": "hatk start",
@@ -29,8 +32,5 @@
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
   },
-  "packageManager": "npm@11.13.0",
-  "workspaces": [
-    "lib"
-  ]
+  "packageManager": "npm@11.13.0"
 }

@@ -16,14 +16,14 @@ export async function uploadBluemoji({
   alttext,
   emojiName,
   encodings = ["png"],
-  originalEncoding = "image/png"
+  originalEncoding = "image/png",
 }: UploadBluemojiParams) {
   const resizedBytes = await resizePngToUintArray(emoji, 128);
   const originalBytes = new Uint8Array(emoji);
 
   if (agent?.session && emoji && alttext && emojiName) {
     const formats: BlueMojiCollectionItem.Formats_v0 = {
-      $type: "blue.moji.collection.item#formats_v0"
+      $type: "blue.moji.collection.item#formats_v0",
     };
 
     // Use the bytesAsset version if smaller than 65kb (SUBJECT TO CHANGE)
@@ -34,10 +34,9 @@ export async function uploadBluemoji({
     if (encodings.includes("lottie")) formats.lottie = originalBytes;
 
     if (encodings.includes("png")) {
-      const { data: pngBlobAsset } = await agent.com.atproto.repo.uploadBlob(
-        resizedBytes,
-        { encoding: "image/png" }
-      );
+      const { data: pngBlobAsset } = await agent.com.atproto.repo.uploadBlob(resizedBytes, {
+        encoding: "image/png",
+      });
 
       formats.png_128 = pngBlobAsset.blob;
     }
@@ -63,7 +62,7 @@ export async function uploadBluemoji({
     }
 
     const { data: originalBlob } = await agent.uploadBlob(originalBytes, {
-      encoding: originalEncoding
+      encoding: originalEncoding,
     });
 
     return agent.com.atproto.repo.putRecord({
@@ -76,8 +75,8 @@ export async function uploadBluemoji({
         alt: alttext,
         createdAt: new Date().toISOString(),
         original: originalBlob.blob,
-        formats
-      }
+        formats,
+      },
     });
   } else {
     return false;

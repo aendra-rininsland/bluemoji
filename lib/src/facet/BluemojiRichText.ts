@@ -12,10 +12,7 @@ import * as BlueMojiRichtextFacet from "../client/types/blue/moji/richtext/facet
 import * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
 
-export const BLUEMOJI_REGEX = new RegExp(
-  ":((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):",
-  "gim",
-);
+export const BLUEMOJI_REGEX = new RegExp(":((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):", "gim");
 
 export class BluemojiRichTextSegment extends RichTextSegment {
   get bluemoji(): BlueMojiRichtextFacet.Main | undefined {
@@ -30,8 +27,7 @@ export class BluemojiRichTextSegment extends RichTextSegment {
   }
 }
 
-export const facetSort = (a: Facet, b: Facet) =>
-  a.index.byteStart - b.index.byteStart;
+export const facetSort = (a: Facet, b: Facet) => a.index.byteStart - b.index.byteStart;
 
 export class BluemojiRichText extends RichText {
   constructor(props: RichTextProps, opts?: RichTextOpts) {
@@ -72,10 +68,7 @@ export class BluemojiRichText extends RichText {
         continue;
       }
       if (currFacet.index.byteStart < currFacet.index.byteEnd) {
-        const subtext = this.unicodeText.slice(
-          currFacet.index.byteStart,
-          currFacet.index.byteEnd,
-        );
+        const subtext = this.unicodeText.slice(currFacet.index.byteStart, currFacet.index.byteEnd);
         if (!subtext.trim()) {
           // dont empty string entities
           yield new BluemojiRichTextSegment(subtext);
@@ -120,8 +113,7 @@ export class BluemojiRichText extends RichText {
               };
               if (BlueMojiCollectionItem.isFormats_v0(record.value.formats)) {
                 if (record.value.formats.png_128) {
-                  feature.formats.png_128 =
-                    record.value.formats.png_128.ref.toString();
+                  feature.formats.png_128 = record.value.formats.png_128.ref.toString();
                 }
 
                 if (record.value.formats.apng_128) {
@@ -172,9 +164,7 @@ function entitiesToFacets(text: UnicodeString, entities: Entity[]): Facet[] {
           byteStart: text.utf16IndexToUtf8Index(ent.index.start),
           byteEnd: text.utf16IndexToUtf8Index(ent.index.end),
         },
-        features: [
-          { $type: "app.bsky.richtext.facet#mention", did: ent.value },
-        ],
+        features: [{ $type: "app.bsky.richtext.facet#mention", did: ent.value }],
       });
     } else if (ent.type === "bluemoji") {
       facets.push({

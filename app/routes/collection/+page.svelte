@@ -15,6 +15,12 @@
     <div style="display: flex; gap: 0.75rem; align-items: center;">
       <span style="color: var(--muted); font-size: 0.875rem;">{items.length} emoji{items.length === 1 ? '' : 's'}</span>
       <a
+        href="/packs"
+        style="padding: 0.375rem 0.875rem; border: 1px solid var(--border); color: var(--text); border-radius: 4px; text-decoration: none; font-size: 0.875rem; white-space: nowrap;"
+      >
+        My packs
+      </a>
+      <a
         href="/upload"
         style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border-radius: 4px; text-decoration: none; font-size: 0.875rem; white-space: nowrap;"
       >

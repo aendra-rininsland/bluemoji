@@ -6,10 +6,7 @@
       "type": "record",
       "record": {
         "type": "object",
-        "required": [
-          "post",
-          "createdAt"
-        ],
+        "required": ["post", "createdAt"],
         "properties": {
           "post": {
             "type": "string",
@@ -19,12 +16,7 @@
           "allow": {
             "type": "array",
             "items": {
-              "refs": [
-                "#mentionRule",
-                "#followerRule",
-                "#followingRule",
-                "#listRule"
-              ],
+              "refs": ["#mentionRule", "#followerRule", "#followingRule", "#listRule"],
               "type": "union"
             },
             "maxLength": 5,
@@ -49,9 +41,7 @@
     },
     "listRule": {
       "type": "object",
-      "required": [
-        "list"
-      ],
+      "required": ["list"],
       "properties": {
         "list": {
           "type": "string",

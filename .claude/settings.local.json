@@ -1,8 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(vp check *)",
-      "Bash(npx svelte-check *)"
-    ]
+    "allow": ["Bash(vp check *)", "Bash(npx svelte-check *)"]
   }
 }

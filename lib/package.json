@@ -1,18 +1,22 @@
 {
   "name": "@aendra/bluemoji",
   "version": "4.0.0",
+  "description": "Client library for Bluemoji (moji.blue)",
+  "keywords": [
+    "atproto"
+  ],
+  "license": "ISC",
+  "author": "Ændra Rininsland",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "test": "tsx src/**/*.test.ts",
     "build": "vite build",
     "prepublishOnly": "npm run build",
     "codegen": "lex gen-api ./src/client  ../lexicons/app/bsky/*/* ../lexicons/com/atproto/*/* ../lexicons/blue/moji/*/*"
   },
-  "keywords": [
-    "atproto"
-  ],
-  "author": "Ændra Rininsland",
-  "license": "ISC",
-  "description": "Client library for Bluemoji (moji.blue)",
   "dependencies": {
     "@atproto/api": "^0.19.11",
     "@atproto/lexicon": "^0.6.2",
@@ -30,14 +34,10 @@
     "swc": "^1.0.11",
     "vite": "^8.0.9"
   },
-  "engines": {
-    "node": ">=24"
-  },
   "peerDependencies": {
     "react-native": "^0.74.4"
   },
-  "files": [
-    "dist",
-    "src"
-  ]
+  "engines": {
+    "node": ">=24"
+  }
 }

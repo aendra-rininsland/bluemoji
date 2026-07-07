@@ -5,12 +5,7 @@
     "label": {
       "type": "object",
       "description": "Metadata tag on an atproto resource (eg, repo or record).",
-      "required": [
-        "src",
-        "uri",
-        "val",
-        "cts"
-      ],
+      "required": ["src", "uri", "val", "cts"],
       "properties": {
         "ver": {
           "type": "integer"
@@ -50,9 +45,7 @@
     "selfLabels": {
       "type": "object",
       "description": "Metadata tags on an atproto record, published by the author within the record.",
-      "required": [
-        "values"
-      ],
+      "required": ["values"],
       "properties": {
         "values": {
           "type": "array",
@@ -66,9 +59,7 @@
     },
     "selfLabel": {
       "type": "object",
-      "required": [
-        "val"
-      ],
+      "required": ["val"],
       "properties": {
         "val": {
           "type": "string",
@@ -79,12 +70,7 @@
     "labelValueDefinition": {
       "type": "object",
       "description": "Declares a label value and its expected interpretations and behaviors.",
-      "required": [
-        "identifier",
-        "severity",
-        "blurs",
-        "locales"
-      ],
+      "required": ["identifier", "severity", "blurs", "locales"],
       "properties": {
         "identifier": {
           "type": "string",
@@ -92,27 +78,15 @@
         },
         "severity": {
           "type": "string",
-          "knownValues": [
-            "inform",
-            "alert",
-            "none"
-          ]
+          "knownValues": ["inform", "alert", "none"]
         },
         "blurs": {
           "type": "string",
-          "knownValues": [
-            "content",
-            "media",
-            "none"
-          ]
+          "knownValues": ["content", "media", "none"]
         },
         "defaultSetting": {
           "type": "string",
-          "knownValues": [
-            "ignore",
-            "warn",
-            "hide"
-          ]
+          "knownValues": ["ignore", "warn", "hide"]
         },
         "adultOnly": {
           "type": "boolean"
@@ -128,11 +102,7 @@
     },
     "labelValueDefinitionStrings": {
       "type": "object",
-      "required": [
-        "lang",
-        "name",
-        "description"
-      ],
+      "required": ["lang", "name", "description"],
       "properties": {
         "lang": {
           "type": "string",

@@ -149,7 +149,8 @@ CREATE TABLE "blue.moji.collection.item" (
   adult_only INTEGER,
   labels TEXT,
   copy_of TEXT,
-  fallback_text TEXT
+  fallback_text TEXT,
+  "sticker_formats" TEXT
 );
 
 CREATE TABLE "blue.moji.collection.item__formats_formats_v0" (
@@ -178,6 +179,16 @@ CREATE TABLE "blue.moji.collection.item__labels_self_labels" (
   parent_uri TEXT NOT NULL,
   parent_did TEXT NOT NULL,
   val TEXT
+);
+
+CREATE TABLE "blue.moji.collection.item__sticker_formats_sticker_formats_v0" (
+  parent_uri TEXT NOT NULL,
+  parent_did TEXT NOT NULL,
+  png_512 TEXT,
+  webp_512 TEXT,
+  gif_512 TEXT,
+  apng_512 TEXT,
+  lottie TEXT
 );
 
 CREATE TABLE "blue.moji.packs.pack" (

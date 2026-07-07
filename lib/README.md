@@ -29,7 +29,7 @@ await agent.login({ ...credentials });
 
 // creating richtext
 const rt = new BluemojiRichText({
-  text: "Hello @aendra.com, check out this link: https://moji.blue :blue-kiss:"
+  text: "Hello @aendra.com, check out this link: https://moji.blue :blue-kiss:",
 });
 
 await rt.detectFacets(agent); // automatically detects mentions and links
@@ -38,15 +38,13 @@ const postRecord = {
   $type: "app.bsky.feed.post",
   text: rt.text,
   facets: rt.facets,
-  createdAt: new Date().toISOString()
+  createdAt: new Date().toISOString(),
 };
 
 // At least one facet will have a feature of type "blue.moji.richtext.facet"
 assert.strictEquals(
-  rt.facets.some((f) =>
-    f.features.some((ff) => f.$type === "blue.moji.richtext.facet")
-  ),
-  true
+  rt.facets.some((f) => f.features.some((ff) => f.$type === "blue.moji.richtext.facet")),
+  true,
 );
 ```
 
@@ -67,7 +65,7 @@ const element = render(bluemojiFacet, agent);
 
 assert.ok(
   element instanceof HTMLCanvasElement || element instanceof HTMLImageElement,
-  "Render returns either <img> (PNG, APNG) or <canvas> (dotLottie)"
+  "Render returns either <img> (PNG, APNG) or <canvas> (dotLottie)",
 );
 ```
 

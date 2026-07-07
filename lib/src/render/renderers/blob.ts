@@ -40,9 +40,7 @@ export const renderBlobAsImg = (
     img.height = params.height;
     if (record) {
       if (BlueMojiCollectionItem.isFormats_v0(record.formats)) {
-        const format = record.formats[
-          `${type}_${params.width}`
-        ] as BlueMojiCollectionItem.Blob_v0;
+        const format = record.formats[`${type}_${params.width}`] as BlueMojiCollectionItem.Blob_v0;
         img.src = `${params.cdnBase}/${did}/${format.ref}@${type}`;
       } else {
         throw new Error("Invalid record");

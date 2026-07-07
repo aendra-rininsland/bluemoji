@@ -171,5 +171,30 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
   const segments = buildSegments(post.text ?? "", facets, emojiPdsMap);
 
-  return { handle, did, rkey, uri, cid, post, segments };
+  // Hydrate a blue.moji.embed.sticker attachment, if present.
+  let sticker: { url: string; name: string; alt?: string } | null = null;
+  const embed = post.embed as
+    | {
+        $type?: string;
+        sticker?: {
+          did: string;
+          name: string;
+          alt?: string;
+          formats?: Record<string, string | undefined>;
+        };
+      }
+    | undefined;
+  if (embed?.$type === "blue.moji.embed.sticker" && embed.sticker) {
+    const s = embed.sticker;
+    const stickerPds = await resolvePds(s.did, fetch).catch(() => null);
+    const cidStr =
+      s.formats?.png_512 ?? s.formats?.webp_512 ?? s.formats?.gif_512 ?? s.formats?.apng_512;
+    if (stickerPds && cidStr) {
+      sticker = { url: blobUrl(stickerPds, s.did, cidStr), name: s.name, alt: s.alt };
+    } else {
+      sticker = { url: "", name: s.name, alt: s.alt };
+    }
+  }
+
+  return { handle, did, rkey, uri, cid, post, segments, sticker };
 };

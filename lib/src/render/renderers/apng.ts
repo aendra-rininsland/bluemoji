@@ -7,8 +7,8 @@ export const renderApngAsImg = (
   bytes: Uint8Array,
   params: RenderApngParams = {
     width: 128,
-    height: 128
-  }
+    height: 128,
+  },
 ) => {
   try {
     const img = document.createElement("img");
