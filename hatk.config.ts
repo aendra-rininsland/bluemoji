@@ -15,14 +15,14 @@ export default defineConfig({
   },
   oauth: {
     issuer: isProd && prodDomain ? `https://${prodDomain}` : undefined,
-    scopes: ["atproto"],
+    scopes: ["atproto", "repo:blue.moji.collection.item", "blob"],
     clients: [
       ...(prodDomain
         ? [
             {
               client_id: `https://${prodDomain}/oauth-client-metadata.json`,
-              client_name: "my-hatk-app",
-              scope: "atproto",
+              client_name: "moji.blue",
+              scope: "atproto repo:blue.moji.collection.item blob",
               redirect_uris: [
                 `https://${prodDomain}/oauth/callback`,
                 `https://${prodDomain}/admin`,
@@ -33,7 +33,7 @@ export default defineConfig({
       {
         client_id: "http://127.0.0.1:3000/oauth-client-metadata.json",
         client_name: "bluemoji",
-        scope: "atproto",
+        scope: "atproto repo:blue.moji.collection.item blob",
         redirect_uris: ["http://127.0.0.1:3000/oauth/callback"],
       },
     ],

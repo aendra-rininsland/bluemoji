@@ -86,8 +86,8 @@
         "alt": { "type": "string" },
         "createdAt": { "type": "string", "format": "datetime" },
         "formats": {
-          "type": "ref",
-          "ref": "#formats_v0"
+          "type": "union",
+          "refs": ["#formats_v0", "#formats_v1"]
         },
         "adultOnly": { "type": "boolean", "default": false }
       }

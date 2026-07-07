@@ -35,7 +35,15 @@
     <p style="margin: 1rem 0; color: var(--muted);">
       Signed in as <code>{did}</code>
     </p>
-    <button onclick={handleLogout}>Sign out</button>
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      <a href="/collection" style="padding: 0.5rem 1rem; background: var(--accent); color: #fff; border-radius: 4px; text-decoration: none;">
+        My collection
+      </a>
+      <a href="/upload" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; text-decoration: none; color: var(--text);">
+        Upload emoji
+      </a>
+      <button onclick={handleLogout}>Sign out</button>
+    </div>
   {:else}
     <form
       onsubmit={handleLogin}
