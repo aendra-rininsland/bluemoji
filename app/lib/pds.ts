@@ -30,3 +30,13 @@ export function blobUrl(pds: string, did: string, ref: unknown): string | null {
   if (!cid) return null;
   return `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`;
 }
+
+/**
+ * Same-origin blob URL through the /img proxy, so assets are edge-cacheable
+ * and same-origin for client-side fetches. Accepts a BlobRef or raw CID.
+ */
+export function imgUrl(did: string, ref: unknown): string | null {
+  const cid = typeof ref === "string" ? ref : ((ref as any)?.ref?.["$link"] ?? null);
+  if (!cid) return null;
+  return `/img/${encodeURIComponent(did)}/${encodeURIComponent(cid)}`;
+}

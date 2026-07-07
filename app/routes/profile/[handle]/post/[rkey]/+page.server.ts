@@ -59,15 +59,11 @@ async function resolvePds(did: string, fetch: typeof globalThis.fetch): Promise<
   return service.serviceEndpoint;
 }
 
-function blobUrl(pds: string, did: string, cid: string): string {
-  return `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`;
+function imgUrl(did: string, cid: string): string {
+  return `/img/${encodeURIComponent(did)}/${encodeURIComponent(cid)}`;
 }
 
-function buildSegments(
-  text: string,
-  facets: AtFacet[],
-  emojiPdsMap: Map<string, string>,
-): Segment[] {
+function buildSegments(text: string, facets: AtFacet[]): Segment[] {
   const textBytes = new TextEncoder().encode(text);
   const decoder = new TextDecoder();
 
@@ -103,9 +99,8 @@ function buildSegments(
     }
 
     const { did, name, alt, fallbackText, formats } = slice.feature;
-    const emojiPds = emojiPdsMap.get(did);
     const cid = formats.png_128 ?? formats.webp_128 ?? formats.gif_128;
-    const url = emojiPds && cid ? blobUrl(emojiPds, did, cid) : "";
+    const url = typeof cid === "string" ? imgUrl(did, cid) : "";
 
     segments.push({ type: "emoji", name, alt, fallbackText, url });
     pos = slice.byteEnd;
@@ -154,24 +149,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
 
   const facets: AtFacet[] = post.facets ?? [];
 
-  const emojiDids = new Set<string>();
-  for (const facet of facets) {
-    for (const feature of facet.features) {
-      if ((feature as BluemojiFacetFeature).$type === "blue.moji.richtext.facet") {
-        emojiDids.add((feature as BluemojiFacetFeature).did);
-      }
-    }
-  }
-
-  const emojiPdsMap = new Map<string, string>();
-  await Promise.all(
-    [...emojiDids].map(async (emojiDid) => {
-      const emojiPds = await resolvePds(emojiDid, fetch).catch(() => null);
-      if (emojiPds) emojiPdsMap.set(emojiDid, emojiPds);
-    }),
-  );
-
-  const segments = buildSegments(post.text ?? "", facets, emojiPdsMap);
+  const segments = buildSegments(post.text ?? "", facets);
 
   // Hydrate a blue.moji.embed.sticker attachment, if present.
   let sticker: { url: string; name: string; alt?: string } | null = null;
@@ -188,14 +166,9 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
     | undefined;
   if (embed?.$type === "blue.moji.embed.sticker" && embed.sticker) {
     const s = embed.sticker;
-    const stickerPds = await resolvePds(s.did, fetch).catch(() => null);
     const cidStr =
       s.formats?.png_512 ?? s.formats?.webp_512 ?? s.formats?.gif_512 ?? s.formats?.apng_512;
-    if (stickerPds && cidStr) {
-      sticker = { url: blobUrl(stickerPds, s.did, cidStr), name: s.name, alt: s.alt };
-    } else {
-      sticker = { url: "", name: s.name, alt: s.alt };
-    }
+    sticker = { url: cidStr ? imgUrl(s.did, cidStr) : "", name: s.name, alt: s.alt };
   }
 
   // Reactions: aggregated groups from the AppView, with emoji images resolved.
@@ -217,19 +190,15 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
   ).catch(() => null);
   if (reactionsRes?.ok) {
     const data = (await reactionsRes.json()) as { groups: ReactionGroup[] };
-    groups = await Promise.all(
-      (data.groups ?? []).map(async (group) => {
-        const emojiDid = group.emoji.uri.split("/")[2];
-        const emojiPds = emojiDid ? await resolvePds(emojiDid, fetch).catch(() => null) : null;
-        const cidStr =
-          group.emoji.formats?.png_128 ??
-          group.emoji.formats?.webp_128 ??
-          group.emoji.formats?.gif_128;
-        const imageUrl =
-          emojiPds && typeof cidStr === "string" ? blobUrl(emojiPds, emojiDid, cidStr) : null;
-        return { ...group, imageUrl };
-      }),
-    );
+    groups = (data.groups ?? []).map((group) => {
+      const emojiDid = group.emoji.uri.split("/")[2];
+      const cidStr =
+        group.emoji.formats?.png_128 ??
+        group.emoji.formats?.webp_128 ??
+        group.emoji.formats?.gif_128;
+      const imageUrl = emojiDid && typeof cidStr === "string" ? imgUrl(emojiDid, cidStr) : null;
+      return { ...group, imageUrl };
+    });
   }
 
   // The viewer's collection, for the reaction picker.
@@ -261,7 +230,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
             uri: r.uri as string,
             name: (r.value?.name as string) ?? "",
             alt: r.value?.alt as string | undefined,
-            imageUrl: pngCid ? blobUrl(viewerPds, viewer.did, pngCid) : null,
+            imageUrl: pngCid ? imgUrl(viewer.did, pngCid) : null,
             formatCids,
           };
         });

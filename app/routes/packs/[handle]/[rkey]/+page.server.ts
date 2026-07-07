@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { parseViewer } from "$hatk/client";
-import { resolvePds, blobUrl } from "$lib/pds";
+import { resolvePds, imgUrl } from "$lib/pds";
 import type { PageServerLoad } from "./$types";
 
 interface ItemView {
@@ -40,27 +40,17 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
 
   const { pack, items } = (await res.json()) as { pack: any; items: PackItemView[] };
 
-  // Resolve blob URLs per item owner (items in a pack can live in different repos).
-  const ownerDids = [...new Set(items.map((i) => i.subject.did).filter(Boolean))] as string[];
-  const pdsMap = new Map<string, string>();
-  await Promise.all(
-    ownerDids.map(async (ownerDid) => {
-      const pds = await resolvePds(ownerDid, fetch).catch(() => null);
-      if (pds) pdsMap.set(ownerDid, pds);
-    }),
-  );
-
+  // Blob URLs go through the same-origin /img proxy (edge-cacheable, no
+  // per-owner PDS resolution needed even though items can span repos).
   const hydrated = items.map((item) => {
     const { subject } = item;
-    const pds = subject.did ? pdsMap.get(subject.did) : undefined;
     const formats = subject.formats ?? {};
-    const imageUrl =
-      pds && subject.did
-        ? (blobUrl(pds, subject.did, formats.png_128) ??
-          blobUrl(pds, subject.did, formats.webp_128) ??
-          blobUrl(pds, subject.did, formats.gif_128))
-        : null;
-    const animatedUrl = pds && subject.did ? blobUrl(pds, subject.did, formats.apng_128) : null;
+    const imageUrl = subject.did
+      ? (imgUrl(subject.did, formats.png_128) ??
+        imgUrl(subject.did, formats.webp_128) ??
+        imgUrl(subject.did, formats.gif_128))
+      : null;
+    const animatedUrl = subject.did ? imgUrl(subject.did, formats.apng_128) : null;
     return { ...item, imageUrl, animatedUrl };
   });
 
@@ -82,8 +72,8 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
           uri: r.uri as string,
           name: (r.value?.name as string) ?? "",
           imageUrl:
-            blobUrl(pds, viewer.did, r.value?.formats?.png_128) ??
-            blobUrl(pds, viewer.did, r.value?.formats?.webp_128),
+            imgUrl(viewer.did, r.value?.formats?.png_128) ??
+            imgUrl(viewer.did, r.value?.formats?.webp_128),
         }));
       }
     }

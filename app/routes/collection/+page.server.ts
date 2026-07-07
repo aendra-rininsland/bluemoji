@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { parseViewer } from "$hatk/client";
-import { resolvePds, blobUrl } from "$lib/pds";
+import { resolvePds, imgUrl } from "$lib/pds";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ cookies, fetch }) => {
@@ -24,11 +24,10 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
     const v = r.value;
     const formats = v?.formats;
     // png_128 is a BlobRef in both formats_v0 and formats_v1
-    const imageUrl =
-      blobUrl(pds, did, formats?.png_128) ?? blobUrl(pds, did, formats?.webp_128) ?? null;
+    const imageUrl = imgUrl(did, formats?.png_128) ?? imgUrl(did, formats?.webp_128) ?? null;
     // apng_128 is only a BlobRef in formats_v1; in v0 it's raw bytes
-    const animatedUrl = blobUrl(pds, did, formats?.apng_128);
-    const lottieUrl = blobUrl(pds, did, formats?.lottie);
+    const animatedUrl = imgUrl(did, formats?.apng_128);
+    const lottieUrl = imgUrl(did, formats?.lottie);
 
     return {
       uri: r.uri as string,

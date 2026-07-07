@@ -98,10 +98,9 @@
   }
 
   function blobFetchUrl(item: any, cid: string): string | null {
-    // imageUrl/animatedUrl are built against the owner's PDS; reuse the base.
-    const base = item.imageUrl ?? item.animatedUrl
-    if (!base) return null
-    return base.replace(/cid=[^&]+/, `cid=${encodeURIComponent(cid)}`)
+    // Same-origin /img/{did}/{cid} proxy URLs: swap the trailing CID segment.
+    if (!item.subject?.did) return null
+    return `/img/${encodeURIComponent(item.subject.did)}/${encodeURIComponent(cid)}`
   }
 
   async function copyOne(item: any) {
