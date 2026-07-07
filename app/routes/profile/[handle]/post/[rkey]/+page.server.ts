@@ -1,4 +1,5 @@
 import { error } from "@sveltejs/kit";
+import { parseViewer } from "$hatk/client";
 import type { PageServerLoad } from "./$types";
 
 interface BluemojiFormats {
@@ -124,7 +125,8 @@ function buildSegments(
   return segments;
 }
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
+  const viewer = await parseViewer(cookies);
   const { handle, rkey } = params;
 
   let did: string;
@@ -196,5 +198,76 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     }
   }
 
-  return { handle, did, rkey, uri, cid, post, segments, sticker };
+  // Reactions: aggregated groups from the AppView, with emoji images resolved.
+  interface EmojiRef {
+    uri: string;
+    name: string;
+    alt?: string;
+    formats?: Record<string, string | boolean | undefined>;
+  }
+  interface ReactionGroup {
+    emoji: EmojiRef;
+    count: number;
+    viewer?: string;
+  }
+
+  let groups: (ReactionGroup & { imageUrl: string | null })[] = [];
+  const reactionsRes = await fetch(
+    `/xrpc/blue.moji.feed.getReactions?uri=${encodeURIComponent(uri)}`,
+  ).catch(() => null);
+  if (reactionsRes?.ok) {
+    const data = (await reactionsRes.json()) as { groups: ReactionGroup[] };
+    groups = await Promise.all(
+      (data.groups ?? []).map(async (group) => {
+        const emojiDid = group.emoji.uri.split("/")[2];
+        const emojiPds = emojiDid ? await resolvePds(emojiDid, fetch).catch(() => null) : null;
+        const cidStr =
+          group.emoji.formats?.png_128 ??
+          group.emoji.formats?.webp_128 ??
+          group.emoji.formats?.gif_128;
+        const imageUrl =
+          emojiPds && typeof cidStr === "string" ? blobUrl(emojiPds, emojiDid, cidStr) : null;
+        return { ...group, imageUrl };
+      }),
+    );
+  }
+
+  // The viewer's collection, for the reaction picker.
+  let pickerItems: {
+    uri: string;
+    name: string;
+    alt?: string;
+    imageUrl: string | null;
+    formatCids: Record<string, string>;
+  }[] = [];
+  if (viewer) {
+    const viewerPds = await resolvePds(viewer.did, fetch).catch(() => null);
+    if (viewerPds) {
+      const listUrl = new URL(`${viewerPds}/xrpc/com.atproto.repo.listRecords`);
+      listUrl.searchParams.set("repo", viewer.did);
+      listUrl.searchParams.set("collection", "blue.moji.collection.item");
+      listUrl.searchParams.set("limit", "100");
+      const listRes = await fetch(listUrl).catch(() => null);
+      if (listRes?.ok) {
+        const { records } = (await listRes.json()) as { records: any[] };
+        pickerItems = (records ?? []).map((r) => {
+          const formatCids: Record<string, string> = {};
+          for (const key of ["png_128", "webp_128", "gif_128", "apng_128", "lottie"]) {
+            const link = r.value?.formats?.[key]?.ref?.$link;
+            if (link) formatCids[key] = link;
+          }
+          const pngCid = formatCids.png_128 ?? formatCids.webp_128 ?? formatCids.gif_128;
+          return {
+            uri: r.uri as string,
+            name: (r.value?.name as string) ?? "",
+            alt: r.value?.alt as string | undefined,
+            imageUrl: pngCid ? blobUrl(viewerPds, viewer.did, pngCid) : null,
+            formatCids,
+          };
+        });
+      }
+    }
+  }
+
+  return { handle, did, rkey, uri, cid, post, segments, sticker, viewer, groups, pickerItems };
 };

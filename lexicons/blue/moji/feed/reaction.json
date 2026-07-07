@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.feed.reaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A custom-emoji reaction to a post. Analogous to app.bsky.feed.like, but the reaction glyph is a Bluemoji. Duplicate reactions (same subject + same emoji URI by the same actor) should be ignored by AppViews.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["subject", "emoji", "createdAt"],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the post being reacted to."
+          },
+          "subjectCid": {
+            "type": "string",
+            "format": "cid",
+            "description": "CID of the subject post at reaction time, for strong referencing."
+          },
+          "emoji": { "type": "ref", "ref": "#emojiRef" },
+          "createdAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    },
+    "emojiRef": {
+      "type": "object",
+      "description": "Denormalized reference to the Bluemoji used, mirroring blue.moji.richtext.facet: CID-only formats let consumers build blob/CDN URLs without a getRecord round-trip. AppViews should verify against the indexed item where possible.",
+      "required": ["uri", "name", "formats"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the blue.moji.collection.item record. The owning DID is derived from this."
+        },
+        "name": {
+          "type": "string",
+          "description": "Colon-wrapped alias, e.g. :blobcat:. Used as fallback text."
+        },
+        "alt": { "type": "string" },
+        "formats": {
+          "type": "union",
+          "refs": ["blue.moji.richtext.facet#formats_v0", "blue.moji.richtext.facet#formats_v1"],
+          "closed": false
+        }
+      }
+    }
+  }
+}

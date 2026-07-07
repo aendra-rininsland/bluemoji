@@ -3301,6 +3301,182 @@ export const schemaDict = {
       },
     },
   },
+  BlueMojiFeedDefs: {
+    lexicon: 1,
+    id: "blue.moji.feed.defs",
+    defs: {
+      reactionView: {
+        type: "object",
+        description: "A single reaction by a single actor.",
+        required: ["uri", "actor", "emoji", "createdAt"],
+        properties: {
+          uri: {
+            type: "string",
+            format: "at-uri",
+          },
+          actor: {
+            type: "ref",
+            ref: "lex:app.bsky.actor.defs#profileViewBasic",
+          },
+          emoji: {
+            type: "ref",
+            ref: "lex:blue.moji.feed.reaction#emojiRef",
+          },
+          createdAt: {
+            type: "string",
+            format: "datetime",
+          },
+        },
+      },
+      reactionGroup: {
+        type: "object",
+        description: "Aggregated reactions to a subject, grouped by emoji item URI.",
+        required: ["emoji", "count"],
+        properties: {
+          emoji: {
+            type: "ref",
+            ref: "lex:blue.moji.feed.reaction#emojiRef",
+          },
+          count: {
+            type: "integer",
+            minimum: 0,
+          },
+          viewer: {
+            type: "string",
+            format: "at-uri",
+            description:
+              "AT-URI of the requesting account's reaction record in this group, if any. Enables un-reacting.",
+          },
+        },
+      },
+    },
+  },
+  BlueMojiFeedGetReactions: {
+    lexicon: 1,
+    id: "blue.moji.feed.getReactions",
+    defs: {
+      main: {
+        type: "query",
+        description:
+          "Get reactions for a post: aggregated per-emoji groups plus a paginated list of individual reactions.",
+        parameters: {
+          type: "params",
+          required: ["uri"],
+          properties: {
+            uri: {
+              type: "string",
+              format: "at-uri",
+              description: "AT-URI of the subject post.",
+            },
+            limit: {
+              type: "integer",
+              minimum: 1,
+              maximum: 100,
+              default: 50,
+            },
+            cursor: {
+              type: "string",
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["uri", "groups", "reactions"],
+            properties: {
+              uri: {
+                type: "string",
+                format: "at-uri",
+              },
+              cursor: {
+                type: "string",
+              },
+              groups: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.feed.defs#reactionGroup",
+                },
+              },
+              reactions: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.feed.defs#reactionView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  BlueMojiFeedReaction: {
+    lexicon: 1,
+    id: "blue.moji.feed.reaction",
+    defs: {
+      main: {
+        type: "record",
+        description:
+          "A custom-emoji reaction to a post. Analogous to app.bsky.feed.like, but the reaction glyph is a Bluemoji. Duplicate reactions (same subject + same emoji URI by the same actor) should be ignored by AppViews.",
+        key: "tid",
+        record: {
+          type: "object",
+          required: ["subject", "emoji", "createdAt"],
+          properties: {
+            subject: {
+              type: "string",
+              format: "at-uri",
+              description: "AT-URI of the post being reacted to.",
+            },
+            subjectCid: {
+              type: "string",
+              format: "cid",
+              description: "CID of the subject post at reaction time, for strong referencing.",
+            },
+            emoji: {
+              type: "ref",
+              ref: "lex:blue.moji.feed.reaction#emojiRef",
+            },
+            createdAt: {
+              type: "string",
+              format: "datetime",
+            },
+          },
+        },
+      },
+      emojiRef: {
+        type: "object",
+        description:
+          "Denormalized reference to the Bluemoji used, mirroring blue.moji.richtext.facet: CID-only formats let consumers build blob/CDN URLs without a getRecord round-trip. AppViews should verify against the indexed item where possible.",
+        required: ["uri", "name", "formats"],
+        properties: {
+          uri: {
+            type: "string",
+            format: "at-uri",
+            description:
+              "AT-URI of the blue.moji.collection.item record. The owning DID is derived from this.",
+          },
+          name: {
+            type: "string",
+            description: "Colon-wrapped alias, e.g. :blobcat:. Used as fallback text.",
+          },
+          alt: {
+            type: "string",
+          },
+          formats: {
+            type: "union",
+            refs: [
+              "lex:blue.moji.richtext.facet#formats_v0",
+              "lex:blue.moji.richtext.facet#formats_v1",
+            ],
+            closed: false,
+          },
+        },
+      },
+    },
+  },
   BlueMojiPacksDefs: {
     lexicon: 1,
     id: "blue.moji.packs.defs",
@@ -4026,6 +4202,9 @@ export const ids = {
   BlueMojiCollectionPutItem: "blue.moji.collection.putItem",
   BlueMojiCollectionSaveToCollection: "blue.moji.collection.saveToCollection",
   BlueMojiEmbedSticker: "blue.moji.embed.sticker",
+  BlueMojiFeedDefs: "blue.moji.feed.defs",
+  BlueMojiFeedGetReactions: "blue.moji.feed.getReactions",
+  BlueMojiFeedReaction: "blue.moji.feed.reaction",
   BlueMojiPacksDefs: "blue.moji.packs.defs",
   BlueMojiPacksGetActorPacks: "blue.moji.packs.getActorPacks",
   BlueMojiPacksGetPack: "blue.moji.packs.getPack",

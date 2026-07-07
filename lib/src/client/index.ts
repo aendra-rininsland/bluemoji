@@ -26,6 +26,9 @@ import * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/
 import * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem.js";
 import * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection.js";
 import * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
+import * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
+import * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
+import * as BlueMojiFeedReaction from "./types/blue/moji/feed/reaction.js";
 import * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs.js";
 import * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks.js";
 import * as BlueMojiPacksGetPack from "./types/blue/moji/packs/getPack.js";
@@ -58,6 +61,9 @@ export * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/
 export * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem.js";
 export * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection.js";
 export * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
+export * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
+export * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
+export * as BlueMojiFeedReaction from "./types/blue/moji/feed/reaction.js";
 export * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs.js";
 export * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks.js";
 export * as BlueMojiPacksGetPack from "./types/blue/moji/packs/getPack.js";
@@ -328,6 +334,7 @@ export class BlueMojiNS {
   _client: XrpcClient;
   collection: BlueMojiCollectionNS;
   embed: BlueMojiEmbedNS;
+  feed: BlueMojiFeedNS;
   packs: BlueMojiPacksNS;
   richtext: BlueMojiRichtextNS;
 
@@ -335,6 +342,7 @@ export class BlueMojiNS {
     this._client = client;
     this.collection = new BlueMojiCollectionNS(client);
     this.embed = new BlueMojiEmbedNS(client);
+    this.feed = new BlueMojiFeedNS(client);
     this.packs = new BlueMojiPacksNS(client);
     this.richtext = new BlueMojiRichtextNS(client);
   }
@@ -460,6 +468,94 @@ export class BlueMojiEmbedNS {
 
   constructor(client: XrpcClient) {
     this._client = client;
+  }
+}
+
+export class BlueMojiFeedNS {
+  _client: XrpcClient;
+  reaction: BlueMojiFeedReactionRecord;
+
+  constructor(client: XrpcClient) {
+    this._client = client;
+    this.reaction = new BlueMojiFeedReactionRecord(client);
+  }
+
+  getReactions(
+    params?: BlueMojiFeedGetReactions.QueryParams,
+    opts?: BlueMojiFeedGetReactions.CallOptions,
+  ): Promise<BlueMojiFeedGetReactions.Response> {
+    return this._client.call("blue.moji.feed.getReactions", params, undefined, opts);
+  }
+}
+
+export class BlueMojiFeedReactionRecord {
+  _client: XrpcClient;
+
+  constructor(client: XrpcClient) {
+    this._client = client;
+  }
+
+  async list(params: OmitKey<ComAtprotoRepoListRecords.QueryParams, "collection">): Promise<{
+    cursor?: string;
+    records: { uri: string; value: BlueMojiFeedReaction.Record }[];
+  }> {
+    const res = await this._client.call("com.atproto.repo.listRecords", {
+      collection: "blue.moji.feed.reaction",
+      ...params,
+    });
+    return res.data;
+  }
+
+  async get(
+    params: OmitKey<ComAtprotoRepoGetRecord.QueryParams, "collection">,
+  ): Promise<{ uri: string; cid: string; value: BlueMojiFeedReaction.Record }> {
+    const res = await this._client.call("com.atproto.repo.getRecord", {
+      collection: "blue.moji.feed.reaction",
+      ...params,
+    });
+    return res.data;
+  }
+
+  async create(
+    params: OmitKey<ComAtprotoRepoCreateRecord.InputSchema, "collection" | "record">,
+    record: Un$Typed<BlueMojiFeedReaction.Record>,
+    headers?: Record<string, string>,
+  ): Promise<{ uri: string; cid: string }> {
+    const collection = "blue.moji.feed.reaction";
+    const res = await this._client.call(
+      "com.atproto.repo.createRecord",
+      undefined,
+      { collection, ...params, record: { ...record, $type: collection } },
+      { encoding: "application/json", headers },
+    );
+    return res.data;
+  }
+
+  async put(
+    params: OmitKey<ComAtprotoRepoPutRecord.InputSchema, "collection" | "record">,
+    record: Un$Typed<BlueMojiFeedReaction.Record>,
+    headers?: Record<string, string>,
+  ): Promise<{ uri: string; cid: string }> {
+    const collection = "blue.moji.feed.reaction";
+    const res = await this._client.call(
+      "com.atproto.repo.putRecord",
+      undefined,
+      { collection, ...params, record: { ...record, $type: collection } },
+      { encoding: "application/json", headers },
+    );
+    return res.data;
+  }
+
+  async delete(
+    params: OmitKey<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
+    headers?: Record<string, string>,
+  ): Promise<void> {
+    await this._client.call(
+      "com.atproto.repo.deleteRecord",
+      undefined,
+      { collection: "blue.moji.feed.reaction", ...params },
+      { headers },
+    );
   }
 }
 

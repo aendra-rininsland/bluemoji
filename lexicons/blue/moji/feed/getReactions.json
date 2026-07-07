@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.feed.getReactions",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get reactions for a post: aggregated per-emoji groups plus a paginated list of individual reactions.",
+      "parameters": {
+        "type": "params",
+        "required": ["uri"],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "AT-URI of the subject post."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "cursor": { "type": "string" }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "groups", "reactions"],
+          "properties": {
+            "uri": { "type": "string", "format": "at-uri" },
+            "cursor": { "type": "string" },
+            "groups": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "blue.moji.feed.defs#reactionGroup" }
+            },
+            "reactions": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "blue.moji.feed.defs#reactionView" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

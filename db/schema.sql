@@ -191,6 +191,17 @@ CREATE TABLE "blue.moji.collection.item__sticker_formats_sticker_formats_v0" (
   lottie TEXT
 );
 
+CREATE TABLE "blue.moji.feed.reaction" (
+  uri TEXT PRIMARY KEY,
+  cid TEXT,
+  did TEXT NOT NULL,
+  indexed_at TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  subject_cid TEXT,
+  emoji TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
 CREATE TABLE "blue.moji.packs.pack" (
   uri TEXT PRIMARY KEY,
   cid TEXT,
