@@ -1,5 +1,6 @@
 <script lang="ts">
   import { callXrpc, getViewer } from '$hatk/client'
+  import { aliasToRkey, normalizeAlias } from '$lib/alias'
 
   let { data } = $props()
 
@@ -15,6 +16,16 @@
   let previewUrl = $state('')
 
   const viewer = $derived(data.viewer)
+
+  // RFC 0005: canonical alias + Punycode rkey preview
+  const aliasCheck = $derived.by(() => {
+    if (!emojiName.trim()) return { alias: '', rkey: '', error: '' }
+    try {
+      return { alias: normalizeAlias(emojiName), rkey: aliasToRkey(emojiName), error: '' }
+    } catch (e: any) {
+      return { alias: '', rkey: '', error: e.message as string }
+    }
+  })
 
   function detectKind(f: File): 'png' | 'apng' | 'webp' | 'lottie' {
     if (f.type === 'image/apng' || f.name.endsWith('.apng')) return 'apng'
@@ -43,7 +54,7 @@
     if (!emojiName) {
       emojiName = f.name
         .replace(/\.[^.]+$/, '')
-        .replace(/[^a-z0-9_-]/gi, '-')
+        .replace(/[\s:]+/g, '-')
         .toLowerCase()
     }
   }
@@ -118,11 +129,11 @@
         }
       }
 
-      const rkey = emojiName.replace(/:/g, '')
+      const alias = normalizeAlias(emojiName)
       const result = await callXrpc('blue.moji.collection.putItem', {
         repo: v.did,
         item: {
-          name: `:${rkey}:`,
+          name: `:${alias}:`,
           alt: altText || undefined,
           createdAt: new Date().toISOString(),
           adultOnly,
@@ -211,16 +222,23 @@
           bind:value={emojiName}
           placeholder="emoji-name"
           required
-          pattern="[a-z0-9_-]+"
           style="flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: 0; font-family: var(--mono); background: var(--bg); color: var(--text); min-width: 0;"
         />
         <span
           style="padding: 0.5rem 0.625rem; border: 1px solid var(--border); border-left: none; border-radius: 0 4px 4px 0; color: var(--muted); background: var(--border); font-family: var(--mono); line-height: 1.5;"
         >:</span>
       </div>
-      <p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--muted);">
-        Lowercase letters, numbers, hyphens, underscores only
-      </p>
+      {#if aliasCheck.error}
+        <p style="margin-top: 0.25rem; font-size: 0.875rem; color: red;">{aliasCheck.error}</p>
+      {:else if aliasCheck.rkey && aliasCheck.rkey !== aliasCheck.alias}
+        <p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--muted);">
+          :{aliasCheck.alias}: — stored as <code>{aliasCheck.rkey}</code>
+        </p>
+      {:else}
+        <p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--muted);">
+          Any language or emoji works — no spaces or colons
+        </p>
+      {/if}
     </div>
 
     <!-- Alt text -->
@@ -253,8 +271,8 @@
     <div>
       <button
         type="submit"
-        disabled={loading || !file}
-        style="padding: 0.5rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; opacity: {loading || !file ? 0.5 : 1};"
+        disabled={loading || !file || !!aliasCheck.error}
+        style="padding: 0.5rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; opacity: {loading || !file || aliasCheck.error ? 0.5 : 1};"
       >
         {loading ? 'Uploading…' : 'Upload emoji'}
       </button>

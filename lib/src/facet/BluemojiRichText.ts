@@ -11,8 +11,12 @@ import AtpAgent, {
 import * as BlueMojiRichtextFacet from "../client/types/blue/moji/richtext/facet";
 import * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
+import { aliasToRkey } from "../util/alias";
 
-export const BLUEMOJI_REGEX = new RegExp(":((?!.*--)[A-Za-z0-9-]{4,20}(?<!-)):", "gim");
+// RFC 0005: Unicode-aware alias detection. All-digit aliases are excluded so
+// times like 3:30:45 don't facet; unresolvable aliases are dropped at
+// hydration time anyway.
+export const BLUEMOJI_REGEX = new RegExp(":(?!\\d+:)([^\\s:]{2,64}):", "gu");
 
 export class BluemojiRichTextSegment extends RichTextSegment {
   get bluemoji(): BlueMojiRichtextFacet.Main | undefined {
@@ -99,9 +103,16 @@ export class BluemojiRichText extends RichText {
               continue;
             }
 
+            let rkey: string;
+            try {
+              rkey = aliasToRkey(feature.name);
+            } catch {
+              continue; // not a valid alias; leave as plain text
+            }
+
             const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
-              rkey: feature.name.replace(/:/g, ""),
+              rkey,
               collection: "blue.moji.collection.item",
             });
 

@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "A custom emoji",
+      "description": "A custom emoji. The record key is the canonical alias for ASCII aliases, or its RFC 3492 Punycode encoding (xn-- prefixed) for internationalised aliases; see Bluemoji RFC 0005.",
       "key": "any",
       "record": {
         "type": "object",

@@ -18,8 +18,8 @@
             },
             "name": {
               "type": "string",
-              "description": "The source Bluemoji name/rkey.",
-              "maxLength": 15
+              "description": "The source Bluemoji alias or rkey. Internationalised aliases are accepted and encoded per RFC 0005.",
+              "maxLength": 512
             },
             "renameTo": {
               "type": "string",

@@ -1,4 +1,5 @@
 import { defineProcedure, InvalidRequestError } from "$hatk";
+import { aliasToRkey, normalizeAlias } from "../app/lib/alias.ts";
 
 export default defineProcedure("blue.moji.collection.putItem", async (ctx) => {
   if (!ctx.viewer) {
@@ -12,9 +13,14 @@ export default defineProcedure("blue.moji.collection.putItem", async (ctx) => {
     throw new InvalidRequestError("repo must match authenticated user");
   }
 
-  const rkey = item.name.replace(/:/g, "");
-  if (!rkey) {
-    throw new InvalidRequestError("item.name must not be empty");
+  // RFC 0005: canonicalise the alias; non-ASCII aliases get Punycode rkeys.
+  let rkey: string;
+  let alias: string;
+  try {
+    alias = normalizeAlias(item.name);
+    rkey = aliasToRkey(item.name);
+  } catch (e) {
+    throw new InvalidRequestError(e instanceof Error ? e.message : "Invalid alias");
   }
 
   // Accept either formats_v0 or formats_v1 from the client, but always
@@ -38,7 +44,7 @@ export default defineProcedure("blue.moji.collection.putItem", async (ctx) => {
 
   const result = await ctx.putRecord("blue.moji.collection.item", rkey, {
     $type: "blue.moji.collection.item",
-    name: `:${rkey}:`,
+    name: `:${alias}:`,
     alt: item.alt,
     createdAt: item.createdAt ?? new Date().toISOString(),
     adultOnly: item.adultOnly ?? false,

@@ -1,5 +1,6 @@
 import AtpAgent from "@atproto/api";
 import { resizePngToUintArray } from "./resizePngToUintArray";
+import { aliasToRkey, normalizeAlias } from "./alias";
 import * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
 interface UploadBluemojiParams {
   agent: AtpAgent;
@@ -69,9 +70,9 @@ export async function uploadBluemoji({
       validate: false,
       repo: agent.session.did,
       collection: "blue.moji.collection.item",
-      rkey: emojiName.replace(/:/g, ""), // strip colons
+      rkey: aliasToRkey(emojiName), // RFC 0005: Punycode-encoded if non-ASCII
       record: {
-        name: `:${emojiName.replace(/:/g, "")}:`, // ensure colons are on the name
+        name: `:${normalizeAlias(emojiName)}:`, // canonical colon-wrapped alias
         alt: alttext,
         createdAt: new Date().toISOString(),
         original: originalBlob.blob,

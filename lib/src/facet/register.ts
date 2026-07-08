@@ -3,6 +3,7 @@ import * as BlueMojiRichtextFacet from "../client/types/blue/moji/richtext/facet
 import * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
 import { detectFacets } from "./detect-facets";
 import { BluemojiRichTextSegment, facetSort } from "./BluemojiRichText";
+import { aliasToRkey } from "../util/alias";
 
 export const register = () => {
   Object.defineProperty(RichTextSegment, "bluemoji", {
@@ -32,9 +33,16 @@ export const register = () => {
               continue;
             }
 
+            let rkey: string;
+            try {
+              rkey = aliasToRkey(feature.name);
+            } catch {
+              continue; // not a valid alias; leave as plain text
+            }
+
             const { data: record } = await agent.com.atproto.repo.getRecord({
               repo,
-              rkey: feature.name.replace(/:/g, ""),
+              rkey,
               collection: "blue.moji.collection.item",
             });
 

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { callXrpc } from '$hatk/client'
   import { invalidateAll } from '$app/navigation'
+  import { aliasToRkey } from '$lib/alias'
 
   let { data } = $props()
 
@@ -64,7 +65,7 @@
     const { subject } = item
     if (!data.viewer || !subject.did || !subject.uri) return
 
-    const rkey = (subject.name as string).replace(/:/g, '')
+    const rkey = aliasToRkey(subject.name as string)
     const formats: Record<string, unknown> = {
       $type: 'blue.moji.collection.item#formats_v1',
     }
