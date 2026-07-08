@@ -33,20 +33,28 @@ export default defineConfig({
   },
   oauth: {
     issuer: isProd && prodDomain ? `https://${prodDomain}` : undefined,
-    // repo:app.bsky.feed.post was added here for the sticker composer
-    // (Phase 4.6) and caused a severe regression: every previously-
-    // authenticated session started getting ScopeMissingError from the PDS
-    // on ALL protected writes (uploadBlob included, not just post
-    // creation), breaking uploads for every existing user. Reverted
-    // 2026-07-08 as an emergency fix — see ROADMAP.md for the incident
-    // writeup and what a safe re-rollout needs to look like.
+    // 2026-07-08 production incident, two fixes here (see ROADMAP.md for
+    // the full writeup):
+    // 1. repo:app.bsky.feed.post (added for the sticker composer, Phase
+    //    4.6) was reverted as a first response to reports of uploads
+    //    breaking — turned out NOT to be the actual cause (a fresh login
+    //    in a fresh scope still failed identically), but there's no reason
+    //    to keep an unused scope declared, so the revert stands.
+    // 2. The real cause: "blob" is not a valid ATProto OAuth scope token on
+    //    its own — per https://atproto.com/specs/permission the blob
+    //    resource type requires a positional MIME-pattern part, e.g.
+    //    "blob:*/*" for "any blob type". The bare "blob" here was
+    //    presumably always technically invalid and tolerated by lenient
+    //    PDS-side scope enforcement until something (a PDS software
+    //    update, most likely) started enforcing it strictly — unrelated to
+    //    any change made today, just unlucky timing that surfaced it.
     scopes: [
       "atproto",
       "repo:blue.moji.collection.item",
       "repo:blue.moji.packs.pack",
       "repo:blue.moji.packs.packitem",
       "repo:blue.moji.feed.reaction",
-      "blob",
+      "blob:*/*",
     ],
     clients: [
       ...(prodDomain
