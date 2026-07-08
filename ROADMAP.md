@@ -358,8 +358,49 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   session for the sticker composer and packs-page checks. Lottie sandboxing
   guidance for renderers not attempted.
 
-- **Interop bridges**: import Slack/Discord/Mastodon emoji archives; export
-  packs as Signal-style bundles.
+- **Interop bridges — Signal-style export done, import deferred**: scoped
+  down deliberately (asked first rather than guessing) — Slack/Discord have
+  no first-party bulk-export format at all (no common spec to import
+  against), and building real importers for three different platforms plus
+  an export in one pass wasn't realistic, so this pass is export-only.
+
+  New `GET /packs/:handle/:rkey/export` (`app/routes/packs/[handle]/[rkey]/
+export/+server.ts`) downloads a portable bundle for sticker-capable pack
+  items: `manifest.proto` (Signal's **real** `StickerPack` protobuf schema
+  — fetched from `signalapp/Signal-Desktop`'s `sticker-creator/protos/
+Stickers.proto` via `gh api`, not guessed), a `manifest.json` mirror, one
+  `N.webp` per item plus `cover.webp`, and a `README.txt` explaining this
+  is a portable bundle for use with a Signal-compatible packaging tool
+  (e.g. `sticker-convert`) — moji.blue has no Signal API credentials to
+  publish a pack directly. Non-WebP sticker formats are converted via the
+  `ffmpeg` now already in the Docker image (Phase 4.7). "Export as Signal
+  stickers" button on the pack page, shown only when the pack has at least
+  one sticker-capable item.
+
+  The protobuf encoder (`app/lib/signal-manifest.ts`) is hand-rolled rather
+  than a new dependency — proto3 wire format for four scalar/nested-message
+  fields is a few dozen lines — but **verified against the real spec, not
+  assumed correct**: installed `protoc` and round-tripped encoded output
+  through `protoc --decode=StickerPack`, confirming byte-exact structural
+  correctness against Signal's own schema. Added `yazl` (small, focused ZIP
+  writer) for the archive itself; verified the full pipeline for real by
+  building an actual zip with a real ffmpeg-converted WebP image, extracting
+  it with `unzip`, and re-verifying `manifest.proto` decoded correctly from
+  the extracted file (not just testing the encoder in isolation). Verified
+  the route's error paths against real seeded data: a pack with no
+  sticker-capable items → clean 400, a nonexistent pack → clean 404. Found
+  and fixed a real bug while verifying in a browser: the export `<a>` tag
+  was being intercepted by SvelteKit's client router (which doesn't know
+  how to navigate to a raw `+server.ts` binary download) and threw a
+  console error instead of downloading — fixed with `data-sveltekit-reload`
+  to force a real browser navigation. **Not verified**: the full happy path
+  with real PDS-backed sticker blobs (no sticker-capable item with a real,
+  resolvable blob was available this session — the one real relay-indexed
+  item in the local dev DB is inline-only) — the 502 "couldn't fetch any
+  sticker images" path was confirmed instead, and every other stage
+  (protobuf, zip, ffmpeg conversion) was verified independently for real.
+  Import from Slack/Discord/Mastodon not attempted this pass.
+
 - **Cloudflare-native port** (optional cost play): Workers + D1 + a
   cron-triggered Jetstream drain (`wantedCollections=blue.moji.*`) fits the
   free plan because Bluemoji event volume is tiny. The trap: do NOT hold the

@@ -18,10 +18,12 @@
     "@hatk/hatk": "^0.0.1-alpha.42",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/adapter-node": "^5.5.4",
-    "@sveltejs/kit": "^2.55.0"
+    "@sveltejs/kit": "^2.55.0",
+    "yazl": "^3.3.1"
   },
   "devDependencies": {
     "@types/node": "^24",
+    "@types/yazl": "^3.3.1",
     "@voidzero-dev/vite-plus-core": "^0.1.11",
     "svelte": "^5",
     "svelte-check": "^4",

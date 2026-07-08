@@ -61,6 +61,8 @@
   }
 
   const inPack = $derived(new Set(data.items.map((i: any) => i.subject.uri).filter(Boolean)))
+  const hasStickers = $derived(data.items.some((i: any) => i.subject.stickerFormats))
+  const exportHref = $derived(`/packs/${data.pack.creator.did}/${data.packUri.split('/').pop()}/export`)
 
   async function shareLink() {
     const url = `${location.origin}/packs/${data.pack.creator.did}/${data.packUri.split('/').pop()}`
@@ -237,6 +239,16 @@
       >
         {shareCopied ? 'Link copied!' : 'Share pack'}
       </button>
+      {#if hasStickers}
+        <a
+          href={exportHref}
+          data-sveltekit-reload
+          title="Downloads a portable bundle (manifest + WebP stickers) for use with Signal-compatible sticker packaging tools — moji.blue can't publish directly to Signal."
+          style="padding: 0.375rem 0.875rem; border: 1px solid var(--border); background: none; color: var(--text); border-radius: 4px; font-size: 0.875rem; text-decoration: none; display: inline-block;"
+        >
+          Export as Signal stickers
+        </a>
+      {/if}
       {#if data.viewer && !data.isOwner}
         <button
           onclick={() => openReport(data.pack.uri, data.pack.cid, data.pack.name)}
