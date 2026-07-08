@@ -10,8 +10,11 @@ export default defineConfig({
   databaseEngine: "sqlite",
   database: isProd ? "/data/hatk.db" : "data/hatk.db",
   // Only index blue.moji.* — without this, hatk indexes every record lexicon
-  // in lexicons/ (including vendored app.bsky.feed.postgate/threadgate) and
-  // auto-backfills the full repo of every DID on the network that writes one.
+  // in lexicons/ (including vendored app.bsky.feed.postgate/threadgate/post)
+  // and auto-backfills the full repo of every DID on the network that writes
+  // one. app.bsky.feed.post is vendored (for PDS-proxied write validation by
+  // the sticker composer) but deliberately absent here and from
+  // signalCollections below — moji.blue writes posts, it doesn't index them.
   collections: [
     "blue.moji.collection.item",
     "blue.moji.packs.pack",
@@ -36,6 +39,7 @@ export default defineConfig({
       "repo:blue.moji.packs.pack",
       "repo:blue.moji.packs.packitem",
       "repo:blue.moji.feed.reaction",
+      "repo:app.bsky.feed.post",
       "blob",
     ],
     clients: [
@@ -45,7 +49,7 @@ export default defineConfig({
               client_id: `https://${prodDomain}/oauth-client-metadata.json`,
               client_name: "moji.blue",
               scope:
-                "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob",
+                "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction repo:app.bsky.feed.post blob",
               redirect_uris: [
                 `https://${prodDomain}/oauth/callback`,
                 `https://${prodDomain}/admin`,
@@ -57,7 +61,7 @@ export default defineConfig({
         client_id: "http://127.0.0.1:3000/oauth-client-metadata.json",
         client_name: "bluemoji",
         scope:
-          "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob",
+          "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction repo:app.bsky.feed.post blob",
         redirect_uris: ["http://127.0.0.1:3000/oauth/callback"],
       },
     ],

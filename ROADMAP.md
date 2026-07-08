@@ -285,9 +285,36 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   freshness, bypassing the AppView entirely, so `originalCreator` isn't
   available there without adding a resolution round-trip; the pack page and
   search (the actual public discovery surfaces) already carry it.
-- **Sticker composer**: pick sticker → attach to post; later,
-  `recordWithMedia`-style composition (sticker + quote post) per RFC 0003's
-  open question.
+- **Sticker composer — pick-and-attach done**: new `/compose` page (auth-
+  gated, redirects signed-out visitors to `/`) lets a signed-in user write
+  post text, pick one of their `stickerFormats`-capable items, and post it
+  as an `app.bsky.feed.post` with a `blue.moji.embed.sticker` embed via
+  `dev.hatk.createRecord`, redirecting to the new post's page on success.
+  Required vendoring the real `app.bsky.feed.post` lexicon (fetched from
+  the canonical `bluesky-social/atproto` GitHub repo — it wasn't already
+  present, only `postgate`/`threadgate` were) since hatk's PDS-proxy write
+  path validates records against vendored lexicons; deliberately did NOT
+  add it to `hatk.config.ts`'s `collections`/`signalCollections` allowlists
+  (see gotcha #1 — moji.blue writes posts, it doesn't need to index them).
+  Added a new `repo:app.bsky.feed.post` OAuth scope to both the `scopes`
+  array and every client's `scope` string. Confirmed the post's `embed`
+  union in the real lexicon has no `"closed": true`, so an unlisted
+  `$type` like `blue.moji.embed.sticker` validates fine as long as its own
+  vendored lexicon is structurally valid — checked this directly by
+  invoking `@bigmoves/lexicon`'s real `validateRecord` against a sample
+  record instead of assuming it. Verified: `vp check`/`svelte-check` clean,
+  a clean boot log shows `app.bsky.feed.post` correctly absent from
+  `Collections:` (not indexed), and the compose page's auth redirect works
+  in a real browser (signed-out visitors bounce to `/`). **Not verified**:
+  the actual PDS write / end-to-end "does a real post appear on Bluesky"
+  path — that needs either Docker (for `hatk seed`'s local test PDS, which
+  wasn't running this session) or a real account's OAuth session, neither
+  of which was available; the record-shape validation above is real but is
+  not a substitute for an actual post round-trip. Whoever tests this live
+  should also check that an _existing_ signed-in session doesn't need to
+  re-auth for the new scope (OAuth scope changes typically require
+  re-consent). `recordWithMedia`-style composition (sticker + quote post,
+  RFC 0003's open question) not attempted.
 - **Animated pipeline**: server-side APNG→animated-WebP transcode (the
   imgproxy#1222 blocker from RFC 0001) so animation works through CDNs;
   Lottie sandboxing guidance for renderers.

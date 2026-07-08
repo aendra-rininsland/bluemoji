@@ -48,6 +48,9 @@
       <a href="/gallery" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; text-decoration: none; color: var(--text);">
         Trending
       </a>
+      <a href="/compose" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; text-decoration: none; color: var(--text);">
+        New post
+      </a>
       <button onclick={handleLogout}>Sign out</button>
     </div>
   {:else}
