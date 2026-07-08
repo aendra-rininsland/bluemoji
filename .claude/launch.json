@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hatk",
+      "runtimeExecutable": "./node_modules/.bin/hatk",
+      "runtimeArgs": ["start"],
+      "port": 3000
+    }
+  ]
+}

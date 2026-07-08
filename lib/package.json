@@ -27,7 +27,9 @@
     "./render": {
       "types": "./dist/render/index.d.ts",
       "import": "./dist/render.js"
-    }
+    },
+    "./components/webcomponent/picker": "./src/components/webcomponent/picker.ts",
+    "./components/webcomponent/webcomponent": "./src/components/webcomponent/webcomponent.ts"
   },
   "scripts": {
     "test": "tsx src/**/*.test.ts",

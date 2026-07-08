@@ -69,13 +69,41 @@ assert.ok(
 );
 ```
 
+### Emoji picker
+
+`<blue-moji-picker>` is a drop-in Custom Element backed by an AppView's
+`blue.moji.collection.searchItems` query — search-as-you-type, no client-side
+index to build or maintain yourself:
+
+```typescript
+import { BluemojiPicker } from "@aendra/bluemoji/components/webcomponent/picker";
+BluemojiPicker.register();
+```
+
+```html
+<!-- omit repo for network-wide whole-word search; pass it to substring-search
+     one user's own collection, which suits live composer autocomplete -->
+<blue-moji-picker api-base="https://moji.blue" repo="did:plc:..."></blue-moji-picker>
+
+<script>
+  document.querySelector("blue-moji-picker").addEventListener("moji-pick", (e) => {
+    // e.detail = { uri, did, name, alt }
+    insertAtCursor(e.detail.name);
+  });
+</script>
+```
+
+`api-base` defaults to `https://moji.blue`; point it at any AppView exposing
+`blue.moji.collection.searchItems` and an `/img/{did}/{cid}` blob proxy (or
+override the `imgUrl` property with a custom resolver).
+
 ### Components
 
-A few components are in development for multiple targets. To start, I hope to include renderer components for:
+A few display components are in development for multiple targets. To start, I hope to include renderer components for:
 
 - [ ] React
 - [ ] React Native
-- [ ] Web Component Custom Element
+- [x] Web Component Custom Element (`<blue-moji>`, single-emoji display — see `components/webcomponent/webcomponent.ts`)
 
 ## Repo Contents
 

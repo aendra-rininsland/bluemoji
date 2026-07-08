@@ -155,9 +155,22 @@ movers: deer.social forks, Klearsky, TOKIMEKI, Ouranos.
 
 ## Phase 4 — Mature Bluemoji (ideation)
 
-- **Emoji picker as infrastructure**: a `blue.moji.collection.searchItems`
-  XRPC + hosted picker web component, so clients get `:`-autocomplete
-  without indexing anything themselves. (hatk has FTS via `ctx.search`.)
+- ~~Emoji picker as infrastructure~~ — done: `blue.moji.collection.searchItems`
+  (`server/search-items.ts`) has two real, distinct, verified matching modes
+  — pass `repo` for substring matching within one repo's own collection
+  (suits live-typing composer autocomplete: every keystroke narrows
+  correctly), omit it for network-wide search via hatk's FTS (`ctx.search`),
+  which turned out to match whole words/tokens rather than arbitrary
+  substrings (confirmed live: "cat" finds `:blobcat:`, but "blob" alone does
+  not) — documented honestly in the lexicon rather than oversold as generic
+  substring search. `<blue-moji-picker>` (`lib/src/components/webcomponent/
+picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
+  `moji-pick` event; verified in a real browser against a live local hatk
+  server (correct URL construction, correct results for both matching
+  modes, correct event payload on click, clean input-clear behaviour, no
+  console errors). Shipped as raw source via new `package.json` exports
+  entries (`./components/webcomponent/picker`), consistent with how the
+  pre-existing `<blue-moji>` display component already shipped.
 - **Reactions everywhere**: batch `getReactions` for timelines (multi-uri
   param); notifications ("X reacted to your post") via hatk push;
   per-post reaction caps (Discord-style) as AppView policy.
