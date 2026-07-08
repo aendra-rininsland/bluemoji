@@ -63,7 +63,7 @@ export default defineConfig({
               client_id: `https://${prodDomain}/oauth-client-metadata.json`,
               client_name: "moji.blue",
               scope:
-                "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob",
+                "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob:*/*",
               redirect_uris: [
                 `https://${prodDomain}/oauth/callback`,
                 `https://${prodDomain}/admin`,
@@ -75,7 +75,7 @@ export default defineConfig({
         client_id: "http://127.0.0.1:3000/oauth-client-metadata.json",
         client_name: "bluemoji",
         scope:
-          "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob",
+          "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob:*/*",
         redirect_uris: ["http://127.0.0.1:3000/oauth/callback"],
       },
     ],
