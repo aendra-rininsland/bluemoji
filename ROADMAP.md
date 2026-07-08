@@ -64,24 +64,46 @@ Done:
 
 ## Phase 2 — Launch operations
 
-1. **Cloudflare cache rule** (30s, dashboard): Rules → Cache Rules, URI Path
-   starts with `/img/` → Eligible for cache. Origin already sends
-   `immutable, max-age=1y`. Until this is set, `cf-cache-status` stays
-   DYNAMIC and every emoji render hits Railway.
-2. **Moderation before scale**: wire `dev.hatk.createReport` into the UI;
-   define the Ozone story (packs are a distribution amplifier for bad
-   content, and stickers raise the stakes vs. 128px glyphs). hatk labels +
-   `_reports` table exist; takedown filtering is already in every query.
-3. **@moji.blue bot** (RFC 0002 adoption strategy): announce new Bluemoji,
-   provide copy links; custom feeds of posts using Bluemoji.
-4. **Publish `@aendra/bluemoji` v5**: sticker + reaction + alias exports are
-   in the tree; needs a version bump and `npm publish` from `lib/`
-   (`prepublishOnly` runs the build).
-5. **Backfill/monitoring hygiene**: watch Railway memory after the
-   `NODE_OPTIONS=--max-old-space-size=4096` bump; the `_repos` backlog from
-   the unscoped first deploy drains junk repos once. Consider `hatk reset`
-   of the prod volume for a clean start before public launch (all data is
-   re-derivable from the network).
+1. ~~Cloudflare cache rule~~ — done, verified live: `/img/*` shows
+   `cf-cache-status: MISS` then `HIT` on repeat requests, both before and
+   after the 2026-07-08 redeploys.
+2. ~~Moderation before scale~~ — `dev.hatk.createReport` is wired into the UI
+   ("Report pack" + per-item report on pack pages; report affordances on
+   post-page stickers and reaction chips). Report reasons are registered as
+   `defineLabel()` identifiers in `server/labels/`. End-to-end tested via
+   hatk's test harness (valid report → 200 + stored; bad label → rejected;
+   unauthenticated → rejected). The Ozone story itself (how a human
+   moderator actually reviews `_reports` and acts on them) is still
+   undefined — intake works, the review workflow doesn't exist yet.
+3. **@moji.blue bot** (RFC 0002 adoption strategy) — **not started, needs
+   you**: this requires a live Bluesky account for @moji.blue and its
+   credentials (app password or OAuth session) stored as a deploy secret, so
+   it can post publicly under that identity. Not something to set up
+   autonomously — the design (announce new Bluemoji, copy links, custom
+   feeds, usage stats) is in RFC 0002 whenever you're ready to provision it.
+4. **Publish `@aendra/bluemoji` v5** — **blocked, needs a decision**: the
+   package has no working build. `lib/` has no `vite.config.ts` for library
+   mode (`vite build` fails immediately with `Cannot resolve entry module
+   index.html`), and `package.json` has no `main`/`module`/`types`/`exports`
+   fields at all, so even a successful build wouldn't be importable. The
+   last published version (3.0.21, currently on npm; local `package.json`
+   says `4.0.0` but that was never published) used **three separate entry
+   points** — root `.` → `facet.js`, plus `./render` and `./facet` subpaths,
+   each dual ESM/CJS — whereas the current `src/index.ts` is a single
+   unified export combining facet + render + the new alias helpers. Fixing
+   the build means picking one: preserve the old multi-entry shape (backward
+   compatible for existing importers of `@aendra/bluemoji/facet`) or
+   consolidate to the new single-entry shape (simpler, breaking). That's a
+   call for whoever owns the package's consumer contract, not something to
+   guess at. `npm whoami` also has no local auth configured, so publishing
+   itself needs `npm login` regardless of which shape is chosen.
+5. **Backfill/monitoring hygiene** — checked 2026-07-08: memory 206 MB
+   current / 219 MB max over the last hour (8 GB limit), disk 138 MB / 500 MB
+   (28%), zero 5xx errors. Healthy; no `hatk reset` needed right now. Revisit
+   before public launch if the `_repos` backlog from the original unscoped
+   deploy is a concern (all data is re-derivable from the network, so a
+   reset is safe whenever you want a clean slate — just destructive and
+   irreversible, so it needs your explicit go-ahead each time, not mine).
 
 ## Phase 3 — Adoption push
 
