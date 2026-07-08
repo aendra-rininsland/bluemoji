@@ -223,7 +223,12 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   calls (used by both this page and the pre-existing packs page) fail
   outright without `ORIGIN`/`PORT` env vars set — documented as hatk gotcha
   #7 in CLAUDE.md and fixed in `.claude/launch.json` for local preview
-  testing; not confirmed whether this affects production the same way.
+  testing. Confirmed this does NOT affect production: deployed and curled
+  `/gallery` live, which does the identical same-origin `fetch("/xrpc/...")`
+  pattern, and it correctly rendered the real (empty) trending state rather
+  than erroring — so whatever Railway's env provides, it resolves fine
+  there. By extension the pre-existing packs page (same fetch pattern) is
+  also fine in production; this was local-only friction.
   OpenGraph cards for pack embeds — **done**: `server/og/pack.ts` renders a real satori image
   (icon/emoji, name, description, item count, creator handle) at
   `/og/packs/:handle/:rkey`, verified end-to-end (200 OK, real 1200x630 PNG
@@ -245,18 +250,16 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   `fetch("/xrpc/...")` call with a raw `TypeError: fetch failed` — setting
   `ORIGIN`/`PORT` env vars (e.g. `ORIGIN=http://localhost:3000 PORT=3000`)
   fixes it locally, so SvelteKit's server-side fetch needs an explicit origin
-  to self-resolve in this setup. Not yet confirmed whether Railway's env
-  already supplies an equivalent (`RAILWAY_PUBLIC_DOMAIN` is read by hatk's
-  OAuth issuer logic, not confirmed wired to `ORIGIN`) — the packs page
-  itself predates this session and is already live in production using the
-  same fetch pattern, so this is pre-existing local-only friction, not a new
-  regression; flagging as worth a direct prod check if OG cards don't
-  unfurl correctly once deployed. Deployed to production 2026-07-08 (Railway
-  build + healthcheck both succeeded, `/_health` returns ok); could NOT do a
-  final live end-to-end check against a real pack, though — there's no
-  public pack-discovery endpoint (`getActorPacks`/`getPacks`/`getPack` all
-  require already knowing an actor or URI) and I don't have app-password
-  credentials to create a test pack. Whoever shares a real pack link next
+  to self-resolve in this setup — confirmed pre-existing local-only friction,
+  NOT a production issue: the trending-stats work below deployed a second
+  page (`/gallery`) using this identical fetch pattern, and it rendered
+  correctly live without any ORIGIN/PORT configuration on Railway's side.
+  Deployed to production 2026-07-08 (Railway build + healthcheck both
+  succeeded, `/_health` returns ok); could NOT do a final live end-to-end
+  check against a real pack, though — there's no public pack-discovery
+  endpoint (`getActorPacks`/`getPacks`/`getPack` all require already knowing
+  an actor or URI) and I don't have app-password credentials to create a
+  test pack. Whoever shares a real pack link next
   should sanity-check `/og/packs/:handle/:rkey` renders and unfurls
   correctly (e.g. paste the pack URL into a Bluesky/Discord composer).
 - **Verified/first-party sets**: artists publish signed packs; `copyOf`

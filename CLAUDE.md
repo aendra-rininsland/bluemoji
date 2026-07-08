@@ -109,12 +109,10 @@ launch.json`'s "hatk" config wraps the start command in `env ORIGIN=http://
 localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
    outside that (bare terminal, a different script) needs the same env vars
    or every page using this pattern (packs, gallery) will silently 500 on
-   its data load and render an empty/default state. Not confirmed whether
-   Railway's production env supplies an equivalent automatically —
-   `RAILWAY_PUBLIC_DOMAIN` is read by hatk's OAuth issuer logic, not
-   confirmed wired to `ORIGIN` — but the packs page has used this exact
-   fetch pattern in production already, so if it's broken there too it's a
-   latent, currently-unnoticed issue, not something introduced recently.
+   its data load and render an empty/default state. Confirmed this is
+   local-only: deployed `/gallery` (same fetch pattern) to Railway and it
+   rendered correctly live with no ORIGIN/PORT set in Railway's env, so
+   whatever Railway supplies resolves it fine there.
 8. **`array`-typed query params on `query` (GET) endpoints are broken in
    hatk's XRPC dispatch**: `server.js`'s param builder does
    `for (const [k,v] of url.searchParams) params[k] = v`, which silently
