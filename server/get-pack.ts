@@ -70,6 +70,7 @@ export default defineQuery("blue.moji.packs.getPack", async (ctx) => {
         subject: {
           $type: "blue.moji.collection.item#itemView",
           uri: subject.uri,
+          cid: subject.cid,
           did: subject.did,
           name: subject.value.name,
           alt: subject.value.alt,

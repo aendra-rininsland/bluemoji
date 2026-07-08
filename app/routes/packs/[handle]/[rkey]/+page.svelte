@@ -12,6 +12,54 @@
   let copied = $state<Set<string>>(new Set())
   let shareCopied = $state(false)
 
+  // Values must match an identifier registered via defineLabel() in
+  // server/labels/ — dev.hatk.createReport rejects any other label.
+  const REPORT_REASONS = [
+    { value: 'sexual', label: 'Unwanted or mislabeled sexual content' },
+    { value: 'violation', label: 'Violates server rules or terms of service' },
+    { value: 'rude', label: 'Rude, harassing, or hateful' },
+    { value: 'misleading', label: 'Misleading identity or content' },
+    { value: 'spam', label: 'Spam' },
+    { value: 'other', label: 'Other' },
+  ]
+  let reportTarget = $state<{ uri: string; cid: string; label: string } | null>(null)
+  let reportLabel = $state(REPORT_REASONS[0].value)
+  let reportReason = $state('')
+  let reportBusy = $state(false)
+  let reportError = $state('')
+  let reportDone = $state<Set<string>>(new Set())
+
+  function openReport(uri: string | undefined, cid: string | undefined, label: string) {
+    if (!uri || !cid) return
+    reportTarget = { uri, cid, label }
+    reportLabel = REPORT_REASONS[0].value
+    reportReason = ''
+    reportError = ''
+  }
+
+  async function submitReport() {
+    if (!reportTarget) return
+    reportBusy = true
+    reportError = ''
+    try {
+      await callXrpc('dev.hatk.createReport', {
+        subject: {
+          $type: 'com.atproto.repo.strongRef',
+          uri: reportTarget.uri,
+          cid: reportTarget.cid,
+        },
+        label: reportLabel,
+        reason: reportReason || undefined,
+      })
+      reportDone = new Set([...reportDone, reportTarget.uri])
+      reportTarget = null
+    } catch (e: any) {
+      reportError = e.message ?? 'Failed to submit report'
+    } finally {
+      reportBusy = false
+    }
+  }
+
   const inPack = $derived(new Set(data.items.map((i: any) => i.subject.uri).filter(Boolean)))
 
   async function shareLink() {
@@ -167,6 +215,15 @@
       </button>
       {#if data.viewer && !data.isOwner}
         <button
+          onclick={() => openReport(data.pack.uri, data.pack.cid, data.pack.name)}
+          disabled={reportDone.has(data.pack.uri)}
+          style="padding: 0.375rem 0.875rem; border: 1px solid var(--border); background: none; color: var(--muted); border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {reportDone.has(data.pack.uri) ? 0.5 : 1};"
+        >
+          {reportDone.has(data.pack.uri) ? 'Reported' : 'Report pack'}
+        </button>
+      {/if}
+      {#if data.viewer && !data.isOwner}
+        <button
           onclick={copyAll}
           disabled={busy !== null}
           style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {busy !== null ? 0.5 : 1};"
@@ -187,6 +244,51 @@
 
   {#if error}
     <p style="color: red; margin-bottom: 1rem;">{error}</p>
+  {/if}
+
+  {#if reportTarget}
+    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+      <p style="font-weight: 500;">Report {reportTarget.label}</p>
+      <label style="display: flex; flex-direction: column; gap: 0.375rem; font-size: 0.875rem;">
+        Reason
+        <select
+          bind:value={reportLabel}
+          style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text);"
+        >
+          {#each REPORT_REASONS as reason (reason.value)}
+            <option value={reason.value}>{reason.label}</option>
+          {/each}
+        </select>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 0.375rem; font-size: 0.875rem;">
+        Additional details <span style="font-weight: 400; color: var(--muted);">(optional)</span>
+        <textarea
+          bind:value={reportReason}
+          rows="2"
+          maxlength="2000"
+          style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); resize: vertical;"
+        ></textarea>
+      </label>
+      {#if reportError}
+        <p style="color: red; font-size: 0.875rem;">{reportError}</p>
+      {/if}
+      <div style="display: flex; gap: 0.5rem;">
+        <button
+          onclick={submitReport}
+          disabled={reportBusy}
+          style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {reportBusy ? 0.5 : 1};"
+        >
+          {reportBusy ? 'Submitting…' : 'Submit report'}
+        </button>
+        <button
+          onclick={() => (reportTarget = null)}
+          disabled={reportBusy}
+          style="padding: 0.375rem 0.875rem; border: 1px solid var(--border); background: none; color: var(--text); border-radius: 4px; font-size: 0.875rem; cursor: pointer;"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   {/if}
 
   <!-- Owner: add-from-collection picker -->
@@ -272,6 +374,15 @@
               style="font-size: 0.75rem; padding: 0.25rem 0.625rem; border: 1px solid var(--border); background: none; color: var(--text); border-radius: 4px; cursor: pointer; opacity: {copied.has(item.subject.uri ?? '') ? 0.5 : 1};"
             >
               {copied.has(item.subject.uri ?? '') ? 'Copied ✓' : busy === item.subject.uri ? 'Copying…' : 'Copy'}
+            </button>
+          {/if}
+          {#if data.viewer && item.subject.uri && item.subject.cid}
+            <button
+              onclick={() => openReport(item.subject.uri, item.subject.cid, item.subject.name)}
+              disabled={reportDone.has(item.subject.uri)}
+              style="font-size: 0.6875rem; padding: 0.125rem 0.5rem; border: none; background: none; color: var(--muted); cursor: pointer; text-decoration: underline; opacity: {reportDone.has(item.subject.uri) ? 0.5 : 1};"
+            >
+              {reportDone.has(item.subject.uri) ? 'Reported' : 'Report'}
             </button>
           {/if}
         </div>

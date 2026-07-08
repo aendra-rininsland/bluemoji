@@ -61,6 +61,7 @@ export default defineQuery("blue.moji.collection.listCollection", async (ctx) =>
   const items = page.map((row) => ({
     $type: "blue.moji.collection.item#itemView",
     uri: row.uri,
+    cid: row.cid,
     did: row.did,
     name: row.name,
     alt: row.alt ?? undefined,

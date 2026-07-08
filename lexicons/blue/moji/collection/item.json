@@ -110,6 +110,11 @@
           "format": "at-uri",
           "description": "AT-URI of the source item record. Views need this so consumers can derive the owning DID for blob URL construction."
         },
+        "cid": {
+          "type": "string",
+          "format": "cid",
+          "description": "CID of the source item record, so consumers can build a com.atproto.repo.strongRef to it (e.g. for moderation reports) without a separate lookup."
+        },
         "did": {
           "type": "string",
           "format": "did",

@@ -39,6 +39,8 @@ export interface EmojiRef {
   $type?: "blue.moji.feed.reaction#emojiRef";
   /** AT-URI of the blue.moji.collection.item record. The owning DID is derived from this. */
   uri: string;
+  /** CID of the blue.moji.collection.item record, populated by AppViews at hydration time (like adultOnly) so consumers can build a com.atproto.repo.strongRef for moderation reports without a separate lookup. Not meaningful on write. */
+  cid?: string;
   /** Colon-wrapped alias, e.g. :blobcat:. Used as fallback text. */
   name: string;
   alt?: string;

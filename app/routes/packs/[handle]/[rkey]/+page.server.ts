@@ -5,6 +5,7 @@ import type { PageServerLoad } from "./$types";
 
 interface ItemView {
   uri?: string;
+  cid?: string;
   did?: string;
   name: string;
   alt?: string;

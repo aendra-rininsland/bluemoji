@@ -111,6 +111,8 @@ export interface ItemView {
   $type?: "blue.moji.collection.item#itemView";
   /** AT-URI of the source item record. Views need this so consumers can derive the owning DID for blob URL construction. */
   uri?: string;
+  /** CID of the source item record, so consumers can build a com.atproto.repo.strongRef to it (e.g. for moderation reports) without a separate lookup. */
+  cid?: string;
   /** DID of the repo that owns this item's blobs. */
   did?: string;
   name: string;

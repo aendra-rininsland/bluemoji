@@ -9,6 +9,54 @@
   let reactBusy = $state(false);
   let reactError = $state("");
 
+  // Values must match an identifier registered via defineLabel() in
+  // server/labels/ — dev.hatk.createReport rejects any other label.
+  const REPORT_REASONS = [
+    { value: "sexual", label: "Unwanted or mislabeled sexual content" },
+    { value: "violation", label: "Violates server rules or terms of service" },
+    { value: "rude", label: "Rude, harassing, or hateful" },
+    { value: "misleading", label: "Misleading identity or content" },
+    { value: "spam", label: "Spam" },
+    { value: "other", label: "Other" },
+  ];
+  let reportTarget = $state<{ uri: string; cid: string; label: string } | null>(null);
+  let reportLabel = $state(REPORT_REASONS[0].value);
+  let reportReason = $state("");
+  let reportBusy = $state(false);
+  let reportError = $state("");
+  let reportDone = $state<Set<string>>(new Set());
+
+  function openReport(uri: string | undefined, cid: string | undefined, label: string) {
+    if (!uri || !cid) return;
+    reportTarget = { uri, cid, label };
+    reportLabel = REPORT_REASONS[0].value;
+    reportReason = "";
+    reportError = "";
+  }
+
+  async function submitReport() {
+    if (!reportTarget) return;
+    reportBusy = true;
+    reportError = "";
+    try {
+      await callXrpc("dev.hatk.createReport", {
+        subject: {
+          $type: "com.atproto.repo.strongRef",
+          uri: reportTarget.uri,
+          cid: reportTarget.cid,
+        },
+        label: reportLabel,
+        reason: reportReason || undefined,
+      });
+      reportDone = new Set([...reportDone, reportTarget.uri]);
+      reportTarget = null;
+    } catch (e: any) {
+      reportError = e.message ?? "Failed to submit report";
+    } finally {
+      reportBusy = false;
+    }
+  }
+
   async function react(emoji: {
     uri: string;
     name: string;
@@ -126,27 +174,38 @@
     <!-- Reactions -->
     <div class="reactions">
       {#each data.groups as group (group.emoji.uri)}
-        <button
-          class="reaction-chip"
-          class:mine={Boolean(group.viewer)}
-          disabled={reactBusy || (!data.viewer && !group.viewer)}
-          title={group.viewer ? `Remove your ${group.emoji.name} reaction` : `React with ${group.emoji.name}`}
-          onclick={() => (group.viewer ? unreact(group.viewer) : react(group.emoji))}
-        >
-          {#if group.imageUrl}
-            <img
-              class:adult={group.emoji.adultOnly}
-              src={group.imageUrl}
-              alt={group.emoji.alt ?? group.emoji.name}
-            />
-          {:else}
-            <span>{group.emoji.name}</span>
+        <div class="reaction-chip-wrap">
+          <button
+            class="reaction-chip"
+            class:mine={Boolean(group.viewer)}
+            disabled={reactBusy || (!data.viewer && !group.viewer)}
+            title={group.viewer ? `Remove your ${group.emoji.name} reaction` : `React with ${group.emoji.name}`}
+            onclick={() => (group.viewer ? unreact(group.viewer) : react(group.emoji))}
+          >
+            {#if group.imageUrl}
+              <img
+                class:adult={group.emoji.adultOnly}
+                src={group.imageUrl}
+                alt={group.emoji.alt ?? group.emoji.name}
+              />
+            {:else}
+              <span>{group.emoji.name}</span>
+            {/if}
+            {#if group.emoji.adultOnly}
+              <span class="badge-18">18+</span>
+            {/if}
+            <span class="count">{group.count}</span>
+          </button>
+          {#if data.viewer && group.emoji.cid && !reportDone.has(group.emoji.uri)}
+            <button
+              class="report-flag"
+              title="Report {group.emoji.name}"
+              onclick={() => openReport(group.emoji.uri, group.emoji.cid, group.emoji.name)}
+            >
+              ⚑
+            </button>
           {/if}
-          {#if group.emoji.adultOnly}
-            <span class="badge-18">18+</span>
-          {/if}
-          <span class="count">{group.count}</span>
-        </button>
+        </div>
       {/each}
       {#if data.viewer}
         <button
@@ -190,21 +249,60 @@
     {/if}
 
     {#if data.sticker}
+      {@const sticker = data.sticker}
       <figure class="sticker">
-        {#if data.sticker.url}
+        {#if sticker.url}
           <img
-            class:adult={data.sticker.adultOnly}
-            src={data.sticker.url}
-            alt={data.sticker.alt ?? data.sticker.name}
-            title={data.sticker.adultOnly ? `${data.sticker.name} (18+)` : data.sticker.name}
+            class:adult={sticker.adultOnly}
+            src={sticker.url}
+            alt={sticker.alt ?? sticker.name}
+            title={sticker.adultOnly ? `${sticker.name} (18+)` : sticker.name}
           />
         {:else}
-          <span title={data.sticker.name}>{data.sticker.name}</span>
+          <span title={sticker.name}>{sticker.name}</span>
         {/if}
-        {#if data.sticker.adultOnly}
-          <figcaption class="badge-18">18+</figcaption>
-        {/if}
+        <figcaption>
+          {#if sticker.adultOnly}
+            <span class="badge-18">18+</span>
+          {/if}
+          {#if data.viewer && sticker.uri && sticker.cid && !reportDone.has(sticker.uri)}
+            <button
+              class="report-flag"
+              title="Report {sticker.name}"
+              onclick={() => openReport(sticker.uri, sticker.cid, sticker.name)}
+            >
+              ⚑ Report
+            </button>
+          {/if}
+        </figcaption>
       </figure>
+    {/if}
+
+    {#if reportTarget}
+      <div class="report-form">
+        <p class="report-form-title">Report {reportTarget.label}</p>
+        <label class="report-field">
+          Reason
+          <select bind:value={reportLabel}>
+            {#each REPORT_REASONS as reason (reason.value)}
+              <option value={reason.value}>{reason.label}</option>
+            {/each}
+          </select>
+        </label>
+        <label class="report-field">
+          Additional details <span class="muted">(optional)</span>
+          <textarea bind:value={reportReason} rows="2" maxlength="2000"></textarea>
+        </label>
+        {#if reportError}
+          <p class="react-error">{reportError}</p>
+        {/if}
+        <div class="report-actions">
+          <button class="btn-primary" onclick={submitReport} disabled={reportBusy}>
+            {reportBusy ? "Submitting…" : "Submit report"}
+          </button>
+          <button onclick={() => (reportTarget = null)} disabled={reportBusy}> Cancel </button>
+        </div>
+      </div>
     {/if}
 
     <footer>
@@ -328,6 +426,87 @@
     color: var(--muted);
   }
 
+  .reaction-chip-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  .report-flag {
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-size: 0.75rem;
+    padding: 0.125rem 0.25rem;
+    cursor: pointer;
+    opacity: 0.6;
+  }
+
+  .report-flag:hover {
+    opacity: 1;
+    color: #c94040;
+  }
+
+  .report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .report-form-title {
+    font-weight: 600;
+  }
+
+  .report-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  .report-field select,
+  .report-field textarea {
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+  }
+
+  .report-field textarea {
+    resize: vertical;
+  }
+
+  .muted {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .report-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .report-actions button {
+    padding: 0.375rem 0.875rem;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .report-actions .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+  }
+
   .picker {
     display: flex;
     flex-wrap: wrap;
@@ -374,6 +553,17 @@
     max-width: 256px;
     max-height: 256px;
     object-fit: contain;
+  }
+
+  .sticker figcaption {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.375rem;
+  }
+
+  .sticker .report-flag {
+    font-size: 0.75rem;
   }
 
   footer {

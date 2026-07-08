@@ -118,6 +118,23 @@ AppView normalises any `formats_v0` input to `formats_v1` on write
   are able to themselves flag their emoji as having sensitive content by
   uploading with a self-label, similar to how posts can be self-labelled.
 
+- **Amendment (2026-07): moderation reporting.** The reference AppView wires
+  up hatk's generic `dev.hatk.createReport` procedure (report a
+  `com.atproto.repo.strongRef` or a bare account, with a `label` reason and
+  optional free-text detail) into the UI: a "Report pack" action on pack
+  pages, per-item report links within a pack, and report affordances on post-
+  page stickers and reaction chips. Report reasons are registered as
+  `defineLabel()` identifiers in `server/labels/` (`sexual`, `violation`,
+  `rude`, `misleading`, `spam`, `other`) since `createReport` validates
+  `label` against the AppView's own registered label vocabulary — an
+  unregistered label, including a bare `com.atproto.moderation.defs#reason*`
+  token, is rejected. Reports land in a moderator-facing queue (hatk's
+  `_reports` table); this is intake only, not automated action — see the
+  project roadmap for the still-open Ozone story. Inline facet emoji
+  (individual `:alias:` occurrences within running text) are not
+  independently reportable in this version; report the pack or post context
+  they came from instead.
+
 - **Payload size:** While reasonable limits have been suggested for Bluemoji
   assets, it's up to the implementers to follow them. Nothing is preventing a
   client from uploading a blob larger than the recommended limits, though it's

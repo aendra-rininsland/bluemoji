@@ -40,7 +40,7 @@ function parseEmoji(text: string): { uri?: string } & Record<string, unknown> {
  */
 function verifiedEmojiRef(
   claimed: { uri?: string },
-  verified: Map<string, { uri: string; value: ItemRecord }>,
+  verified: Map<string, { uri: string; cid: string; value: ItemRecord }>,
 ) {
   const uri = claimed.uri;
   if (!uri) return null;
@@ -49,6 +49,7 @@ function verifiedEmojiRef(
   return {
     $type: "blue.moji.feed.reaction#emojiRef",
     uri,
+    cid: record.cid,
     name: record.value.name,
     alt: record.value.alt,
     adultOnly: Boolean(record.value.adultOnly),

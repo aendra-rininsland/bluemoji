@@ -41,6 +41,7 @@ export default defineQuery("blue.moji.collection.getItem", async (ctx) => {
     item: {
       $type: "blue.moji.collection.item#itemView",
       uri: record.uri,
+      cid: record.cid,
       did: record.did,
       name: record.value.name,
       alt: record.value.alt,
