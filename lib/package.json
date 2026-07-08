@@ -1,6 +1,6 @@
 {
   "name": "@aendra/bluemoji",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Client library for Bluemoji (moji.blue)",
   "keywords": [
     "atproto"
@@ -11,6 +11,24 @@
     "dist",
     "src"
   ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./facet": {
+      "types": "./dist/facet/index.d.ts",
+      "import": "./dist/facet.js"
+    },
+    "./render": {
+      "types": "./dist/render/index.d.ts",
+      "import": "./dist/render.js"
+    }
+  },
   "scripts": {
     "test": "tsx src/**/*.test.ts",
     "build": "vite build",
@@ -32,7 +50,8 @@
     "@swc/cli": "^0.8.1",
     "@swc/core": "^1.15.30",
     "swc": "^1.0.11",
-    "vite": "^8.0.9"
+    "vite": "^8.0.9",
+    "vite-plugin-dts": "^5.0.3"
   },
   "peerDependencies": {
     "react-native": "^0.74.4"

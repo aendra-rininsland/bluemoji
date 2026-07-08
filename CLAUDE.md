@@ -108,8 +108,13 @@ ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
   errors are false positives** (aliases exist only under hatk's vite plugin
   at runtime). Real errors are anything else.
 - Alias spec tests: `npx tsx lib/src/util/alias.test.ts` (6 tests; known IDN
-  vectors). `lib/src/facet/BluemojiRichText.test.ts` fails offline — it
-  resolves a live DID over the network; pre-existing, not a regression.
+  vectors). `lib/src/facet/BluemojiRichText.test.ts` fails — its fixture does
+  `agent.session = {...}` directly, but `AtpAgent.session` is a getter-only
+  accessor as of the pinned `@atproto/api@0.19.11`; the test predates that API
+  change. Pre-existing, not a regression, and unrelated to anything in
+  `detect-facets.ts`/`BluemojiRichText.ts` (it fails before `detectFacets()`
+  is ever called). Needs the fixture rewritten to use a mock session, not a
+  direct assignment.
 - `vp test` at root finds no tests (expected; tests live in `lib/`).
 - Local smoke boot without the docker PDS:
   `timeout 12 ./node_modules/.bin/hatk start` — check the `XRPC:` line lists

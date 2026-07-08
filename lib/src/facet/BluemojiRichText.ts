@@ -91,7 +91,7 @@ export class BluemojiRichText extends RichText {
   }
 
   async detectFacets(agent: AtpAgent): Promise<void> {
-    this.facets = detectFacets(this.unicodeText);
+    this.facets = await detectFacets(this.unicodeText);
     if (this.facets) {
       for (const facet of this.facets) {
         for (const feature of facet.features) {

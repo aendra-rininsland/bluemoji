@@ -81,22 +81,48 @@ Done:
    it can post publicly under that identity. Not something to set up
    autonomously — the design (announce new Bluemoji, copy links, custom
    feeds, usage stats) is in RFC 0002 whenever you're ready to provision it.
-4. **Publish `@aendra/bluemoji` v5** — **blocked, needs a decision**: the
-   package has no working build. `lib/` has no `vite.config.ts` for library
-   mode (`vite build` fails immediately with `Cannot resolve entry module
-   index.html`), and `package.json` has no `main`/`module`/`types`/`exports`
-   fields at all, so even a successful build wouldn't be importable. The
-   last published version (3.0.21, currently on npm; local `package.json`
-   says `4.0.0` but that was never published) used **three separate entry
-   points** — root `.` → `facet.js`, plus `./render` and `./facet` subpaths,
-   each dual ESM/CJS — whereas the current `src/index.ts` is a single
-   unified export combining facet + render + the new alias helpers. Fixing
-   the build means picking one: preserve the old multi-entry shape (backward
-   compatible for existing importers of `@aendra/bluemoji/facet`) or
-   consolidate to the new single-entry shape (simpler, breaking). That's a
-   call for whoever owns the package's consumer contract, not something to
-   guess at. `npm whoami` also has no local auth configured, so publishing
-   itself needs `npm login` regardless of which shape is chosen.
+4. ~~Publish `@aendra/bluemoji` v5~~ — **build fixed, ready whenever you want
+   to `npm login` and publish**. The package genuinely had no working build
+   (no `vite.config.ts` for library mode at all — `vite build` failed
+   immediately trying to resolve `index.html` — and no `main`/`module`/
+   `types`/`exports` in `package.json`). Rather than guess between
+   "preserve the old 3.0.21 multi-entry shape" and "consolidate to the
+   current single `src/index.ts`", did both: added `lib/vite.config.ts` +
+   `lib/tsconfig.json` building three entries (`index`, `facet`, `render`),
+   so `@aendra/bluemoji` (root) gets the richer unified export (facet +
+   render + the new alias helpers) while `@aendra/bluemoji/facet` and
+   `@aendra/bluemoji/render` keep working exactly as they did in 3.0.21 for
+   anyone already depending on those subpaths. `package.json` now has real
+   `main`/`module`/`types`/`exports` fields and `"type": "module"`; version
+   bumped to `5.0.0` (`4.0.0` was in package.json but never actually
+   published — 3.0.21 is still the latest on npm).
+
+   Verifying the build actually ran surfaced a real latent bug, not
+   something this session introduced: `lib/src/facet/detect-facets.ts`
+   deep-imports `@atproto/api/src/rich-text/detection` (source, not a
+   compiled entry point) — `@atproto/api` doesn't publicly export its own
+   mention/link/tag facet detector, only `UnicodeString`. As a static
+   top-level import this broke loading the _entire_ package under plain
+   Node ESM resolution (every consumer, not just ones calling
+   `detectFacets()`) — this was presumably always broken for any real npm
+   consumer, just never caught because the build never ran to completion
+   before. Fixed by (a) importing `UnicodeString` from the public
+   `@atproto/api` entry instead of the deep path, and (b) deferring the
+   unavoidable `@atproto/api/src/rich-text/detection` import to a dynamic
+   `import()` inside `detectFacets()` itself (now `async`, `await`ed at
+   both call sites) — so the package loads fine anywhere, and only calling
+   `detectFacets()` outside a TypeScript-transpiling bundler (Vite, Metro,
+   webpack+ts-loader) throws. That's an upstream `@atproto/api` gap, not
+   fixable here without reimplementing mention/link/tag detection.
+
+   Verified for real: built, then imported all three entry points via
+   actual Node `import()` against the built `dist/` files (not just "did
+   the build exit 0") — confirmed every expected export is present and
+   `aliasToRkey`/`normalizeAlias`/`rkeyToAlias` work correctly through the
+   built artifact. `npm whoami` has no local auth configured, so `npm
+login` is still needed before `npm publish` — that step (and the
+   publish itself) needs your go-ahead, not mine.
+
 5. **Backfill/monitoring hygiene** — checked 2026-07-08: memory 206 MB
    current / 219 MB max over the last hour (8 GB limit), disk 138 MB / 500 MB
    (28%), zero 5xx errors. Healthy; no `hatk reset` needed right now. Revisit
