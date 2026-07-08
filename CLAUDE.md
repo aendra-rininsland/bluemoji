@@ -11,7 +11,11 @@ ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
 0003 stickers, 0004 reactions, 0005 internationalised aliases).
 [RENDERING.md](RENDERING.md) is the third-party-facing "render a Bluemoji
 facet in ~20 lines" adoption doc — link that, not this file, to external
-developers.
+developers. [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) is the
+deeper companion for two specific adopter tracks: forking
+`bluesky-social/social-app` for full native integration, and independent
+non-microblogging apps (including building your own AppView indexer) —
+link that instead of this file for adopters past the RENDERING.md stage.
 
 ## Repo map
 
