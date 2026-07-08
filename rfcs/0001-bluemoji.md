@@ -94,6 +94,16 @@ may change if a lossless route to easily convert APNG to WebP is found, however,
 or if ImgProxy adds support for APNG animations. See
 [imgproxy#1222][imgproxy_1222]).
 
+**Amendment (2026-07):** The formats described above are `formats_v0`.
+`formats_v0` is now **deprecated**: its `apng_128`/`lottie` fields are raw
+`Bytes` rather than `Blob`, which makes them invisible to blob-based image
+moderation pipelines and forces an extra `getRecord` round-trip to render.
+`formats_v1` supersedes it — every animated/vector rendition is a `Blob`, CDN-
+servable like the static formats. Writers MUST produce `formats_v1`; readers
+SHOULD continue to accept `formats_v0` for historical records. The reference
+AppView normalises any `formats_v0` input to `formats_v1` on write
+(`server/put-item.ts`), so no client-visible migration is required.
+
 # Drawbacks
 
 - **Moderation concerns:** Bluemoji leverages the `Bytes` and `Blob` types,
@@ -124,6 +134,38 @@ or if ImgProxy adds support for APNG animations. See
 - **Accessibility concerns:** The colon-wrapped alias provides a slight amount
   of contextual information so it has been recommended as the fallback text, but
   there's no way of enforcing that given how ATProto facets work.
+
+- **Facet self-attestation (amendment, 2026-07):** `blue.moji.richtext.facet`
+  denormalizes `did`, `name`, `alt`, `adultOnly`, `labels`, and format CIDs
+  onto the facet itself so clients can render without a round-trip. Nothing
+  about writing an `app.bsky.feed.post` validates that a facet's claims match
+  a real `blue.moji.collection.item` record — a poster's client could attach
+  any `did`/CID pair it likes, rendering an arbitrary image as if it belonged
+  to another user's collection, or simply omit `adultOnly`/`labels` to bypass
+  a content warning the source item's own record carries. The same applies to
+  `blue.moji.embed.sticker`'s `sticker` object and
+  `blue.moji.feed.reaction#emojiRef`, which follow the same
+  denormalized-for-performance shape. **AppViews SHOULD verify these claims —
+  including self-labels — against the indexed source item before
+  rendering**, since firehose ingestion cryptographically verifies the source
+  item's own repo commit; that's the actual trust anchor, not the poster's
+  self-report. Note that `blue.moji.feed.reaction` has no self-label fields
+  of its own at all — a reaction's `adultOnly` is _only_ ever available via
+  this verification step, so skipping it means rendering a potentially
+  sensitive emoji with zero warning.
+
+  The reference AppView does this: `blue.moji.collection.getItem` performs a
+  verified lookup (returning the item's real `formats`, `stickerFormats`, and
+  `adultOnly`); `server/get-reactions.ts` rebuilds each reaction's `emojiRef`
+  — including `adultOnly` — from the indexed item, dropping reactions whose
+  referenced item can't be verified at all; and the post-page renderer calls
+  `getItem` for every facet/sticker before trusting its image or alt text.
+  The reference client renders a small "18+" badge plus a visual outline
+  around adult-only emoji/stickers/reactions rather than hiding them
+  outright — full viewer-preference-based hide/warn moderation is tracked as
+  a separate, larger piece of work (see the project roadmap). Clients that
+  skip verification should treat the rendered image as decorative/best-effort
+  only, the same way they would an unverified embed.
 
 # Alternatives
 

@@ -4,10 +4,15 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "List a range of Bluemoji in a repository, matching a specific collection. Requires auth.",
+      "description": "List a range of Bluemoji in a repository. Public read: pass 'repo' to browse any repo's collection. If 'repo' is omitted, the caller must be authenticated and their own collection is listed.",
       "parameters": {
         "type": "params",
         "properties": {
+          "repo": {
+            "type": "string",
+            "format": "at-identifier",
+            "description": "The handle or DID of the repo to list. Defaults to the authenticated caller if omitted."
+          },
           "limit": {
             "type": "integer",
             "minimum": 1,
@@ -18,7 +23,7 @@
           "cursor": { "type": "string" },
           "reverse": {
             "type": "boolean",
-            "description": "Flag to reverse the order of the returned records."
+            "description": "Flag to reverse the order of the returned records. Default is oldest-first (ascending by creation time), mirroring com.atproto.repo.listRecords."
           }
         }
       },
@@ -38,14 +43,6 @@
             }
           }
         }
-      }
-    },
-    "itemView": {
-      "type": "object",
-      "required": ["uri", "record"],
-      "properties": {
-        "uri": { "type": "string", "format": "at-uri" },
-        "record": { "type": "ref", "ref": "blue.moji.collection.item#itemView" }
       }
     }
   }

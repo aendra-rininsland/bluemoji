@@ -29,6 +29,15 @@ Terminology
   _any_ repo, so packs can curate other people's emoji. AppViews ignore
   duplicate packitems for the same subject.
 
+  **Naming (confirmed, 2026-07):** `packitem`, not `packItem`. This
+  intentionally follows Bluesky's own convention for record-type NSID
+  segments — compound words are lowercased with no separator (`postgate`,
+  `threadgate`, `listitem`, `starterpack`), where camelCase is reserved for
+  query/procedure NSIDs (`getPack`, `getActorPacks`, `putItem`). Every record
+  type in `blue.moji.*` follows this: `pack`, `packitem`, `item`, `reaction`.
+  Do not "fix" this to camelCase later — it would be inconsistent with the
+  ecosystem it's meant to interoperate with.
+
 Reads are AppView queries, following the `app.bsky.graph.starterpack` pattern:
 
 - `blue.moji.packs.getPack` — hydrated `packView` plus paginated

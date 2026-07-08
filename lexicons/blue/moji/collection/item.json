@@ -18,7 +18,7 @@
           "createdAt": { "type": "string", "format": "datetime" },
           "formats": {
             "type": "union",
-            "description": "Open union to allow for future formats",
+            "description": "Open union to allow for future formats. #formats_v0 is deprecated: writers MUST write #formats_v1 (see RFC 0001 Adoption strategy / RFC 0005). Readers SHOULD continue to accept #formats_v0 for historical records.",
             "refs": ["#formats_v0", "#formats_v1"],
             "closed": false
           },
@@ -41,6 +41,7 @@
     },
     "formats_v0": {
       "type": "object",
+      "description": "DEPRECATED. apng_128/lottie are raw Bytes (not Blob), which makes them invisible to blob-based image moderation pipelines and requires a getRecord round-trip to render. New writes MUST use #formats_v1. Retained only so existing v0 records remain readable.",
       "properties": {
         "original": {
           "type": "blob",

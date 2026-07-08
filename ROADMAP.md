@@ -1,8 +1,8 @@
 # Bluemoji Roadmap
 
-_Last updated: 2026-07-08. Combines the lexicon adoption review, ship plan,
-and mature-version ideation into one document. Update the Status section as
-items land._
+_Last updated: 2026-07-08 (Phase 1 hygiene pass). Combines the lexicon
+adoption review, ship plan, and mature-version ideation into one document.
+Update the Status section as items land._
 
 ## Status snapshot
 
@@ -22,37 +22,45 @@ Shipped and live at <https://moji.blue> (Railway project "Bluemoji", service
   alias support end-to-end, relaxed ASCII rule.
 - **Infrastructure**: `/img/{did}/{cid}` immutable blob proxy; indexing
   scoped to `blue.moji.*`; OAuth issuer on moji.blue.
+- **Standard hygiene** (Phase 1, below — done except item 4): `formats_v0`
+  deprecated; facet/sticker/reaction self-attestation now verified against
+  indexed items (`blue.moji.collection.getItem`, `get-reactions.ts`, the
+  post-page renderer) instead of trusted blindly; `listCollection` gained a
+  public `repo` param; `adultOnly` now propagates end-to-end from the
+  verified source item (an 18+ badge renders on inline emoji, stickers, and
+  reactions); `packs.packitem` naming confirmed and documented.
 
 ## Phase 1 — Standard hygiene (before promoting adoption)
 
-Remaining defects/frictions from the lexicon review, in priority order.
-(Already fixed: `itemView` lacking `uri`/`did`; `saveToCollection` 15-char
-name cap; alias regex inconsistency — see RFC 0005.)
+One item remains; the rest landed 2026-07-08 (see CLAUDE.md's "Core design
+decisions" and RFC 0001's self-attestation amendment for what changed and
+why — this isn't just documentation, the verification is load-bearing code
+in `server/get-item.ts`, `server/get-reactions.ts`, and the post-page loader).
 
-1. **Deprecate `formats_v0`.** Dual unions are the single biggest adopter
-   tax: every renderer must handle both, and v0's `bytes`-typed
-   `apng_128`/`lottie` require a `getRecord` round-trip AND are invisible to
-   image moderation tooling. Action: mark v0 deprecated in lexicon
-   descriptions + RFC 0001; AppView normalises to v1 on write already;
-   consider a migration sweep for existing v0 records.
-2. **Facet/emojiRef self-attestation.** `blue.moji.richtext.facet` (and
-   `reaction#emojiRef`) carry a self-attested `did` + format CIDs — nothing
-   stops a post claiming someone else's emoji or pointing CIDs at unrelated
-   blobs. Action: AppView SHOULD verify facet claims against indexed items at
-   hydration and drop/flag mismatches; document in RFC 0001.
-3. **`listCollection` has no `repo` param** — as specified it can only list
-   the authed user's collection, making it impossible to browse someone
-   else's emoji through the standard. It also defines a redundant local
-   `itemView`. Action: add optional `repo` (at-identifier) param + handler.
-4. **Publish lexicons as `com.atproto.lexicon.schema` records** under the
+1. **Publish lexicons as `com.atproto.lexicon.schema` records** under the
    moji.blue DID so they resolve in lexicon browsers (`pdsls`, lexicon.
-   directory etc.). Bluesky tooling increasingly expects this.
-5. **Self-label propagation**: clients consuming `viewSticker.labels` /
-   facet `labels` need documented guidance; `adultOnly` on an emoji must be
-   consulted when rendering reactions (the reaction record carries none).
-6. Naming nit (decide once, before third parties encode it): `packs.packitem`
-   is lowercase like Bluesky's `listitem` — fine, but confirm and document
-   the convention.
+   directory etc.). Bluesky tooling increasingly expects this. Not yet done —
+   this is a one-time operational action (write the records via the moji.blue
+   account), not a code change.
+
+Done:
+
+2. ~~Deprecate `formats_v0`~~ — marked deprecated in lexicon descriptions and
+   RFC 0001; the AppView already normalised to v1 on write.
+3. ~~Facet/emojiRef self-attestation~~ — `blue.moji.collection.getItem` is a
+   new verified-lookup query; `get-reactions.ts` rebuilds every `emojiRef`
+   from the indexed item (dropping unverifiable reactions); the post-page
+   loader verifies every facet/sticker claim before rendering an image.
+4. ~~`listCollection` repo param~~ — added, public read, cursor-paginated,
+   `reverse` flag mirrors `com.atproto.repo.listRecords` semantics.
+5. ~~Self-label propagation~~ — `adultOnly` now flows from the verified item
+   through facets, stickers, and reactions (new `emojiRef.adultOnly` field);
+   the reference client shows a small "18+" badge + outline rather than
+   hiding content (full viewer-preference moderation is a separate, larger
+   Phase 2 item).
+6. ~~`packs.packitem` naming~~ — confirmed against Bluesky's own
+   `postgate`/`threadgate` convention and documented in RFC 0002 + CLAUDE.md
+   so it isn't "corrected" to camelCase later.
 
 ## Phase 2 — Launch operations
 
@@ -125,6 +133,7 @@ movers: deer.social forks, Klearsky, TOKIMEKI, Ouranos.
 ## Strategic note
 
 Everything in Phase 4 gets cheaper once the AppView is authoritative for
-hydration — which it now is. Prioritise Phase 1 items 1–3 before evangelising
-the lexicons: schema changes get exponentially harder after third parties
-encode them.
+hydration — which it now is. With Phase 1's substantive items done, the
+schema surface is stable enough to start Phase 3's adoption push in parallel
+with Phase 2's launch ops; only the lexicon-publishing step (Phase 1 item 1)
+blocks lexicon-browser discoverability specifically, nothing else.

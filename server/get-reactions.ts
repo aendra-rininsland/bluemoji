@@ -1,21 +1,59 @@
 import { defineQuery, InvalidRequestError } from "$hatk";
-import { handlesForDids } from "./_pack-views.ts";
+import { handlesForDids, normalizeFormats } from "./_pack-views.ts";
 
 interface ReactionRow {
   uri: string;
   cid: string;
   did: string;
-  emoji: string; // JSON text of blue.moji.feed.reaction#emojiRef
+  emoji: string; // JSON text of blue.moji.feed.reaction#emojiRef, self-attested
   created_at: string;
 }
 
-function parseEmoji(text: string): Record<string, unknown> | null {
+interface ItemRecord {
+  name: string;
+  alt?: string;
+  formats: unknown;
+  adultOnly?: boolean;
+}
+
+function parseEmoji(text: string): { uri?: string } & Record<string, unknown> {
   try {
     const parsed = JSON.parse(text);
-    return parsed && typeof parsed === "object" ? parsed : null;
+    return parsed && typeof parsed === "object" ? parsed : {};
   } catch {
-    return null;
+    return {};
   }
+}
+
+/**
+ * blue.moji.feed.reaction#emojiRef is self-attested by the reactor (see RFC
+ * 0001 amendment) — a client could claim any did/name/formats. Rebuild it
+ * from the indexed blue.moji.collection.item instead of trusting the stored
+ * value; that item was only indexed after the relay verified its owner's
+ * repo commit, so it's the actual trust anchor. Reactions whose claimed
+ * subject can't be verified (deleted, or never existed) are dropped.
+ *
+ * adultOnly is populated here from the source item, never from the reactor's
+ * own claim — the reaction record carries no self-label of its own, so a
+ * consumer that skips this hydration step would render a sensitive emoji
+ * with no warning at all. See RFC 0001's self-label propagation note.
+ */
+function verifiedEmojiRef(
+  claimed: { uri?: string },
+  verified: Map<string, { uri: string; value: ItemRecord }>,
+) {
+  const uri = claimed.uri;
+  if (!uri) return null;
+  const record = verified.get(uri);
+  if (!record) return null;
+  return {
+    $type: "blue.moji.feed.reaction#emojiRef",
+    uri,
+    name: record.value.name,
+    alt: record.value.alt,
+    adultOnly: Boolean(record.value.adultOnly),
+    formats: normalizeFormats(record.value.formats),
+  };
 }
 
 export default defineQuery("blue.moji.feed.getReactions", async (ctx) => {
@@ -46,19 +84,6 @@ export default defineQuery("blue.moji.feed.getReactions", async (ctx) => {
     for (const row of rows) viewerReactions.set(row.emoji_uri, row.uri);
   }
 
-  const groups = groupRows.flatMap((row) => {
-    const emoji = parseEmoji(row.emoji);
-    if (!emoji) return [];
-    return [
-      {
-        $type: "blue.moji.feed.defs#reactionGroup",
-        emoji,
-        count: row.n,
-        viewer: viewerReactions.get(emoji.uri as string),
-      },
-    ];
-  });
-
   // Paginated individual reactions, newest first.
   const params: unknown[] = [uri];
   let cursorClause = "";
@@ -88,9 +113,33 @@ export default defineQuery("blue.moji.feed.getReactions", async (ctx) => {
     ctx.lookup<{ displayName?: string; avatar?: unknown }>("app.bsky.actor.profile", "did", dids),
   ]);
 
-  const reactions = visible.flatMap((row) => {
-    const emoji = parseEmoji(row.emoji);
-    if (!emoji) return [];
+  // Verify every claimed emoji URI (from both groups and the reaction page)
+  // against the indexed source item in one batch, before trusting any of it.
+  const claimedGroups = groupRows.map((row) => parseEmoji(row.emoji));
+  const claimedReactions = visible.map((row) => parseEmoji(row.emoji));
+  const claimedUris = new Set(
+    [...claimedGroups, ...claimedReactions].flatMap((e) => (e.uri ? [e.uri] : [])),
+  );
+  const verifiedItems = await ctx.getRecords<ItemRecord>("blue.moji.collection.item", [
+    ...claimedUris,
+  ]);
+
+  const groups = groupRows.flatMap((row, i) => {
+    const verified = verifiedEmojiRef(claimedGroups[i], verifiedItems);
+    if (!verified) return [];
+    return [
+      {
+        $type: "blue.moji.feed.defs#reactionGroup",
+        emoji: verified,
+        count: row.n,
+        viewer: viewerReactions.get(verified.uri),
+      },
+    ];
+  });
+
+  const reactions = visible.flatMap((row, i) => {
+    const verified = verifiedEmojiRef(claimedReactions[i], verifiedItems);
+    if (!verified) return [];
     const profile = profiles.get(row.did)?.value;
     return [
       {
@@ -102,7 +151,7 @@ export default defineQuery("blue.moji.feed.getReactions", async (ctx) => {
           displayName: profile?.displayName,
           avatar: ctx.blobUrl(row.did, profile?.avatar),
         },
-        emoji,
+        emoji: verified,
         createdAt: row.created_at,
       },
     ];

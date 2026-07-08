@@ -16,9 +16,12 @@ ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
   `lexicons/app/bsky/**` and `com/atproto/**` are vendored Bluesky/ATProto
   lexicons (do not edit except to re-vendor).
 - `server/` — hatk XRPC handlers (`get-pack.ts`, `get-actor-packs.ts`,
-  `get-packs.ts`, `get-reactions.ts`, `put-item.ts`) and hooks
-  (`on-login.ts`). Files starting with `_` are scanner-ignored shared
-  helpers (`_pack-views.ts`).
+  `get-packs.ts`, `get-reactions.ts`, `get-item.ts`, `list-collection.ts`,
+  `put-item.ts`) and hooks (`on-login.ts`). `get-item.ts`
+  (`blue.moji.collection.getItem`) is the verification primitive everything
+  else in this list uses to check self-attested claims — see the "Facet/
+  sticker/reaction claims" design decision above before touching it. Files
+  starting with `_` are scanner-ignored shared helpers (`_pack-views.ts`).
 - `app/` — SvelteKit frontend. Routes: `/` (login), `/collection`, `/upload`,
   `/packs`, `/packs/[handle]/[rkey]`, `/profile/[handle]/post/[rkey]`
   (post renderer with facets, sticker embed, reaction bar), and
@@ -53,6 +56,21 @@ ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
   makes packs fault-resistant to source-account deletion.
 - **All image URLs go through `/img/{did}/{cid}`** (same-origin, immutable
   cache headers) — never link PDS `getBlob` URLs directly from the app.
+- **Facet/sticker/reaction claims are self-attested and must be verified**
+  (RFC 0001 self-attestation amendment): `did`, `formats`, `alt`, `adultOnly`,
+  `labels` on a `blue.moji.richtext.facet`, `blue.moji.embed.sticker#sticker`,
+  or `blue.moji.feed.reaction#emojiRef` are written by the poster/reactor and
+  never checked by the PDS. Only the indexed `blue.moji.collection.item`
+  (verified via firehose repo-commit signatures) is trustworthy. Always
+  re-derive rendering data from `blue.moji.collection.getItem` /
+  `ctx.getRecords` — see `server/get-item.ts`, `server/get-reactions.ts`'s
+  `verifiedEmojiRef`, and the post-page loader's `verifyEmoji`/`verifyClaims`.
+  Never render an image or a content-warning decision from the claim itself.
+- **NSID casing**: record types are lowercase-no-separator compound words
+  (`pack`, `packitem`, `item`, `reaction` — matching Bluesky's own
+  `postgate`/`threadgate`/`listitem`); queries and procedures are camelCase
+  verb phrases (`getPack`, `putItem`, `listCollection`). Don't "fix" one to
+  match the other's casing.
 
 ## hatk gotchas (each of these cost real debugging time)
 

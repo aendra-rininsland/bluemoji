@@ -40,6 +40,11 @@
           "description": "Colon-wrapped alias, e.g. :blobcat:. Used as fallback text."
         },
         "alt": { "type": "string" },
+        "adultOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "MUST be populated by AppViews from the source item's adultOnly at hydration time (the source item is the trust anchor; do not trust a reactor-supplied value on write). Consumers SHOULD warn or blur before rendering when true, consistent with how the same item's adultOnly is handled elsewhere (facets, collection views)."
+        },
         "formats": {
           "type": "union",
           "refs": ["blue.moji.richtext.facet#formats_v0", "blue.moji.richtext.facet#formats_v1"],

@@ -13,10 +13,12 @@ const is$typed = _is$typed,
 const id = "blue.moji.collection.listCollection";
 
 export type QueryParams = {
+  /** The handle or DID of the repo to list. Defaults to the authenticated caller if omitted. */
+  repo?: string;
   /** The number of records to return. */
   limit?: number;
   cursor?: string;
-  /** Flag to reverse the order of the returned records. */
+  /** Flag to reverse the order of the returned records. Default is oldest-first (ascending by creation time), mirroring com.atproto.repo.listRecords. */
   reverse?: boolean;
 };
 export type InputSchema = undefined;
@@ -39,20 +41,4 @@ export interface Response {
 
 export function toKnownErr(e: any) {
   return e;
-}
-
-export interface ItemView {
-  $type?: "blue.moji.collection.listCollection#itemView";
-  uri: string;
-  record: BlueMojiCollectionItem.ItemView;
-}
-
-const hashItemView = "itemView";
-
-export function isItemView<V>(v: V) {
-  return is$typed(v, id, hashItemView);
-}
-
-export function validateItemView<V>(v: V) {
-  return validate<ItemView & V>(v, id, hashItemView);
 }

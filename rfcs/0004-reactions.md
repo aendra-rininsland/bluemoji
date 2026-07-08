@@ -62,7 +62,12 @@ Writes are ordinary record creates/deletes through the user's PDS
 - The denormalized `emojiRef` is self-attested, like the facet; AppViews
   should verify against indexed items before trusting `formats`, and the
   emoji's self-labels (`adultOnly`) must be consulted at hydration time since
-  the reaction record itself carries none.
+  the reaction record itself carries none. **Amendment (2026-07):**
+  `emojiRef` gained an optional `adultOnly` field for exactly this purpose.
+  The reference AppView's `getReactions` populates it from the verified
+  source item — never from the reactor's own write — and drops any reaction
+  whose claimed item can't be verified against the index at all (see RFC
+  0001's self-attestation amendment).
 - Subjects other than posts (e.g. reacting to a reply in another lexicon's
   thread model) are unspecified; `subject` accepts any AT-URI on purpose.
 

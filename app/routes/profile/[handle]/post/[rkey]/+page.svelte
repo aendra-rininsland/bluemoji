@@ -109,9 +109,10 @@
           {#if seg.url}
             <img
               class="bluemoji"
+              class:adult={seg.adultOnly}
               src={seg.url}
               alt={seg.alt ?? seg.name}
-              title={seg.name}
+              title={seg.adultOnly ? `${seg.name} (18+)` : seg.name}
             />
           {:else}
             <span title={seg.name}>{seg.fallbackText ?? seg.name}</span>
@@ -133,9 +134,16 @@
           onclick={() => (group.viewer ? unreact(group.viewer) : react(group.emoji))}
         >
           {#if group.imageUrl}
-            <img src={group.imageUrl} alt={group.emoji.alt ?? group.emoji.name} />
+            <img
+              class:adult={group.emoji.adultOnly}
+              src={group.imageUrl}
+              alt={group.emoji.alt ?? group.emoji.name}
+            />
           {:else}
             <span>{group.emoji.name}</span>
+          {/if}
+          {#if group.emoji.adultOnly}
+            <span class="badge-18">18+</span>
           {/if}
           <span class="count">{group.count}</span>
         </button>
@@ -184,9 +192,17 @@
     {#if data.sticker}
       <figure class="sticker">
         {#if data.sticker.url}
-          <img src={data.sticker.url} alt={data.sticker.alt ?? data.sticker.name} title={data.sticker.name} />
+          <img
+            class:adult={data.sticker.adultOnly}
+            src={data.sticker.url}
+            alt={data.sticker.alt ?? data.sticker.name}
+            title={data.sticker.adultOnly ? `${data.sticker.name} (18+)` : data.sticker.name}
+          />
         {:else}
           <span title={data.sticker.name}>{data.sticker.name}</span>
+        {/if}
+        {#if data.sticker.adultOnly}
+          <figcaption class="badge-18">18+</figcaption>
         {/if}
       </figure>
     {/if}
@@ -250,6 +266,27 @@
     height: 1.5em;
     vertical-align: middle;
     object-fit: contain;
+  }
+
+  /* Self-labelled (adultOnly) content: never hidden outright here (that's a
+     viewer-preference concern for a future moderation pass), but always
+     visually distinct so it's never mistaken for an unlabelled emoji. */
+  .adult {
+    outline: 2px solid #c94040;
+    outline-offset: 1px;
+    border-radius: 3px;
+  }
+
+  .badge-18 {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.0625rem 0.3125rem;
+    background: #c94040;
+    color: #fff;
+    border-radius: 999px;
+    line-height: 1.4;
   }
 
   .reactions {
