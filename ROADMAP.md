@@ -22,7 +22,7 @@ Shipped and live at <https://moji.blue> (Railway project "Bluemoji", service
   alias support end-to-end, relaxed ASCII rule.
 - **Infrastructure**: `/img/{did}/{cid}` immutable blob proxy; indexing
   scoped to `blue.moji.*`; OAuth issuer on moji.blue.
-- **Standard hygiene** (Phase 1, below — done except item 4): `formats_v0`
+- **Standard hygiene** (Phase 1, below — all done): `formats_v0`
   deprecated; facet/sticker/reaction self-attestation now verified against
   indexed items (`blue.moji.collection.getItem`, `get-reactions.ts`, the
   post-page renderer) instead of trusted blindly; `listCollection` gained a
@@ -32,16 +32,14 @@ Shipped and live at <https://moji.blue> (Railway project "Bluemoji", service
 
 ## Phase 1 — Standard hygiene (before promoting adoption)
 
-One item remains; the rest landed 2026-07-08 (see CLAUDE.md's "Core design
-decisions" and RFC 0001's self-attestation amendment for what changed and
-why — this isn't just documentation, the verification is load-bearing code
-in `server/get-item.ts`, `server/get-reactions.ts`, and the post-page loader).
+All items done as of 2026-07-08 (see CLAUDE.md's "Core design decisions" and
+RFC 0001's self-attestation amendment for what changed and why — this isn't
+just documentation, the verification is load-bearing code in
+`server/get-item.ts`, `server/get-reactions.ts`, and the post-page loader).
 
-1. **Publish lexicons as `com.atproto.lexicon.schema` records** under the
-   moji.blue DID so they resolve in lexicon browsers (`pdsls`, lexicon.
-   directory etc.). Bluesky tooling increasingly expects this. Not yet done —
-   this is a one-time operational action (write the records via the moji.blue
-   account), not a code change.
+1. ~~Publish lexicons as `com.atproto.lexicon.schema` records~~ — done, via
+   `scripts/publish-lexicons.mjs` under the moji.blue account. Resolves in
+   lexicon browsers now.
 
 Done:
 
@@ -119,9 +117,22 @@ Done:
    actual Node `import()` against the built `dist/` files (not just "did
    the build exit 0") — confirmed every expected export is present and
    `aliasToRkey`/`normalizeAlias`/`rkeyToAlias` work correctly through the
-   built artifact. `npm whoami` has no local auth configured, so `npm
-login` is still needed before `npm publish` — that step (and the
-   publish itself) needs your go-ahead, not mine.
+   built artifact.
+
+   **Published 2026-07-08.** Found one more real bug at publish time: the
+   `build` script itself ran raw `vite build`, but this project's tooling
+   never exposes a bare `vite` binary (everything goes through `vp`) — so
+   `npm run build` (and therefore `prepublishOnly`) failed outright. `vp
+pack` isn't a substitute either: it forwards to tsdown and ignores this
+   package's `vite.config.ts` entirely, silently producing a single generic
+   `dist/index.mjs` that doesn't match `package.json`'s actual three-entry
+   `exports` map. `vp build` (the generic Vite wrapper, not `vp pack`) is
+   the one that respects a local `vite.config.ts` — fixed `build` to call
+   that instead. Verified again post-fix: dry-run tarball contents looked
+   right, published with `--access public`, then did a real `npm install`
+   of the published package in a scratch directory (not just the local
+   `dist/`) and imported it — confirmed the exports are correct as an
+   actual installed dependency, not just a local build artifact.
 
 5. **Backfill/monitoring hygiene** — checked 2026-07-08: memory 206 MB
    current / 219 MB max over the last hour (8 GB limit), disk 138 MB / 500 MB
