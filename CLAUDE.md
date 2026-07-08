@@ -1,3 +1,125 @@
+# Bluemoji (moji.blue)
+
+Custom emoji standard for ATProto: shareable emoji (inline via richtext
+facets), stickers (full-size post embeds), packs (curated shareable groups),
+and custom-emoji reactions. This repo is the whole project: lexicons, the
+moji.blue AppView (hatk framework), and the `@aendra/bluemoji` client library.
+
+**Read [ROADMAP.md](ROADMAP.md) before planning any feature work** — it holds
+the prioritised backlog, the remaining lexicon-hygiene items, and the
+ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
+0003 stickers, 0004 reactions, 0005 internationalised aliases).
+
+## Repo map
+
+- `lexicons/blue/moji/**` — the standard. Source of truth for everything.
+  `lexicons/app/bsky/**` and `com/atproto/**` are vendored Bluesky/ATProto
+  lexicons (do not edit except to re-vendor).
+- `server/` — hatk XRPC handlers (`get-pack.ts`, `get-actor-packs.ts`,
+  `get-packs.ts`, `get-reactions.ts`, `put-item.ts`) and hooks
+  (`on-login.ts`). Files starting with `_` are scanner-ignored shared
+  helpers (`_pack-views.ts`).
+- `app/` — SvelteKit frontend. Routes: `/` (login), `/collection`, `/upload`,
+  `/packs`, `/packs/[handle]/[rkey]`, `/profile/[handle]/post/[rkey]`
+  (post renderer with facets, sticker embed, reaction bar), and
+  `/img/[did]/[cid]` (+server.ts blob proxy).
+- `app/lib/alias.ts` — canonical RFC 0005 implementation (alias
+  canonicalisation + Punycode rkey encoding). **Duplicated** in
+  `lib/src/util/alias.ts` for the published package; keep the two in sync.
+- `lib/` — `@aendra/bluemoji` npm workspace: generated lexicon client
+  (`lib/src/client/`, via lex-cli codegen), `BluemojiRichText` + facet
+  detection, renderers, React/RN/web components.
+- `hatk.config.ts` — relay, DB, OAuth scopes, and the **collections
+  allowlist** (see gotcha #1 below).
+- `hatk.generated.ts` / `hatk.generated.client.ts` — regenerated artifacts;
+  never hand-edit.
+
+## Core design decisions (do not casually revisit)
+
+- **Alias ↔ rkey (RFC 0005)**: rkey = canonical alias if it matches
+  `^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$`, else `xn--` + RFC 3492 Punycode of
+  the NFC+lowercase+NFC canonical form. `name` fields always hold the
+  colon-wrapped _decoded_ alias. Every rkey derivation MUST go through
+  `aliasToRkey()` — never `name.replace(/:/g, "")`.
+- **Emoji vs sticker**: one record type; an item with `stickerFormats`
+  (512px renditions) is sticker-capable, `formats` (128px) alone is
+  inline-only. No `kind` enum.
+- **Cross-repo blob references are impossible** in ATProto, so facets,
+  sticker embeds, and reaction `emojiRef`s carry **CID strings + a did**
+  (URL construction without round-trips), never `blob` refs. Blobs only
+  appear in `blue.moji.collection.item` itself.
+- **Copying is duplication by design** (`copyOf` records provenance): fetch
+  blob bytes → re-upload to the copier's repo → write item. This is what
+  makes packs fault-resistant to source-account deletion.
+- **All image URLs go through `/img/{did}/{cid}`** (same-origin, immutable
+  cache headers) — never link PDS `getBlob` URLs directly from the app.
+
+## hatk gotchas (each of these cost real debugging time)
+
+1. **Set `collections:` in hatk.config.ts or hatk indexes every record
+   lexicon in `lexicons/`** — including vendored postgate/threadgate — and
+   auto-backfills the full repo of every DID on the network that writes one.
+   This OOM'd production twice. The allowlist + `backfill.signalCollections`
+   must both list exactly the `blue.moji.*` record types.
+2. **`ctx.getRecords`/`ctx.lookup` rows return union sub-objects with blob
+   refs serialized as JSON strings and absent keys as `null`.** Normalise
+   before returning views — see `normalizeFormats()` in
+   `server/_pack-views.ts`. Booleans come back as 0/1.
+3. `ctx.filterTakendownDids(dids)` returns the set of **taken-down** DIDs
+   (filter _out_ members), not the survivors.
+4. The `server/` scanner skips `_`-prefixed files; that's the only way to
+   have shared helpers there. Server files can import from `app/lib/` via
+   relative path with explicit `.ts` extension (put-item.ts does).
+5. After editing lexicons: `./node_modules/.bin/hatk generate types`, and
+   hatk auto-migrates SQLite columns on next boot. For the npm lib:
+   `cd lib && ../node_modules/.bin/lex gen-api ./src/client
+../lexicons/app/bsky/*/* ../lexicons/com/atproto/*/*
+../lexicons/blue/moji/*/* --yes`.
+6. XRPC handler param/ctx surface: see `@hatk/hatk/dist/xrpc.d.ts`
+   (`XrpcContext`) — includes `packCursor`/`unpackCursor` for keyset
+   pagination, `blobUrl`, `search`, `exists`, PDS-proxied record writes.
+7. SSR pages can call our own XRPC same-origin with SvelteKit's relative
+   `fetch("/xrpc/...")` — cookies forward, viewer state works.
+
+## Verification workflow
+
+- `vp check` (0 errors expected; warnings in generated lib code are normal),
+  `vp check --fix` to format. It also reformats vendored lexicon JSON —
+  harmless churn.
+- `npx svelte-check` — **the `Cannot find module '$hatk/client' / '$lib/…'`
+  errors are false positives** (aliases exist only under hatk's vite plugin
+  at runtime). Real errors are anything else.
+- Alias spec tests: `npx tsx lib/src/util/alias.test.ts` (6 tests; known IDN
+  vectors). `lib/src/facet/BluemojiRichText.test.ts` fails offline — it
+  resolves a live DID over the network; pre-existing, not a regression.
+- `vp test` at root finds no tests (expected; tests live in `lib/`).
+- Local smoke boot without the docker PDS:
+  `timeout 12 ./node_modules/.bin/hatk start` — check the `XRPC:` line lists
+  all five handlers; relay connection errors are expected locally.
+- Full local dev (`vp dev`) needs Docker for the local PDS/PLC on ports
+  2582/2583; `hatk seed` creates alice.test/bob.test.
+- Endpoint testing pattern: seed rows directly into `data/hatk.db` with
+  sqlite3, boot, curl `localhost:3000/xrpc/...`, then delete the rows.
+
+## Deployment (Railway + Cloudflare)
+
+- Railway CLI is authed. Project **Bluemoji**, service **moji.blue**, volume
+  `moji-blue-volume` at `/data` (SQLite lives there and survives deploys).
+- Deploy: `railway up --detach` from repo root (Dockerfile build, ~2 min).
+  Status: `railway status`; logs: `railway logs` / `railway logs --build`.
+- Env: `RAILWAY_PUBLIC_DOMAIN=moji.blue` (overrides the injected var; OAuth
+  issuer + client metadata derive from it), `NODE_OPTIONS=--max-old-space-
+size=4096` (backfill CAR imports spike; V8's default 2GB cap crashed prod).
+- moji.blue DNS is on Cloudflare, proxied, SSL mode **Full** (Flexible
+  causes an infinite 301 loop with Railway). Pending: a Cache Rule for
+  `/img/*` (see ROADMAP Phase 2).
+- Prod health checks: `https://moji.blue/_health`,
+  `/xrpc/blue.moji.packs.getPacks?uris=…`, `/oauth-client-metadata.json`
+  (issuer must be moji.blue), `/img/{did}/{cid}` (expect `immutable` +
+  etag; 304 on `If-None-Match`).
+- After lexicon changes that affect OAuth scopes, update **both** the
+  `scopes` array and every client's `scope` string in `hatk.config.ts`.
+
 <!--VITE PLUS START-->
 
 # Using Vite+, the Unified Toolchain for the Web
