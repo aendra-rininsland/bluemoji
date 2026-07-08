@@ -136,8 +136,15 @@ login` is still needed before `npm publish` — that step (and the
 The standard lives or dies on one or two third-party clients. Realistic first
 movers: deer.social forks, Klearsky, TOKIMEKI, Ouranos.
 
-- Write a "render Bluemoji facets in 20 lines" doc; the web component in
-  `lib/src/components/webcomponent/` is the demo.
+- ~~Write a "render Bluemoji facets in 20 lines" doc~~ — done, see
+  [RENDERING.md](RENDERING.md): dependency-free snippet (detect the
+  feature, build a `did`+CID blob URL, fall back to the colon-wrapped name),
+  a verify-don't-trust callout linking RFC 0001's self-attestation
+  amendment, and pointers to reactions/stickers/packs as easy next steps.
+  Verified the exact snippet against realistic fixtures (happy path,
+  formats_v0 fallback, XSS-in-`alt`/`name`) before publishing it. The web
+  component in `lib/src/components/webcomponent/` is a fuller worked
+  example for anyone who wants one.
 - **Reactions are the lowest-friction entry point**: read-only support needs
   only `getReactions` + blob URLs — no composer integration. Pitch that
   first.

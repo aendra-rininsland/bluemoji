@@ -9,6 +9,9 @@ moji.blue AppView (hatk framework), and the `@aendra/bluemoji` client library.
 the prioritised backlog, the remaining lexicon-hygiene items, and the
 ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
 0003 stickers, 0004 reactions, 0005 internationalised aliases).
+[RENDERING.md](RENDERING.md) is the third-party-facing "render a Bluemoji
+facet in ~20 lines" adoption doc — link that, not this file, to external
+developers.
 
 ## Repo map
 
