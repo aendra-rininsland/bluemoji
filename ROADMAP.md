@@ -315,9 +315,49 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   re-auth for the new scope (OAuth scope changes typically require
   re-consent). `recordWithMedia`-style composition (sticker + quote post,
   RFC 0003's open question) not attempted.
-- **Animated pipeline**: server-side APNG→animated-WebP transcode (the
-  imgproxy#1222 blocker from RFC 0001) so animation works through CDNs;
-  Lottie sandboxing guidance for renderers.
+- **Animated pipeline — transcode done**: checked imgproxy#1222 live
+  (`gh issue view`) — still open upstream, no maintainer commitment to
+  APNG animation support. But the actual serving path in this codebase
+  (`/img/{did}/{cid}`) turned out to be a pure PDS-blob passthrough that
+  never used imgproxy at all, and the upload flow was uploading the raw,
+  **unresized** original APNG bytes verbatim into `apng_128` (not actually
+  128px, whatever the source file's dimensions were). So the real fix
+  isn't blocked by imgproxy: added `blue.moji.collection.transcodeAnimation`
+  (`server/transcode-animation.ts`), a pure utility procedure (no PDS/
+  record writes) that shells out to `ffmpeg` to transcode an uploaded
+  animated source into properly-sized 128×128 and 512×512 animated WebP
+  (`libwebp_anim` encoder) — auth-gated, base64-in/base64-out JSON (custom
+  procedures on this AppView always get JSON-parsed bodies; only the
+  built-in `dev.hatk.uploadBlob` gets raw-body handling, discovered while
+  designing this), with a decoded-size cap and an ffmpeg timeout. Wired
+  into the upload page: APNG uploads now transcode to `webp_128`/`webp_512`
+  instead of storing raw `apng_128`, with a catch-and-fallback to the old
+  raw-upload behaviour if the transcode call fails for any reason. Added
+  `ffmpeg` to the Dockerfile.
+
+  Verified for real, not assumed: spun up Docker (wasn't running earlier
+  this session) and ran the exact `node:25-slim` + `apt-get install ffmpeg`
+  combination the Dockerfile uses — confirmed Debian's ffmpeg package
+  actually ships `libwebp`/`libwebp_anim` encoders (my local Homebrew
+  ffmpeg build notably does NOT include libwebp encoding at all, which
+  would have been a false-negative if I'd only tested locally). Generated a
+  real 10-frame test APNG with ffmpeg itself, ran the exact `execFile` call
+  from `server/transcode-animation.ts` (not just a hand-typed shell
+  command) inside that container, and validated the output with `webpinfo`:
+  both 128×128 and 512×512 outputs are structurally valid animated WebP
+  (`VP8X`/`ANIM`/10×`ANMF` chunks, loop count 0) — `libwebp_anim` produced
+  a smaller file than plain `libwebp` via inter-frame diffing, so switched
+  to it. Also verified the failure path: feeding garbage bytes through the
+  same code produces a clean ffmpeg error (caught as `InvalidRequestError`),
+  not a hang or crash. Confirmed the procedure registers in a real boot's
+  `XRPC:` list and correctly rejects unauthenticated requests
+  (`{"error":"Authentication required"}`). **Not verified**: the upload
+  page's browser-side integration (base64 encode/decode, the `callXrpc`
+  round-trip, the fallback-on-failure UI path) — that needs the same
+  Docker/credentials-gated login flow already flagged as unavailable this
+  session for the sticker composer and packs-page checks. Lottie sandboxing
+  guidance for renderers not attempted.
+
 - **Interop bridges**: import Slack/Discord/Mastodon emoji archives; export
   packs as Signal-style bundles.
 - **Cloudflare-native port** (optional cost play): Workers + D1 + a

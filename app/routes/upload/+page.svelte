@@ -75,6 +75,23 @@
     )
   }
 
+  function toBase64(bytes: ArrayBuffer): string {
+    let binary = ''
+    const chunk = 0x8000
+    const arr = new Uint8Array(bytes)
+    for (let i = 0; i < arr.length; i += chunk) {
+      binary += String.fromCharCode(...arr.subarray(i, i + chunk))
+    }
+    return btoa(binary)
+  }
+
+  function fromBase64(b64: string, type: string): Blob {
+    const binary = atob(b64)
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+    return new Blob([bytes], { type })
+  }
+
   async function upload() {
     const v = viewer ?? getViewer()
     if (!v || !file) return
@@ -92,6 +109,8 @@
         original,
       }
 
+      let stickerFormats: Record<string, unknown> | undefined
+
       if (kind === 'lottie') {
         // The lottie blob IS the original for Lottie files
         formats.lottie = original
@@ -104,10 +123,34 @@
         formats.png_128 = png128
 
         if (kind === 'apng') {
-          // Upload the full APNG source for animated playback
-          const apngBlob = new Blob([await file.arrayBuffer()], { type: 'image/apng' })
-          const { blob: apng128 } = await callXrpc('dev.hatk.uploadBlob', apngBlob)
-          formats.apng_128 = apng128
+          // Transcode to properly-sized animated WebP server-side (ffmpeg)
+          // rather than storing the raw, unresized original — imgproxy
+          // can't resize APNG on demand (RFC 0001 / imgproxy#1222), and the
+          // old behaviour uploaded the source file byte-for-byte regardless
+          // of its actual dimensions.
+          try {
+            const data = toBase64(await file.arrayBuffer())
+            const { webp128, webp512 } = await callXrpc('blue.moji.collection.transcodeAnimation', { data })
+            const { blob: webp128Blob } = await callXrpc('dev.hatk.uploadBlob', fromBase64(webp128, 'image/webp'))
+            formats.webp_128 = webp128Blob
+            if (asSticker && webp512) {
+              const stickerBlob = fromBase64(webp512, 'image/webp')
+              if (stickerBlob.size <= 512_000) {
+                const { blob: webp512Blob } = await callXrpc('dev.hatk.uploadBlob', stickerBlob)
+                stickerFormats = {
+                  $type: 'blue.moji.collection.item#stickerFormats_v0',
+                  webp_512: webp512Blob,
+                }
+              }
+            }
+          } catch (transcodeErr) {
+            // Fall back to the old raw-upload behaviour rather than hard-
+            // failing the whole upload if the transcode pipeline is down.
+            console.error('Animation transcode failed, falling back to raw APNG upload', transcodeErr)
+            const apngBlob = new Blob([await file.arrayBuffer()], { type: 'image/apng' })
+            const { blob: apng128 } = await callXrpc('dev.hatk.uploadBlob', apngBlob)
+            formats.apng_128 = apng128
+          }
         } else if (kind === 'webp') {
           const webpBlob = await canvasToBlob(canvas, 'image/webp')
           const { blob: webp128 } = await callXrpc('dev.hatk.uploadBlob', webpBlob)
@@ -115,9 +158,9 @@
         }
       }
 
-      // Full-size sticker rendition (static raster only for now)
-      let stickerFormats: Record<string, unknown> | undefined
-      if (asSticker && (kind === 'png' || kind === 'webp')) {
+      // Static raster sticker rendition (skipped for apng, which already
+      // produces its own animated stickerFormats above when successful)
+      if (asSticker && !stickerFormats && (kind === 'png' || kind === 'webp')) {
         const canvas512 = await resizeCanvas(file, 512)
         const sticker = await canvasToBlob(canvas512, 'image/png')
         if (sticker.size <= 512_000) {

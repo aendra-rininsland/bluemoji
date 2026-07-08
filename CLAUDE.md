@@ -132,6 +132,19 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
    the last URI's results until hatk's dispatch is patched upstream. POST
    procedures are unaffected (JSON bodies have real arrays, no repeated-key
    ambiguity).
+9. **Custom `/xrpc/{nsid}` procedures always get a JSON-parsed request
+   body** (`server.js`: `input = JSON.parse(await request.text())`, falling
+   back to `{}` on parse failure) — a lexicon's `input.encoding` field is
+   purely documentation for custom handlers, it doesn't change how hatk
+   actually parses the body. Only the **built-in** `dev.hatk.uploadBlob` XRPC
+   route gets special-cased raw-body handling
+   (`new Uint8Array(await request.arrayBuffer())`) before falling through to
+   the generic dispatcher. So any custom procedure that needs to accept
+   binary data (e.g. `blue.moji.collection.transcodeAnimation`, which
+   ffmpeg-transcodes an uploaded image server-side) has to base64-encode it
+   into a JSON field instead of declaring a binary `input.encoding` and
+   expecting raw bytes in `ctx.input` — confirmed by reading `server.js`'s
+   dispatch before assuming otherwise.
 
 ## Verification workflow
 

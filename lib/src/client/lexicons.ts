@@ -1845,6 +1845,138 @@ export const schemaDict = {
     $type: "com.atproto.lexicon.schema",
     lexicon: 1,
   },
+  AppBskyFeedPost: {
+    lexicon: 1,
+    id: "app.bsky.feed.post",
+    defs: {
+      main: {
+        type: "record",
+        description: "Record containing a Bluesky post.",
+        key: "tid",
+        record: {
+          type: "object",
+          required: ["text", "createdAt"],
+          properties: {
+            text: {
+              type: "string",
+              maxLength: 3000,
+              maxGraphemes: 300,
+              description: "The primary post content. May be an empty string, if there are embeds.",
+            },
+            entities: {
+              type: "array",
+              description: "DEPRECATED: replaced by app.bsky.richtext.facet.",
+              items: {
+                type: "ref",
+                ref: "lex:app.bsky.feed.post#entity",
+              },
+            },
+            facets: {
+              type: "array",
+              description: "Annotations of text (mentions, URLs, hashtags, etc)",
+              items: {
+                type: "ref",
+                ref: "lex:app.bsky.richtext.facet",
+              },
+            },
+            reply: {
+              type: "ref",
+              ref: "lex:app.bsky.feed.post#replyRef",
+            },
+            embed: {
+              type: "union",
+              refs: [
+                "lex:app.bsky.embed.images",
+                "lex:app.bsky.embed.video",
+                "lex:app.bsky.embed.gallery",
+                "lex:app.bsky.embed.external",
+                "lex:app.bsky.embed.record",
+                "lex:app.bsky.embed.recordWithMedia",
+              ],
+            },
+            langs: {
+              type: "array",
+              description: "Indicates human language of post primary text content.",
+              maxLength: 3,
+              items: {
+                type: "string",
+                format: "language",
+              },
+            },
+            labels: {
+              type: "union",
+              description: "Self-label values for this post. Effectively content warnings.",
+              refs: ["lex:com.atproto.label.defs#selfLabels"],
+            },
+            tags: {
+              type: "array",
+              description:
+                "Additional hashtags, in addition to any included in post text and facets.",
+              maxLength: 8,
+              items: {
+                type: "string",
+                maxLength: 640,
+                maxGraphemes: 64,
+              },
+            },
+            createdAt: {
+              type: "string",
+              format: "datetime",
+              description: "Client-declared timestamp when this post was originally created.",
+            },
+          },
+        },
+      },
+      replyRef: {
+        type: "object",
+        required: ["root", "parent"],
+        properties: {
+          root: {
+            type: "ref",
+            ref: "lex:com.atproto.repo.strongRef",
+          },
+          parent: {
+            type: "ref",
+            ref: "lex:com.atproto.repo.strongRef",
+          },
+        },
+      },
+      entity: {
+        type: "object",
+        description: "Deprecated: use facets instead.",
+        required: ["index", "type", "value"],
+        properties: {
+          index: {
+            type: "ref",
+            ref: "lex:app.bsky.feed.post#textSlice",
+          },
+          type: {
+            type: "string",
+            description: "Expected values are 'mention' and 'link'.",
+          },
+          value: {
+            type: "string",
+          },
+        },
+      },
+      textSlice: {
+        type: "object",
+        description:
+          "Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings.",
+        required: ["start", "end"],
+        properties: {
+          start: {
+            type: "integer",
+            minimum: 0,
+          },
+          end: {
+            type: "integer",
+            minimum: 0,
+          },
+        },
+      },
+    },
+  },
   AppBskyFeedPostgate: {
     id: "app.bsky.feed.postgate",
     defs: {
@@ -3258,6 +3390,49 @@ export const schemaDict = {
       },
     },
   },
+  BlueMojiCollectionTranscodeAnimation: {
+    lexicon: 1,
+    id: "blue.moji.collection.transcodeAnimation",
+    defs: {
+      main: {
+        type: "procedure",
+        description:
+          "Server-side utility: transcodes an uploaded APNG (or other ffmpeg-readable animated image) into properly-sized animated WebP renditions, sidestepping imgproxy's lack of APNG support (see RFC 0001 / imgproxy#1222) by never storing raw APNG in the first place. Pure transcode — does not touch the PDS or write any record; the caller uploads the returned bytes via dev.hatk.uploadBlob itself, same as any other format. Input/output are base64 JSON, not raw bytes, because this AppView's custom-procedure dispatch always JSON-parses the request body (only the built-in dev.hatk.uploadBlob gets raw-body handling).",
+        input: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["data"],
+            properties: {
+              data: {
+                type: "string",
+                description: "Base64-encoded source file bytes (e.g. an APNG).",
+              },
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            properties: {
+              webp128: {
+                type: "string",
+                description:
+                  "Base64-encoded 128x128 animated WebP, for the inline formats_v1#webp_128 slot.",
+              },
+              webp512: {
+                type: "string",
+                description:
+                  "Base64-encoded 512x512 animated WebP, for the stickerFormats_v0#webp_512 slot.",
+              },
+            },
+          },
+        },
+        errors: [],
+      },
+    },
+  },
   BlueMojiEmbedSticker: {
     lexicon: 1,
     id: "blue.moji.embed.sticker",
@@ -4413,6 +4588,7 @@ export const ids = {
   AppBskyEmbedRecordWithMedia: "app.bsky.embed.recordWithMedia",
   AppBskyEmbedVideo: "app.bsky.embed.video",
   AppBskyFeedDefs: "app.bsky.feed.defs",
+  AppBskyFeedPost: "app.bsky.feed.post",
   AppBskyFeedPostgate: "app.bsky.feed.postgate",
   AppBskyFeedThreadgate: "app.bsky.feed.threadgate",
   AppBskyGraphDefs: "app.bsky.graph.defs",
@@ -4426,6 +4602,7 @@ export const ids = {
   BlueMojiCollectionPutItem: "blue.moji.collection.putItem",
   BlueMojiCollectionSaveToCollection: "blue.moji.collection.saveToCollection",
   BlueMojiCollectionSearchItems: "blue.moji.collection.searchItems",
+  BlueMojiCollectionTranscodeAnimation: "blue.moji.collection.transcodeAnimation",
   BlueMojiEmbedSticker: "blue.moji.embed.sticker",
   BlueMojiFeedDefs: "blue.moji.feed.defs",
   BlueMojiFeedGetReactionCounts: "blue.moji.feed.getReactionCounts",

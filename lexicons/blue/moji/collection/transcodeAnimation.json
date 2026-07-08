@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.collection.transcodeAnimation",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Server-side utility: transcodes an uploaded APNG (or other ffmpeg-readable animated image) into properly-sized animated WebP renditions, sidestepping imgproxy's lack of APNG support (see RFC 0001 / imgproxy#1222) by never storing raw APNG in the first place. Pure transcode — does not touch the PDS or write any record; the caller uploads the returned bytes via dev.hatk.uploadBlob itself, same as any other format. Input/output are base64 JSON, not raw bytes, because this AppView's custom-procedure dispatch always JSON-parses the request body (only the built-in dev.hatk.uploadBlob gets raw-body handling).",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["data"],
+          "properties": {
+            "data": {
+              "type": "string",
+              "description": "Base64-encoded source file bytes (e.g. an APNG)."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "webp128": {
+              "type": "string",
+              "description": "Base64-encoded 128x128 animated WebP, for the inline formats_v1#webp_128 slot."
+            },
+            "webp512": {
+              "type": "string",
+              "description": "Base64-encoded 512x512 animated WebP, for the stickerFormats_v0#webp_512 slot."
+            }
+          }
+        }
+      },
+      "errors": []
+    }
+  }
+}

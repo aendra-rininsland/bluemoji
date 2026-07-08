@@ -13,6 +13,7 @@ import * as AppBskyEmbedRecord from "./types/app/bsky/embed/record.js";
 import * as AppBskyEmbedRecordWithMedia from "./types/app/bsky/embed/recordWithMedia.js";
 import * as AppBskyEmbedVideo from "./types/app/bsky/embed/video.js";
 import * as AppBskyFeedDefs from "./types/app/bsky/feed/defs.js";
+import * as AppBskyFeedPost from "./types/app/bsky/feed/post.js";
 import * as AppBskyFeedPostgate from "./types/app/bsky/feed/postgate.js";
 import * as AppBskyFeedThreadgate from "./types/app/bsky/feed/threadgate.js";
 import * as AppBskyGraphDefs from "./types/app/bsky/graph/defs.js";
@@ -26,6 +27,7 @@ import * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/
 import * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem.js";
 import * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection.js";
 import * as BlueMojiCollectionSearchItems from "./types/blue/moji/collection/searchItems.js";
+import * as BlueMojiCollectionTranscodeAnimation from "./types/blue/moji/collection/transcodeAnimation.js";
 import * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
 import * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
 import * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReactionCounts.js";
@@ -51,6 +53,7 @@ export * as AppBskyEmbedRecord from "./types/app/bsky/embed/record.js";
 export * as AppBskyEmbedRecordWithMedia from "./types/app/bsky/embed/recordWithMedia.js";
 export * as AppBskyEmbedVideo from "./types/app/bsky/embed/video.js";
 export * as AppBskyFeedDefs from "./types/app/bsky/feed/defs.js";
+export * as AppBskyFeedPost from "./types/app/bsky/feed/post.js";
 export * as AppBskyFeedPostgate from "./types/app/bsky/feed/postgate.js";
 export * as AppBskyFeedThreadgate from "./types/app/bsky/feed/threadgate.js";
 export * as AppBskyGraphDefs from "./types/app/bsky/graph/defs.js";
@@ -64,6 +67,7 @@ export * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/
 export * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem.js";
 export * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection.js";
 export * as BlueMojiCollectionSearchItems from "./types/blue/moji/collection/searchItems.js";
+export * as BlueMojiCollectionTranscodeAnimation from "./types/blue/moji/collection/transcodeAnimation.js";
 export * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
 export * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
 export * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReactionCounts.js";
@@ -164,13 +168,86 @@ export class AppBskyEmbedNS {
 
 export class AppBskyFeedNS {
   _client: XrpcClient;
+  post: AppBskyFeedPostRecord;
   postgate: AppBskyFeedPostgateRecord;
   threadgate: AppBskyFeedThreadgateRecord;
 
   constructor(client: XrpcClient) {
     this._client = client;
+    this.post = new AppBskyFeedPostRecord(client);
     this.postgate = new AppBskyFeedPostgateRecord(client);
     this.threadgate = new AppBskyFeedThreadgateRecord(client);
+  }
+}
+
+export class AppBskyFeedPostRecord {
+  _client: XrpcClient;
+
+  constructor(client: XrpcClient) {
+    this._client = client;
+  }
+
+  async list(params: OmitKey<ComAtprotoRepoListRecords.QueryParams, "collection">): Promise<{
+    cursor?: string;
+    records: { uri: string; value: AppBskyFeedPost.Record }[];
+  }> {
+    const res = await this._client.call("com.atproto.repo.listRecords", {
+      collection: "app.bsky.feed.post",
+      ...params,
+    });
+    return res.data;
+  }
+
+  async get(
+    params: OmitKey<ComAtprotoRepoGetRecord.QueryParams, "collection">,
+  ): Promise<{ uri: string; cid: string; value: AppBskyFeedPost.Record }> {
+    const res = await this._client.call("com.atproto.repo.getRecord", {
+      collection: "app.bsky.feed.post",
+      ...params,
+    });
+    return res.data;
+  }
+
+  async create(
+    params: OmitKey<ComAtprotoRepoCreateRecord.InputSchema, "collection" | "record">,
+    record: Un$Typed<AppBskyFeedPost.Record>,
+    headers?: Record<string, string>,
+  ): Promise<{ uri: string; cid: string }> {
+    const collection = "app.bsky.feed.post";
+    const res = await this._client.call(
+      "com.atproto.repo.createRecord",
+      undefined,
+      { collection, ...params, record: { ...record, $type: collection } },
+      { encoding: "application/json", headers },
+    );
+    return res.data;
+  }
+
+  async put(
+    params: OmitKey<ComAtprotoRepoPutRecord.InputSchema, "collection" | "record">,
+    record: Un$Typed<AppBskyFeedPost.Record>,
+    headers?: Record<string, string>,
+  ): Promise<{ uri: string; cid: string }> {
+    const collection = "app.bsky.feed.post";
+    const res = await this._client.call(
+      "com.atproto.repo.putRecord",
+      undefined,
+      { collection, ...params, record: { ...record, $type: collection } },
+      { encoding: "application/json", headers },
+    );
+    return res.data;
+  }
+
+  async delete(
+    params: OmitKey<ComAtprotoRepoDeleteRecord.InputSchema, "collection">,
+    headers?: Record<string, string>,
+  ): Promise<void> {
+    await this._client.call(
+      "com.atproto.repo.deleteRecord",
+      undefined,
+      { collection: "app.bsky.feed.post", ...params },
+      { headers },
+    );
   }
 }
 
@@ -400,6 +477,13 @@ export class BlueMojiCollectionNS {
     opts?: BlueMojiCollectionSearchItems.CallOptions,
   ): Promise<BlueMojiCollectionSearchItems.Response> {
     return this._client.call("blue.moji.collection.searchItems", params, undefined, opts);
+  }
+
+  transcodeAnimation(
+    data?: BlueMojiCollectionTranscodeAnimation.InputSchema,
+    opts?: BlueMojiCollectionTranscodeAnimation.CallOptions,
+  ): Promise<BlueMojiCollectionTranscodeAnimation.Response> {
+    return this._client.call("blue.moji.collection.transcodeAnimation", opts?.qp, data, opts);
   }
 }
 

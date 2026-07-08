@@ -1,5 +1,5 @@
 FROM node:25-slim
-RUN apt-get update && apt-get install -y --no-install-recommends unzip ca-certificates curl xz-utils sqlite3 \
+RUN apt-get update && apt-get install -y --no-install-recommends unzip ca-certificates curl xz-utils sqlite3 ffmpeg \
     && curl -fsSL https://github.com/duckdb/duckdb/releases/download/v1.2.1/duckdb_cli-linux-amd64.zip -o /tmp/duckdb.zip \
     && unzip /tmp/duckdb.zip -d /usr/local/bin \
     && chmod +x /usr/local/bin/duckdb \
