@@ -1,5 +1,5 @@
 import { defineQuery, InvalidRequestError } from "$hatk";
-import { normalizeFormats, resolveActorDid } from "./_pack-views.ts";
+import { itemView, resolveActorDid } from "./_pack-views.ts";
 
 interface ItemValue {
   name: string;
@@ -8,6 +8,7 @@ interface ItemValue {
   formats: unknown;
   stickerFormats?: unknown;
   adultOnly?: boolean;
+  copyOf?: string;
 }
 
 interface ItemRow {
@@ -20,6 +21,7 @@ interface ItemRow {
   formats: string;
   sticker_formats: string | null;
   adult_only: number | null;
+  copy_of: string | null;
 }
 
 function parseJson(text: string | null | undefined): unknown {
@@ -29,31 +31,6 @@ function parseJson(text: string | null | undefined): unknown {
   } catch {
     return undefined;
   }
-}
-
-function toItemView(row: {
-  uri: string;
-  did: string;
-  cid: string;
-  name: string;
-  alt?: string | null;
-  createdAt?: string;
-  formats: unknown;
-  stickerFormats?: unknown;
-  adultOnly?: unknown;
-}) {
-  return {
-    $type: "blue.moji.collection.item#itemView",
-    uri: row.uri,
-    cid: row.cid,
-    did: row.did,
-    name: row.name,
-    alt: row.alt ?? undefined,
-    createdAt: row.createdAt,
-    formats: normalizeFormats(row.formats),
-    stickerFormats: normalizeFormats(row.stickerFormats),
-    adultOnly: Boolean(row.adultOnly),
-  };
 }
 
 export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
@@ -79,7 +56,7 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
     }
 
     const rows = (await ctx.db.query(
-      `SELECT uri, did, cid, created_at, name, alt, formats, sticker_formats, adult_only
+      `SELECT uri, did, cid, created_at, name, alt, formats, sticker_formats, adult_only, copy_of
        FROM "blue.moji.collection.item"
        WHERE did = $1 AND (name LIKE $2 OR alt LIKE $2) ${cursorClause}
        ORDER BY created_at DESC, cid DESC
@@ -89,18 +66,21 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
 
     const hasMore = rows.length > limit;
     const page = rows.slice(0, limit);
-    const items = page.map((row) =>
-      toItemView({
-        uri: row.uri,
-        did: row.did,
-        cid: row.cid,
-        name: row.name,
-        alt: row.alt,
-        createdAt: row.created_at,
-        formats: parseJson(row.formats),
-        stickerFormats: parseJson(row.sticker_formats),
-        adultOnly: row.adult_only,
-      }),
+    const items = await Promise.all(
+      page.map((row) =>
+        itemView(ctx, {
+          uri: row.uri,
+          did: row.did,
+          cid: row.cid,
+          name: row.name,
+          alt: row.alt,
+          createdAt: row.created_at,
+          formats: parseJson(row.formats),
+          stickerFormats: parseJson(row.sticker_formats),
+          adultOnly: row.adult_only,
+          copyOf: row.copy_of,
+        }),
+      ),
     );
 
     const last = page[page.length - 1];
@@ -118,18 +98,21 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
     cursor: ctx.cursor,
   });
 
-  const items = records.map((row) =>
-    toItemView({
-      uri: row.uri,
-      did: row.did,
-      cid: row.cid,
-      name: row.value.name,
-      alt: row.value.alt,
-      createdAt: row.value.createdAt,
-      formats: row.value.formats,
-      stickerFormats: row.value.stickerFormats,
-      adultOnly: row.value.adultOnly,
-    }),
+  const items = await Promise.all(
+    records.map((row) =>
+      itemView(ctx, {
+        uri: row.uri,
+        did: row.did,
+        cid: row.cid,
+        name: row.value.name,
+        alt: row.value.alt,
+        createdAt: row.value.createdAt,
+        formats: row.value.formats,
+        stickerFormats: row.value.stickerFormats,
+        adultOnly: row.value.adultOnly,
+        copyOf: row.value.copyOf,
+      }),
+    ),
   );
 
   return ctx.ok({ items, cursor });

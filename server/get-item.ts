@@ -1,5 +1,5 @@
 import { defineQuery, InvalidRequestError, NotFoundError } from "$hatk";
-import { normalizeFormats, resolveActorDid } from "./_pack-views.ts";
+import { itemView, resolveActorDid } from "./_pack-views.ts";
 import { aliasToRkey } from "../app/lib/alias.ts";
 
 interface ItemRecord {
@@ -9,6 +9,7 @@ interface ItemRecord {
   formats: unknown;
   stickerFormats?: unknown;
   adultOnly?: boolean;
+  copyOf?: string;
 }
 
 // The AppView-indexed lookup that verification elsewhere in this codebase
@@ -38,17 +39,17 @@ export default defineQuery("blue.moji.collection.getItem", async (ctx) => {
 
   return ctx.ok({
     uri: record.uri,
-    item: {
-      $type: "blue.moji.collection.item#itemView",
+    item: await itemView(ctx, {
       uri: record.uri,
       cid: record.cid,
       did: record.did,
       name: record.value.name,
       alt: record.value.alt,
       createdAt: record.value.createdAt,
-      formats: normalizeFormats(record.value.formats),
-      stickerFormats: normalizeFormats(record.value.stickerFormats),
-      adultOnly: Boolean(record.value.adultOnly),
-    },
+      formats: record.value.formats,
+      stickerFormats: record.value.stickerFormats,
+      adultOnly: record.value.adultOnly,
+      copyOf: record.value.copyOf,
+    }),
   });
 });

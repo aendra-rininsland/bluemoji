@@ -376,6 +376,11 @@
           <span style="font-family: var(--mono); font-size: 0.75rem; text-align: center; word-break: break-all; line-height: 1.3;">
             {item.subject.name}
           </span>
+          {#if item.subject.originalCreator}
+            <span style="font-size: 0.6875rem; color: var(--muted);" title="Copied via {item.subject.copyOf}">
+              by @{item.subject.originalCreator.handle}
+            </span>
+          {/if}
           {#if item.subject.adultOnly}
             <span style="font-size: 0.625rem; padding: 0.125rem 0.375rem; background: var(--border); color: var(--muted); border-radius: 999px;">18+</span>
           {/if}

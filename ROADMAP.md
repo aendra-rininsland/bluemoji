@@ -262,9 +262,29 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   test pack. Whoever shares a real pack link next
   should sanity-check `/og/packs/:handle/:rkey` renders and unfurls
   correctly (e.g. paste the pack URL into a Bluesky/Discord composer).
-- **Verified/first-party sets**: artists publish signed packs; `copyOf`
-  chains already give attribution for "created by" credits and tip-jar
-  links.
+- **Verified/first-party sets — attribution done**: `blue.moji.collection.item#itemView`
+  now carries `copyOf` (the record's own field, just projected into the
+  view) and a server-resolved `originalCreator` ({did, handle}) —
+  `resolveOriginalCreator()` in `_pack-views.ts` walks the `copyOf` chain
+  back to its root (bounded to 10 hops) rather than just exposing the
+  immediate, possibly-also-a-copy source, so a pack showing someone's copy
+  of a copy still credits the actual original artist. Wired into all four
+  itemView call sites (`getItem`, `listCollection`, `searchItems`,
+  `getPack`), consolidated behind one shared `itemView()` helper (was four
+  near-duplicate inline object literals before this pass). Surfaced in the
+  pack page UI as a "by @handle" credit line under each copied item.
+  Verified live: seeded a real 2-hop chain (original → copy → copy-of-copy)
+  and confirmed all four endpoints resolve to the true root creator, a
+  broken chain (copyOf pointing at a deleted item) correctly omits
+  `originalCreator` rather than erroring, and the pack page renders the
+  credit correctly in a real browser. Not done: artists _signing_ packs, or
+  tip-jar links — those need actual design work, not just this attribution
+  plumbing, and weren't attempted this pass. Deliberately did NOT wire this
+  into the personal collection page (`/collection`) — that page reads
+  directly from the viewer's own PDS (`com.atproto.repo.listRecords`) for
+  freshness, bypassing the AppView entirely, so `originalCreator` isn't
+  available there without adding a resolution round-trip; the pack page and
+  search (the actual public discovery surfaces) already carry it.
 - **Sticker composer**: pick sticker → attach to post; later,
   `recordWithMedia`-style composition (sticker + quote post) per RFC 0003's
   open question.

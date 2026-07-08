@@ -163,6 +163,87 @@ export function verifiedEmojiRef(
   };
 }
 
+// --- Item view construction + copyOf attribution (shared by get-item.ts,
+// list-collection.ts, search-items.ts, get-pack.ts) ---
+
+export interface ItemViewInput {
+  uri: string;
+  cid: string;
+  did: string;
+  name: string;
+  alt?: string | null;
+  createdAt?: string;
+  formats: unknown;
+  stickerFormats?: unknown;
+  adultOnly?: unknown;
+  copyOf?: string | null;
+}
+
+export interface OriginalCreator {
+  uri: string;
+  did: string;
+  handle: string;
+}
+
+/** Bounds the copyOf chain walk below so a pathological (or, once cross-repo
+ * write races are possible, maliciously cyclic) chain can't hang a request. */
+const MAX_COPY_CHAIN_DEPTH = 10;
+
+/**
+ * Walk copyOf back to its root so packs/collections can show real "created
+ * by" attribution instead of just the immediate (possibly also-a-copy)
+ * source. Stops and returns the last link it could still resolve if the
+ * chain is broken (source item deleted) rather than failing outright — see
+ * RFC 0002's note that copying is duplication-by-design specifically so
+ * packs survive source-account deletion.
+ */
+export async function resolveOriginalCreator(
+  ctx: Pick<XrpcContext, "getRecords" | "db">,
+  copyOf: string | null | undefined,
+): Promise<OriginalCreator | null> {
+  if (!copyOf) return null;
+
+  let currentUri: string | undefined = copyOf;
+  let last: { uri: string; did: string } | null = null;
+  for (let depth = 0; currentUri && depth < MAX_COPY_CHAIN_DEPTH; depth++) {
+    const records = await ctx.getRecords<{ copyOf?: string }>("blue.moji.collection.item", [
+      currentUri,
+    ]);
+    const record = records.get(currentUri);
+    if (!record) break;
+    last = { uri: record.uri, did: record.did };
+    currentUri = record.value.copyOf;
+  }
+  if (!last) return null;
+
+  const handles = await handlesForDids(ctx, [last.did]);
+  return { uri: last.uri, did: last.did, handle: handles.get(last.did) ?? "handle.invalid" };
+}
+
+export async function itemView(ctx: Pick<XrpcContext, "getRecords" | "db">, input: ItemViewInput) {
+  const originalCreator = await resolveOriginalCreator(ctx, input.copyOf);
+  return {
+    $type: "blue.moji.collection.item#itemView",
+    uri: input.uri,
+    cid: input.cid,
+    did: input.did,
+    name: input.name,
+    alt: input.alt ?? undefined,
+    createdAt: input.createdAt,
+    formats: normalizeFormats(input.formats),
+    stickerFormats: normalizeFormats(input.stickerFormats),
+    adultOnly: Boolean(input.adultOnly),
+    copyOf: input.copyOf ?? undefined,
+    originalCreator: originalCreator
+      ? {
+          $type: "blue.moji.collection.item#originalCreator",
+          did: originalCreator.did,
+          handle: originalCreator.handle,
+        }
+      : undefined,
+  };
+}
+
 export async function packView(
   ctx: XrpcContext,
   row: PackRow,

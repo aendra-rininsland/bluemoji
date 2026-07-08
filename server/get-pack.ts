@@ -1,5 +1,5 @@
 import { defineQuery, NotFoundError } from "$hatk";
-import { normalizeFormats, packView, type PackRow } from "./_pack-views.ts";
+import { itemView, packView, type PackRow } from "./_pack-views.ts";
 
 interface PackItemRow {
   uri: string;
@@ -15,6 +15,7 @@ interface ItemRecord {
   formats: unknown;
   stickerFormats?: unknown;
   adultOnly?: boolean;
+  copyOf?: string;
 }
 
 export default defineQuery("blue.moji.packs.getPack", async (ctx) => {
@@ -60,28 +61,30 @@ export default defineQuery("blue.moji.packs.getPack", async (ctx) => {
     deduped.map((row) => row.subject),
   );
 
-  const items = deduped.flatMap((row) => {
-    const subject = subjects.get(row.subject);
-    if (!subject) return [];
-    return [
-      {
-        $type: "blue.moji.packs.defs#packItemView",
-        uri: row.uri,
-        subject: {
-          $type: "blue.moji.collection.item#itemView",
-          uri: subject.uri,
-          cid: subject.cid,
-          did: subject.did,
-          name: subject.value.name,
-          alt: subject.value.alt,
-          createdAt: subject.value.createdAt,
-          formats: normalizeFormats(subject.value.formats),
-          stickerFormats: normalizeFormats(subject.value.stickerFormats),
-          adultOnly: Boolean(subject.value.adultOnly),
-        },
-      },
-    ];
-  });
+  const items = await Promise.all(
+    deduped.flatMap((row) => {
+      const subject = subjects.get(row.subject);
+      if (!subject) return [];
+      return [
+        (async () => ({
+          $type: "blue.moji.packs.defs#packItemView",
+          uri: row.uri,
+          subject: await itemView(ctx, {
+            uri: subject.uri,
+            cid: subject.cid,
+            did: subject.did,
+            name: subject.value.name,
+            alt: subject.value.alt,
+            createdAt: subject.value.createdAt,
+            formats: subject.value.formats,
+            stickerFormats: subject.value.stickerFormats,
+            adultOnly: subject.value.adultOnly,
+            copyOf: subject.value.copyOf,
+          }),
+        }))(),
+      ];
+    }),
+  );
 
   const countRow = (await ctx.db.query(
     `SELECT COUNT(DISTINCT subject) AS n FROM "blue.moji.packs.packitem" WHERE pack = $1`,

@@ -3004,6 +3004,31 @@ export const schemaDict = {
             type: "boolean",
             default: false,
           },
+          copyOf: {
+            type: "string",
+            format: "at-uri",
+            description:
+              "AT-URI of the item this was directly copied from, mirroring the record's own copyOf field.",
+          },
+          originalCreator: {
+            type: "ref",
+            ref: "lex:blue.moji.collection.item#originalCreator",
+            description:
+              "The account at the root of this item's copyOf chain (walked server-side, since a copy can itself be copied), if this item is a copy at all. Omitted for original items. If a link in the chain is missing (e.g. a source account deleted its copy), resolves to whatever the chain reaches rather than failing outright.",
+          },
+        },
+      },
+      originalCreator: {
+        type: "object",
+        required: ["did", "handle"],
+        properties: {
+          did: {
+            type: "string",
+            format: "did",
+          },
+          handle: {
+            type: "string",
+          },
         },
       },
     },

@@ -122,6 +122,9 @@ export interface ItemView {
   formats: $Typed<Formats_v0> | $Typed<Formats_v1> | { $type: string };
   stickerFormats?: $Typed<StickerFormats_v0> | { $type: string };
   adultOnly: boolean;
+  /** AT-URI of the item this was directly copied from, mirroring the record's own copyOf field. */
+  copyOf?: string;
+  originalCreator?: OriginalCreator;
 }
 
 const hashItemView = "itemView";
@@ -132,4 +135,20 @@ export function isItemView<V>(v: V) {
 
 export function validateItemView<V>(v: V) {
   return validate<ItemView & V>(v, id, hashItemView);
+}
+
+export interface OriginalCreator {
+  $type?: "blue.moji.collection.item#originalCreator";
+  did: string;
+  handle: string;
+}
+
+const hashOriginalCreator = "originalCreator";
+
+export function isOriginalCreator<V>(v: V) {
+  return is$typed(v, id, hashOriginalCreator);
+}
+
+export function validateOriginalCreator<V>(v: V) {
+  return validate<OriginalCreator & V>(v, id, hashOriginalCreator);
 }
