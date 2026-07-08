@@ -235,7 +235,14 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   itself predates this session and is already live in production using the
   same fetch pattern, so this is pre-existing local-only friction, not a new
   regression; flagging as worth a direct prod check if OG cards don't
-  unfurl correctly once deployed.
+  unfurl correctly once deployed. Deployed to production 2026-07-08 (Railway
+  build + healthcheck both succeeded, `/_health` returns ok); could NOT do a
+  final live end-to-end check against a real pack, though — there's no
+  public pack-discovery endpoint (`getActorPacks`/`getPacks`/`getPack` all
+  require already knowing an actor or URI) and I don't have app-password
+  credentials to create a test pack. Whoever shares a real pack link next
+  should sanity-check `/og/packs/:handle/:rkey` renders and unfurls
+  correctly (e.g. paste the pack URL into a Bluesky/Discord composer).
 - **Verified/first-party sets**: artists publish signed packs; `copyOf`
   chains already give attribution for "created by" credits and tip-jar
   links.
