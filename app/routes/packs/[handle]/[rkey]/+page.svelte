@@ -279,7 +279,7 @@
   </div>
 
   {#if error}
-    <p style="color: red; margin-bottom: 1rem;">{error}</p>
+    <p style="color: var(--danger); margin-bottom: 1rem;">{error}</p>
   {/if}
 
   {#if reportTarget}
@@ -306,7 +306,7 @@
         ></textarea>
       </label>
       {#if reportError}
-        <p style="color: red; font-size: 0.875rem;">{reportError}</p>
+        <p style="color: var(--danger); font-size: 0.875rem;">{reportError}</p>
       {/if}
       <div style="display: flex; gap: 0.5rem;">
         <button

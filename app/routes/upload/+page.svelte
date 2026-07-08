@@ -272,7 +272,7 @@
         >:</span>
       </div>
       {#if aliasCheck.error}
-        <p style="margin-top: 0.25rem; font-size: 0.875rem; color: red;">{aliasCheck.error}</p>
+        <p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--danger);">{aliasCheck.error}</p>
       {:else if aliasCheck.rkey && aliasCheck.rkey !== aliasCheck.alias}
         <p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--muted);">
           :{aliasCheck.alias}: — stored as <code>{aliasCheck.rkey}</code>
@@ -323,7 +323,7 @@
   </form>
 
   {#if error}
-    <p style="margin-top: 1rem; color: red;">{error}</p>
+    <p style="margin-top: 1rem; color: var(--danger);">{error}</p>
   {/if}
 
   {#if successUri}

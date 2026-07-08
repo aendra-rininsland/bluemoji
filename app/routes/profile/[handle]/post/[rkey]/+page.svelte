@@ -370,7 +370,7 @@
      viewer-preference concern for a future moderation pass), but always
      visually distinct so it's never mistaken for an unlabelled emoji. */
   .adult {
-    outline: 2px solid #c94040;
+    outline: 2px solid var(--danger);
     outline-offset: 1px;
     border-radius: 3px;
   }
@@ -381,7 +381,7 @@
     font-size: 0.625rem;
     font-weight: 600;
     padding: 0.0625rem 0.3125rem;
-    background: #c94040;
+    background: var(--danger);
     color: #fff;
     border-radius: 999px;
     line-height: 1.4;
@@ -444,7 +444,7 @@
 
   .report-flag:hover {
     opacity: 1;
-    color: #c94040;
+    color: var(--danger);
   }
 
   .report-form {
@@ -541,7 +541,7 @@
   }
 
   .react-error {
-    color: red;
+    color: var(--danger);
     font-size: 0.875rem;
   }
 

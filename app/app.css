@@ -7,20 +7,61 @@
 }
 
 :root {
-  --font: system-ui, -apple-system, sans-serif;
-  --mono: ui-monospace, "SF Mono", monospace;
-  --bg: #fff;
-  --text: #111;
-  --muted: #666;
-  --border: #e5e5e5;
-  --accent: #0066ff;
+  /* GeoCities Chaos — the confirmed desktop identity. Deliberately a single
+     committed visual world (see IMPLEMENTATION_GUIDE.md-adjacent design
+     pitch), not a light/dark pair — the joke doesn't work in "light mode". */
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Comic Sans MS", "Chalkboard SE", "Bradley Hand", cursive;
+  --mono: ui-monospace, "SF Mono", "Courier New", monospace;
+
+  --bg: #2b0b3f;
+  --bg-panel: #1b0527;
+  --bg-inset: #12031a;
+  --text: #f2e9ff;
+  --muted: #b9a3d6;
+  --border: #8a5bb0;
+  --accent: #ff2ee0;
+  --accent-2: #39ff14;
+  --accent-3: #ffe500;
+  --danger: #ff5470;
 }
 
 body {
   font-family: var(--font);
   color: var(--text);
-  background: var(--bg);
-  line-height: 1.5;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1.4px) 0 0 / 26px 26px,
+    var(--bg);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+h1 {
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    var(--accent-3),
+    var(--accent-2),
+    var(--accent)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+h2,
+h3 {
+  color: var(--accent-2);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
 }
 
 a {
@@ -29,5 +70,97 @@ a {
 }
 
 a:hover {
+  color: var(--accent-3);
   text-decoration: underline;
+}
+
+code,
+pre {
+  font-family: var(--mono);
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  color-scheme: dark;
+}
+
+/* Base look for any plain, un-styled <button> — most buttons in this app
+   set their own inline style, but this is the safety net for ones that
+   don't (and it's what a bare native button would otherwise look like,
+   which reads as jarringly out of place against everything else here). */
+button {
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+button:not([style]) {
+  background: linear-gradient(180deg, #f3e8ff, var(--border));
+  color: #1a0a2e;
+  border: 2px outset var(--border);
+  padding: 0.5rem 1.25rem;
+  font-weight: 700;
+  border-radius: 2px;
+}
+
+button:not([style]):active {
+  border-style: inset;
+}
+
+::selection {
+  background: var(--accent);
+  color: #000;
+}
+
+/* ---------- Shared chrome: marquee banner + blinking badge ---------- */
+
+.site-marquee {
+  background: #000;
+  border-bottom: 3px solid var(--accent-3);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 5px 0;
+}
+
+.site-marquee__track {
+  display: inline-block;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--accent-3);
+  padding-left: 100%;
+  animation: site-marquee-scroll 22s linear infinite;
+}
+
+@keyframes site-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.blink {
+  animation: site-blink 1s steps(1) infinite;
+}
+
+@keyframes site-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-marquee__track,
+  .blink {
+    animation: none;
+  }
 }

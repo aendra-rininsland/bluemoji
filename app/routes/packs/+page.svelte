@@ -125,7 +125,7 @@
         </button>
       </div>
       {#if error}
-        <p style="color: red;">{error}</p>
+        <p style="color: var(--danger);">{error}</p>
       {/if}
     </form>
   {/if}

@@ -108,7 +108,7 @@
   {/if}
 
   {#if error}
-    <p style="color: red; margin-bottom: 1rem;">{error}</p>
+    <p style="color: var(--danger); margin-bottom: 1rem;">{error}</p>
   {/if}
 
   <button

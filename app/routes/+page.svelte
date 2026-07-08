@@ -69,7 +69,7 @@
       </button>
     </form>
     {#if error}
-      <p style="color: red;">{error}</p>
+      <p style="color: var(--danger);">{error}</p>
     {/if}
     <p style="margin-top: 1rem;">
       <a href="/gallery" style="color: var(--text);">See what's trending →</a>
