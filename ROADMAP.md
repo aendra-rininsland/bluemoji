@@ -171,9 +171,38 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   console errors). Shipped as raw source via new `package.json` exports
   entries (`./components/webcomponent/picker`), consistent with how the
   pre-existing `<blue-moji>` display component already shipped.
-- **Reactions everywhere**: batch `getReactions` for timelines (multi-uri
-  param); notifications ("X reacted to your post") via hatk push;
-  per-post reaction caps (Discord-style) as AppView policy.
+- ~~Reactions everywhere~~ — done, with one real limitation surfaced along
+  the way:
+  - **Batch `getReactionCounts`** (`server/get-reaction-counts.ts`): counts-
+    only aggregation for many posts in one call. Building it surfaced a
+    genuine hatk framework bug — its XRPC dispatch drops all but the last
+    value of a repeated query key, so the ATProto-standard `uris=a&uris=b`
+    array-param convention (what `@atproto/xrpc`-based clients, including
+    our own `@aendra/bluemoji`, actually send) never reaches a handler as
+    more than one value. Confirmed this also affects the pre-existing,
+    already-shipped `getPacks` (latent — the packs UI never happened to call
+    it with >1 uri). Worked around both endpoints server-side with a
+    comma-joined-value fallback (`parseUriListParam` in `_pack-views.ts`;
+    AT-URIs can't contain commas, so it's unambiguous) — but that only
+    helps callers who build the query string by hand; standard client
+    libraries need hatk's dispatch patched upstream to truly benefit from
+    batching. Full writeup in CLAUDE.md's hatk gotchas #8. Verified with
+    real seeded data: dedup/spoofing-override/fabricated-claim-dropping all
+    correct, multi-subject batching correct via the comma workaround,
+    zero-reaction subjects correctly omitted.
+  - **Per-post reaction caps**: `MAX_REACTION_GROUPS = 20` (shared constant
+    in `_pack-views.ts`) caps distinct emoji _groups_ shown per post — an
+    AppView anti-spam policy, not a per-actor limit — applied identically in
+    both `getReactions` and `getReactionCounts`. Verified live: seeded 25
+    distinct reaction types on one post, both endpoints correctly capped at
+    20, keeping the highest-count groups.
+  - **Notifications** (`server/on-reaction-notify.ts`): a real `on-commit`
+    hook fires on every new reaction and calls hatk's push interface. This
+    is genuinely dormant today, not faked — hatk's push is APNs-only
+    (requires a real iOS app's bundle ID + signing key), moji.blue has
+    neither, and `ctx.push.send()` is expected to throw until someone
+    registers a token. Wired up and ready; starts working the moment a real
+    mobile client exists and registers push tokens, no code changes needed.
 - **Community/shared namespaces**: packs owned by community or feed-gen
   accounts with delegation — the Discord "server emoji" model mapped onto
   ATProto identity.

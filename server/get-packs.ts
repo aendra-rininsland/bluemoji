@@ -1,9 +1,8 @@
 import { defineQuery, InvalidRequestError } from "$hatk";
-import { packViewBasic, type PackRow } from "./_pack-views.ts";
+import { packViewBasic, parseUriListParam, type PackRow } from "./_pack-views.ts";
 
 export default defineQuery("blue.moji.packs.getPacks", async (ctx) => {
-  const raw = ctx.params.uris as string | string[] | undefined;
-  const uris = (Array.isArray(raw) ? raw : raw ? [raw] : []).slice(0, 25);
+  const uris = parseUriListParam(ctx.params.uris, 25);
   if (uris.length === 0) throw new InvalidRequestError("uris is required");
 
   const placeholders = uris.map((_, i) => `$${i + 1}`).join(",");

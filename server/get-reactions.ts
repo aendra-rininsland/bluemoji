@@ -1,5 +1,11 @@
 import { defineQuery, InvalidRequestError } from "$hatk";
-import { handlesForDids, normalizeFormats } from "./_pack-views.ts";
+import {
+  handlesForDids,
+  MAX_REACTION_GROUPS,
+  parseEmojiClaim,
+  verifiedEmojiRef,
+  type ReactionItemRecord,
+} from "./_pack-views.ts";
 
 interface ReactionRow {
   uri: string;
@@ -9,67 +15,23 @@ interface ReactionRow {
   created_at: string;
 }
 
-interface ItemRecord {
-  name: string;
-  alt?: string;
-  formats: unknown;
-  adultOnly?: boolean;
-}
-
-function parseEmoji(text: string): { uri?: string } & Record<string, unknown> {
-  try {
-    const parsed = JSON.parse(text);
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-/**
- * blue.moji.feed.reaction#emojiRef is self-attested by the reactor (see RFC
- * 0001 amendment) — a client could claim any did/name/formats. Rebuild it
- * from the indexed blue.moji.collection.item instead of trusting the stored
- * value; that item was only indexed after the relay verified its owner's
- * repo commit, so it's the actual trust anchor. Reactions whose claimed
- * subject can't be verified (deleted, or never existed) are dropped.
- *
- * adultOnly is populated here from the source item, never from the reactor's
- * own claim — the reaction record carries no self-label of its own, so a
- * consumer that skips this hydration step would render a sensitive emoji
- * with no warning at all. See RFC 0001's self-label propagation note.
- */
-function verifiedEmojiRef(
-  claimed: { uri?: string },
-  verified: Map<string, { uri: string; cid: string; value: ItemRecord }>,
-) {
-  const uri = claimed.uri;
-  if (!uri) return null;
-  const record = verified.get(uri);
-  if (!record) return null;
-  return {
-    $type: "blue.moji.feed.reaction#emojiRef",
-    uri,
-    cid: record.cid,
-    name: record.value.name,
-    alt: record.value.alt,
-    adultOnly: Boolean(record.value.adultOnly),
-    formats: normalizeFormats(record.value.formats),
-  };
-}
-
 export default defineQuery("blue.moji.feed.getReactions", async (ctx) => {
   const { uri } = ctx.params;
   if (!uri) throw new InvalidRequestError("uri is required");
   const limit = ctx.limit ?? 50;
 
-  // Aggregate groups: one row per distinct emoji item, counting distinct actors
-  // (duplicate reactions by the same actor are ignored per the lexicon).
+  // Aggregate groups: one row per distinct emoji item, counting distinct
+  // actors (duplicate reactions by the same actor are ignored per the
+  // lexicon). Capped to MAX_REACTION_GROUPS distinct emoji, keeping the
+  // highest-count ones — an AppView-level anti-spam policy, not a per-actor
+  // limit.
   const groupRows = (await ctx.db.query(
     `SELECT emoji, COUNT(DISTINCT did) AS n, MIN(created_at) AS first_at
      FROM "blue.moji.feed.reaction"
      WHERE subject = $1
      GROUP BY json_extract(emoji, '$.uri')
-     ORDER BY n DESC, first_at ASC`,
+     ORDER BY n DESC, first_at ASC
+     LIMIT ${MAX_REACTION_GROUPS}`,
     [uri],
   )) as { emoji: string; n: number }[];
 
@@ -116,12 +78,12 @@ export default defineQuery("blue.moji.feed.getReactions", async (ctx) => {
 
   // Verify every claimed emoji URI (from both groups and the reaction page)
   // against the indexed source item in one batch, before trusting any of it.
-  const claimedGroups = groupRows.map((row) => parseEmoji(row.emoji));
-  const claimedReactions = visible.map((row) => parseEmoji(row.emoji));
+  const claimedGroups = groupRows.map((row) => parseEmojiClaim(row.emoji));
+  const claimedReactions = visible.map((row) => parseEmojiClaim(row.emoji));
   const claimedUris = new Set(
     [...claimedGroups, ...claimedReactions].flatMap((e) => (e.uri ? [e.uri] : [])),
   );
-  const verifiedItems = await ctx.getRecords<ItemRecord>("blue.moji.collection.item", [
+  const verifiedItems = await ctx.getRecords<ReactionItemRecord>("blue.moji.collection.item", [
     ...claimedUris,
   ]);
 

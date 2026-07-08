@@ -2,6 +2,26 @@ import type { XrpcContext } from "@hatk/hatk/xrpc";
 
 // Underscore prefix keeps this module out of the server/ scanner.
 
+/**
+ * hatk's XRPC dispatch builds ctx.params from `for (const [k,v] of
+ * url.searchParams) params[k] = v`, which silently overwrites on repeated
+ * keys — the ATProto-conventional `uris=a&uris=b` array-param form (used by
+ * e.g. app.bsky.feed.getPosts) never reaches a handler as an array; only the
+ * *last* value survives. Confirmed by direct test against both this
+ * codebase's own getPacks and a from-scratch handler — not something fixable
+ * from application code, since the raw request is never exposed past
+ * dispatch. Until that's fixed upstream in hatk, array-typed query params
+ * accept a comma-joined single value instead (AT-URIs never contain commas —
+ * rkeys are restricted to [A-Za-z0-9._:~-] — so splitting on "," is safe).
+ * The `Array.isArray` branch is dead code today (hatk never produces a real
+ * array) but costs nothing to keep for forward-compatibility if that
+ * changes.
+ */
+export function parseUriListParam(raw: unknown, max: number): string[] {
+  const list = Array.isArray(raw) ? raw : typeof raw === "string" && raw ? raw.split(",") : [];
+  return list.slice(0, max);
+}
+
 export interface PackRow {
   uri: string;
   cid: string;
@@ -85,6 +105,61 @@ export function packViewBasic(
     itemCount,
     labels,
     indexedAt: row.indexed_at,
+  };
+}
+
+// --- Reaction verification (shared by get-reactions.ts and
+// get-reaction-counts.ts) ---
+
+export interface ReactionItemRecord {
+  name: string;
+  alt?: string;
+  formats: unknown;
+  adultOnly?: boolean;
+}
+
+/** Cap on distinct emoji groups returned per subject: an AppView-level anti-
+ * spam policy (roadmap: "per-post reaction caps as AppView policy") bounding
+ * how many distinct reaction types a single post's UI has to render, since
+ * nothing stops someone reacting with hundreds of different emoji. Does not
+ * limit how many actors can react with an already-shown emoji — only caps
+ * the number of distinct emoji groups displayed, keeping the highest-count
+ * ones. */
+export const MAX_REACTION_GROUPS = 20;
+
+export function parseEmojiClaim(text: string): { uri?: string } & Record<string, unknown> {
+  try {
+    const parsed = JSON.parse(text);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * blue.moji.feed.reaction#emojiRef is self-attested by the reactor (RFC 0001
+ * amendment) — a client could claim any did/name/formats. Rebuild it from
+ * the indexed blue.moji.collection.item instead of trusting the stored
+ * value; that item was only indexed after the relay verified its owner's
+ * repo commit, so it's the actual trust anchor. Returns null (caller should
+ * drop the reaction) when the claimed subject can't be verified at all.
+ */
+export function verifiedEmojiRef(
+  claimed: { uri?: string },
+  verified: Map<string, { uri: string; cid: string; value: ReactionItemRecord }>,
+) {
+  const uri = claimed.uri;
+  if (!uri) return null;
+  const record = verified.get(uri);
+  if (!record) return null;
+  return {
+    $type: "blue.moji.feed.reaction#emojiRef",
+    uri,
+    cid: record.cid,
+    name: record.value.name,
+    alt: record.value.alt,
+    adultOnly: Boolean(record.value.adultOnly),
+    formats: normalizeFormats(record.value.formats),
   };
 }
 

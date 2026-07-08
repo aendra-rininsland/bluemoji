@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.feed.getReactionCounts",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Batch version of blue.moji.feed.getReactions for timelines: aggregated reaction groups (counts only, no paginated individual reactions) for many posts in one call, avoiding an N+1 fetch per rendered post. Use getReactions for a single post's full detail (e.g. its own dedicated view with an actor list).",
+      "parameters": {
+        "type": "params",
+        "required": ["uris"],
+        "properties": {
+          "uris": {
+            "type": "array",
+            "items": { "type": "string", "format": "at-uri" },
+            "maxLength": 50,
+            "description": "AT-URIs of the subject posts. Send as a single comma-joined value (e.g. 'uris=at://a,at://b'), not repeated 'uris=' keys — this AppView's implementation currently only sees the last occurrence of a repeated query key. AT-URIs never contain commas (record keys exclude them), so this is unambiguous."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["counts"],
+          "properties": {
+            "counts": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "#subjectReactionCounts" }
+            }
+          }
+        }
+      }
+    },
+    "subjectReactionCounts": {
+      "type": "object",
+      "required": ["uri", "groups"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the subject post. Subjects with zero reactions are omitted from the response rather than included with an empty groups array."
+        },
+        "groups": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "blue.moji.feed.defs#reactionGroup" }
+        }
+      }
+    }
+  }
+}

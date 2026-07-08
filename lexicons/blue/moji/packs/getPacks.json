@@ -12,7 +12,8 @@
           "uris": {
             "type": "array",
             "items": { "type": "string", "format": "at-uri" },
-            "maxLength": 25
+            "maxLength": 25,
+            "description": "Send as a single comma-joined value (e.g. 'uris=at://a,at://b'), not repeated 'uris=' keys — this AppView's implementation currently only sees the last occurrence of a repeated query key. AT-URIs never contain commas (record keys exclude them), so this is unambiguous."
           }
         }
       },

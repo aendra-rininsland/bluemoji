@@ -101,6 +101,25 @@ developers.
    pagination, `blobUrl`, `search`, `exists`, PDS-proxied record writes.
 7. SSR pages can call our own XRPC same-origin with SvelteKit's relative
    `fetch("/xrpc/...")` — cookies forward, viewer state works.
+8. **`array`-typed query params on `query` (GET) endpoints are broken in
+   hatk's XRPC dispatch**: `server.js`'s param builder does
+   `for (const [k,v] of url.searchParams) params[k] = v`, which silently
+   drops all but the _last_ value of a repeated key. The ATProto-standard
+   `uris=a&uris=b` convention (what `@atproto/xrpc`-based clients — including
+   our own `@aendra/bluemoji` — actually send for array params) therefore
+   never reaches a handler as more than one value; `ctx.params.uris` is
+   always a plain string, never a real array, regardless of how many query
+   values were sent. Not fixable from application code (the raw request
+   isn't exposed past dispatch) — confirmed against both `getPacks` (shipped
+   before this was noticed; the packs UI happens to never call it with >1
+   uri, so it was latent) and `getReactionCounts`. Worked around
+   server-side via `parseUriListParam()` in `server/_pack-views.ts`, which
+   also accepts a single comma-joined value (safe: AT-URI record keys
+   exclude commas) — but this only helps callers who construct the query
+   string by hand; standard ATProto client libraries will still only see
+   the last URI's results until hatk's dispatch is patched upstream. POST
+   procedures are unaffected (JSON bodies have real arrays, no repeated-key
+   ambiguity).
 
 ## Verification workflow
 
