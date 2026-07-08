@@ -2789,7 +2789,8 @@ export const schemaDict = {
     defs: {
       main: {
         type: "record",
-        description: "A custom emoji",
+        description:
+          "A custom emoji. The record key is the canonical alias for ASCII aliases, or its RFC 3492 Punycode encoding (xn-- prefixed) for internationalised aliases; see Bluemoji RFC 0005.",
         key: "any",
         record: {
           type: "object",
@@ -2808,7 +2809,8 @@ export const schemaDict = {
             },
             formats: {
               type: "union",
-              description: "Open union to allow for future formats",
+              description:
+                "Open union to allow for future formats. #formats_v0 is deprecated: writers MUST write #formats_v1 (see RFC 0001 Adoption strategy / RFC 0005). Readers SHOULD continue to accept #formats_v0 for historical records.",
               refs: [
                 "lex:blue.moji.collection.item#formats_v0",
                 "lex:blue.moji.collection.item#formats_v1",
@@ -2845,6 +2847,8 @@ export const schemaDict = {
       },
       formats_v0: {
         type: "object",
+        description:
+          "DEPRECATED. apng_128/lottie are raw Bytes (not Blob), which makes them invisible to blob-based image moderation pipelines and requires a getRecord round-trip to render. New writes MUST use #formats_v1. Retained only so existing v0 records remain readable.",
         properties: {
           original: {
             type: "blob",
@@ -2963,6 +2967,12 @@ export const schemaDict = {
             description:
               "AT-URI of the source item record. Views need this so consumers can derive the owning DID for blob URL construction.",
           },
+          cid: {
+            type: "string",
+            format: "cid",
+            description:
+              "CID of the source item record, so consumers can build a com.atproto.repo.strongRef to it (e.g. for moderation reports) without a separate lookup.",
+          },
           did: {
             type: "string",
             format: "did",
@@ -3005,10 +3015,16 @@ export const schemaDict = {
       main: {
         type: "query",
         description:
-          "List a range of Bluemoji in a repository, matching a specific collection. Requires auth.",
+          "List a range of Bluemoji in a repository. Public read: pass 'repo' to browse any repo's collection. If 'repo' is omitted, the caller must be authenticated and their own collection is listed.",
         parameters: {
           type: "params",
           properties: {
+            repo: {
+              type: "string",
+              format: "at-identifier",
+              description:
+                "The handle or DID of the repo to list. Defaults to the authenticated caller if omitted.",
+            },
             limit: {
               type: "integer",
               minimum: 1,
@@ -3021,7 +3037,8 @@ export const schemaDict = {
             },
             reverse: {
               type: "boolean",
-              description: "Flag to reverse the order of the returned records.",
+              description:
+                "Flag to reverse the order of the returned records. Default is oldest-first (ascending by creation time), mirroring com.atproto.repo.listRecords.",
             },
           },
         },
@@ -3042,20 +3059,6 @@ export const schemaDict = {
                 },
               },
             },
-          },
-        },
-      },
-      itemView: {
-        type: "object",
-        required: ["uri", "record"],
-        properties: {
-          uri: {
-            type: "string",
-            format: "at-uri",
-          },
-          record: {
-            type: "ref",
-            ref: "lex:blue.moji.collection.item#itemView",
           },
         },
       },
@@ -3130,8 +3133,9 @@ export const schemaDict = {
               },
               name: {
                 type: "string",
-                description: "The source Bluemoji name/rkey.",
-                maxLength: 15,
+                description:
+                  "The source Bluemoji alias or rkey. Internationalised aliases are accepted and encoded per RFC 0005.",
+                maxLength: 512,
               },
               renameTo: {
                 type: "string",
@@ -3172,6 +3176,63 @@ export const schemaDict = {
       },
     },
   },
+  BlueMojiCollectionSearchItems: {
+    lexicon: 1,
+    id: "blue.moji.collection.searchItems",
+    defs: {
+      main: {
+        type: "query",
+        description:
+          "Search Bluemoji by alias or alt text. Intended as shared infrastructure so clients don't need to maintain their own emoji search index. Two distinct matching modes depending on 'repo': pass it for substring matching within one repo's own collection (suited to live-typing :-autocomplete in a composer — every keystroke narrows correctly, including partial prefixes); omit it for network-wide full-text search (subject to takedown filtering), which matches whole words/tokens rather than arbitrary substrings — e.g. 'cat' can match ':blobcat:' but 'blob' alone may not, since the underlying index is word-oriented. Network-wide mode suits a 'discover emoji' browse/search surface better than character-by-character autocomplete.",
+        parameters: {
+          type: "params",
+          required: ["q"],
+          properties: {
+            q: {
+              type: "string",
+              description: "Search query, matched against the alias and alt text.",
+              minLength: 1,
+              maxLength: 100,
+            },
+            repo: {
+              type: "string",
+              format: "at-identifier",
+              description:
+                "Restrict results to a single repo's collection, using substring matching. Network-wide whole-word search when omitted.",
+            },
+            limit: {
+              type: "integer",
+              minimum: 1,
+              maximum: 100,
+              default: 25,
+            },
+            cursor: {
+              type: "string",
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["items"],
+            properties: {
+              cursor: {
+                type: "string",
+              },
+              items: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.collection.item#itemView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   BlueMojiEmbedSticker: {
     lexicon: 1,
     id: "blue.moji.embed.sticker",
@@ -3190,18 +3251,21 @@ export const schemaDict = {
       },
       sticker: {
         type: "object",
+        description:
+          "SECURITY: did/name/formats are self-attested by the posting client, like blue.moji.richtext.facet. Verify against the record strongRef (or by re-deriving the rkey from name and looking up did's blue.moji.collection.item) before rendering an image, if the render surface matters for trust.",
         required: ["did", "name", "formats"],
         properties: {
           record: {
             type: "ref",
             ref: "lex:com.atproto.repo.strongRef",
-            description: "Strong reference to the source blue.moji.collection.item record.",
+            description:
+              "Strong reference to the source blue.moji.collection.item record. Use this as the verification anchor: resolve it and compare formats before trusting this embed's claims.",
           },
           did: {
             type: "string",
             format: "did",
             description:
-              "DID of the repo that owns the sticker record. Combined with the format CIDs to construct blob/CDN URLs without a getRecord round-trip, mirroring blue.moji.richtext.facet.",
+              "DID of the repo that owns the sticker record. Combined with the format CIDs to construct blob/CDN URLs without a getRecord round-trip, mirroring blue.moji.richtext.facet. Self-attested; see security note on this object.",
           },
           name: {
             type: "string",
@@ -3292,6 +3356,8 @@ export const schemaDict = {
           },
           labels: {
             type: "array",
+            description:
+              "AppViews producing this view MUST populate labels (and reflect the source item's adultOnly) from the verified blue.moji.collection.item record, not from the embed's own self-attested fields — see the security note on #sticker. Consumers SHOULD warn or blur before rendering fullsize/thumb when present.",
             items: {
               type: "ref",
               ref: "lex:com.atproto.label.defs#label",
@@ -3346,6 +3412,68 @@ export const schemaDict = {
             format: "at-uri",
             description:
               "AT-URI of the requesting account's reaction record in this group, if any. Enables un-reacting.",
+          },
+        },
+      },
+    },
+  },
+  BlueMojiFeedGetReactionCounts: {
+    lexicon: 1,
+    id: "blue.moji.feed.getReactionCounts",
+    defs: {
+      main: {
+        type: "query",
+        description:
+          "Batch version of blue.moji.feed.getReactions for timelines: aggregated reaction groups (counts only, no paginated individual reactions) for many posts in one call, avoiding an N+1 fetch per rendered post. Use getReactions for a single post's full detail (e.g. its own dedicated view with an actor list).",
+        parameters: {
+          type: "params",
+          required: ["uris"],
+          properties: {
+            uris: {
+              type: "array",
+              items: {
+                type: "string",
+                format: "at-uri",
+              },
+              maxLength: 50,
+              description:
+                "AT-URIs of the subject posts. Send as a single comma-joined value (e.g. 'uris=at://a,at://b'), not repeated 'uris=' keys — this AppView's implementation currently only sees the last occurrence of a repeated query key. AT-URIs never contain commas (record keys exclude them), so this is unambiguous.",
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["counts"],
+            properties: {
+              counts: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.feed.getReactionCounts#subjectReactionCounts",
+                },
+              },
+            },
+          },
+        },
+      },
+      subjectReactionCounts: {
+        type: "object",
+        required: ["uri", "groups"],
+        properties: {
+          uri: {
+            type: "string",
+            format: "at-uri",
+            description:
+              "AT-URI of the subject post. Subjects with zero reactions are omitted from the response rather than included with an empty groups array.",
+          },
+          groups: {
+            type: "array",
+            items: {
+              type: "ref",
+              ref: "lex:blue.moji.feed.defs#reactionGroup",
+            },
           },
         },
       },
@@ -3412,6 +3540,55 @@ export const schemaDict = {
       },
     },
   },
+  BlueMojiFeedGetTrending: {
+    lexicon: 1,
+    id: "blue.moji.feed.getTrending",
+    defs: {
+      main: {
+        type: "query",
+        description:
+          'AppView-computed "Weekly Top Bluemoji": the custom emoji reacted with by the most distinct actors in a recent window. Purely a discovery/trending signal derived from indexed blue.moji.feed.reaction records verified against their source blue.moji.collection.item — not a network-wide count (only reflects reactions this AppView has indexed), and not the same per-post cap applied by getReactions/getReactionCounts.',
+        parameters: {
+          type: "params",
+          properties: {
+            period: {
+              type: "string",
+              default: "week",
+              description:
+                "Trending window: 'day', 'week', or 'month'. Any other value is rejected.",
+            },
+            limit: {
+              type: "integer",
+              minimum: 1,
+              maximum: 100,
+              default: 25,
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["period", "items"],
+            properties: {
+              period: {
+                type: "string",
+              },
+              items: {
+                type: "array",
+                description:
+                  "blue.moji.feed.defs#reactionGroup entries reused here: 'count' is the distinct-reactor count within the window (not a per-post count), and 'viewer' is always omitted since there's no single subject.",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.feed.defs#reactionGroup",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   BlueMojiFeedReaction: {
     lexicon: 1,
     id: "blue.moji.feed.reaction",
@@ -3458,12 +3635,24 @@ export const schemaDict = {
             description:
               "AT-URI of the blue.moji.collection.item record. The owning DID is derived from this.",
           },
+          cid: {
+            type: "string",
+            format: "cid",
+            description:
+              "CID of the blue.moji.collection.item record, populated by AppViews at hydration time (like adultOnly) so consumers can build a com.atproto.repo.strongRef for moderation reports without a separate lookup. Not meaningful on write.",
+          },
           name: {
             type: "string",
             description: "Colon-wrapped alias, e.g. :blobcat:. Used as fallback text.",
           },
           alt: {
             type: "string",
+          },
+          adultOnly: {
+            type: "boolean",
+            default: false,
+            description:
+              "MUST be populated by AppViews from the source item's adultOnly at hydration time (the source item is the trust anchor; do not trust a reactor-supplied value on write). Consumers SHOULD warn or blur before rendering when true, consistent with how the same item's adultOnly is handled elsewhere (facets, collection views).",
           },
           formats: {
             type: "union",
@@ -3736,6 +3925,8 @@ export const schemaDict = {
                 format: "at-uri",
               },
               maxLength: 25,
+              description:
+                "Send as a single comma-joined value (e.g. 'uris=at://a,at://b'), not repeated 'uris=' keys — this AppView's implementation currently only sees the last occurrence of a repeated query key. AT-URIs never contain commas (record keys exclude them), so this is unambiguous.",
             },
           },
         },
@@ -3849,11 +4040,14 @@ export const schemaDict = {
     defs: {
       main: {
         type: "object",
+        description:
+          "SECURITY: did/name/formats/adultOnly/labels are all self-attested by the posting client at write time and are not re-validated by the PDS. Consumers that render an image from this facet without first verifying it against the referenced blue.moji.collection.item record (e.g. via an AppView's blue.moji.collection.getItem, hydrated from firehose-verified data) are trusting the poster to have told the truth about whose emoji it is, what it looks like, and whether it needs a content warning. In particular, adultOnly/labels here MUST NOT be trusted for moderation decisions — a poster could simply omit them to bypass a warning the source item's own record carries. Verified renderers should use the source item's adultOnly/labels instead. Renderers that skip verification SHOULD treat the facet as decorative/best-effort only, exactly as they would an unverified embed.",
         required: ["did", "name", "formats"],
         properties: {
           did: {
             type: "string",
-            description: "DID of the user posting the Bluemoji",
+            description:
+              "DID of the user posting the Bluemoji. Self-attested; see security note on this object.",
           },
           name: {
             type: "string",
@@ -3865,14 +4059,19 @@ export const schemaDict = {
           adultOnly: {
             type: "boolean",
             default: false,
+            description:
+              "Self-attested by the poster; see security note on this object. Verified renderers SHOULD use the source item's adultOnly instead.",
           },
           labels: {
             type: "union",
-            description: "Self-label values for this emoji. Effectively content warnings.",
+            description:
+              "Self-label values for this emoji. Effectively content warnings. Self-attested by the poster; see security note on this object.",
             refs: ["lex:com.atproto.label.defs#selfLabels"],
           },
           formats: {
             type: "union",
+            description:
+              "#formats_v0 is deprecated (see RFC 0001); writers MUST produce #formats_v1.",
             refs: [
               "lex:blue.moji.richtext.facet#formats_v0",
               "lex:blue.moji.richtext.facet#formats_v1",
@@ -3884,7 +4083,7 @@ export const schemaDict = {
       formats_v1: {
         type: "object",
         description:
-          "On the facet, only the CID is provided as this can be combined with the DID to create CDN URLs for non-animated blobs. For APNG and dotLottie, raw Bytes are served and require a com.atproto.repo.getRecord roundtrip on render so are marked with a boolean",
+          "Only the CID is provided; combine with the facet's did to construct a blob/CDN URL with no additional round-trip. All formats, including animated ones, are CIDs of Blob-typed values on the source record.",
         properties: {
           png_128: {
             type: "string",
@@ -3911,7 +4110,7 @@ export const schemaDict = {
       formats_v0: {
         type: "object",
         description:
-          "On the facet, only the CID is provided as this can be combined with the DID to create CDN URLs for non-animated blobs. For APNG and dotLottie, raw Bytes are served and require a com.atproto.repo.getRecord roundtrip on render so are marked with a boolean",
+          "DEPRECATED, corresponds to blue.moji.collection.item#formats_v0. png/webp/gif are CIDs combinable with the facet's did to build a blob/CDN URL; apng_128/lottie are raw Bytes on the source record (not Blob) so are only marked present here as a boolean and require a com.atproto.repo.getRecord round-trip to render.",
         properties: {
           png_128: {
             type: "string",
@@ -4201,9 +4400,12 @@ export const ids = {
   BlueMojiCollectionListCollection: "blue.moji.collection.listCollection",
   BlueMojiCollectionPutItem: "blue.moji.collection.putItem",
   BlueMojiCollectionSaveToCollection: "blue.moji.collection.saveToCollection",
+  BlueMojiCollectionSearchItems: "blue.moji.collection.searchItems",
   BlueMojiEmbedSticker: "blue.moji.embed.sticker",
   BlueMojiFeedDefs: "blue.moji.feed.defs",
+  BlueMojiFeedGetReactionCounts: "blue.moji.feed.getReactionCounts",
   BlueMojiFeedGetReactions: "blue.moji.feed.getReactions",
+  BlueMojiFeedGetTrending: "blue.moji.feed.getTrending",
   BlueMojiFeedReaction: "blue.moji.feed.reaction",
   BlueMojiPacksDefs: "blue.moji.packs.defs",
   BlueMojiPacksGetActorPacks: "blue.moji.packs.getActorPacks",

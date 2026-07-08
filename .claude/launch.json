@@ -3,8 +3,13 @@
   "configurations": [
     {
       "name": "hatk",
-      "runtimeExecutable": "./node_modules/.bin/hatk",
-      "runtimeArgs": ["start"],
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "ORIGIN=http://localhost:3000",
+        "PORT=3000",
+        "./node_modules/.bin/hatk",
+        "start"
+      ],
       "port": 3000
     }
   ]

@@ -25,9 +25,12 @@ import * as BlueMojiCollectionItem from "./types/blue/moji/collection/item.js";
 import * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/listCollection.js";
 import * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem.js";
 import * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection.js";
+import * as BlueMojiCollectionSearchItems from "./types/blue/moji/collection/searchItems.js";
 import * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
 import * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
+import * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReactionCounts.js";
 import * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
+import * as BlueMojiFeedGetTrending from "./types/blue/moji/feed/getTrending.js";
 import * as BlueMojiFeedReaction from "./types/blue/moji/feed/reaction.js";
 import * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs.js";
 import * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks.js";
@@ -60,9 +63,12 @@ export * as BlueMojiCollectionItem from "./types/blue/moji/collection/item.js";
 export * as BlueMojiCollectionListCollection from "./types/blue/moji/collection/listCollection.js";
 export * as BlueMojiCollectionPutItem from "./types/blue/moji/collection/putItem.js";
 export * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collection/saveToCollection.js";
+export * as BlueMojiCollectionSearchItems from "./types/blue/moji/collection/searchItems.js";
 export * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
 export * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
+export * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReactionCounts.js";
 export * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
+export * as BlueMojiFeedGetTrending from "./types/blue/moji/feed/getTrending.js";
 export * as BlueMojiFeedReaction from "./types/blue/moji/feed/reaction.js";
 export * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs.js";
 export * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks.js";
@@ -388,6 +394,13 @@ export class BlueMojiCollectionNS {
         throw BlueMojiCollectionSaveToCollection.toKnownErr(e);
       });
   }
+
+  searchItems(
+    params?: BlueMojiCollectionSearchItems.QueryParams,
+    opts?: BlueMojiCollectionSearchItems.CallOptions,
+  ): Promise<BlueMojiCollectionSearchItems.Response> {
+    return this._client.call("blue.moji.collection.searchItems", params, undefined, opts);
+  }
 }
 
 export class BlueMojiCollectionItemRecord {
@@ -480,11 +493,25 @@ export class BlueMojiFeedNS {
     this.reaction = new BlueMojiFeedReactionRecord(client);
   }
 
+  getReactionCounts(
+    params?: BlueMojiFeedGetReactionCounts.QueryParams,
+    opts?: BlueMojiFeedGetReactionCounts.CallOptions,
+  ): Promise<BlueMojiFeedGetReactionCounts.Response> {
+    return this._client.call("blue.moji.feed.getReactionCounts", params, undefined, opts);
+  }
+
   getReactions(
     params?: BlueMojiFeedGetReactions.QueryParams,
     opts?: BlueMojiFeedGetReactions.CallOptions,
   ): Promise<BlueMojiFeedGetReactions.Response> {
     return this._client.call("blue.moji.feed.getReactions", params, undefined, opts);
+  }
+
+  getTrending(
+    params?: BlueMojiFeedGetTrending.QueryParams,
+    opts?: BlueMojiFeedGetTrending.CallOptions,
+  ): Promise<BlueMojiFeedGetTrending.Response> {
+    return this._client.call("blue.moji.feed.getTrending", params, undefined, opts);
   }
 }
 

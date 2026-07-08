@@ -17,7 +17,7 @@ export type QueryParams = {};
 export interface InputSchema {
   /** The handle or DID of the repo to copy from. */
   source: string;
-  /** The source Bluemoji name/rkey. */
+  /** The source Bluemoji alias or rkey. Internationalised aliases are accepted and encoded per RFC 0005. */
   name: string;
   /** The alias to save the Bluemoji to in the current logged-in user's repo. */
   renameTo?: string;

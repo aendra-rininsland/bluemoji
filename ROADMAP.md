@@ -206,9 +206,25 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
 - **Community/shared namespaces**: packs owned by community or feed-gen
   accounts with delegation — the Discord "server emoji" model mapped onto
   ATProto identity.
-- **Trending & discovery**: firehose-derived usage stats ("Weekly Top
-  Bluemoji"), public gallery at moji.blue — still pending. OpenGraph cards
-  for pack embeds — **done**: `server/og/pack.ts` renders a real satori image
+- **Trending & discovery — done**: "Weekly Top Bluemoji" stats
+  (`blue.moji.feed.getTrending`, `server/get-trending.ts`) rank custom emoji
+  by distinct-reactor count over a `day`/`week`/`month` window, reusing the
+  same self-attestation verification as `getReactions`/`getReactionCounts`
+  (`_pack-views.ts`'s `verifiedEmojiRef`) so spoofed/deleted claims are
+  dropped and taken-down accounts' items are excluded. Verified live: seeded
+  a real item + 3 distinct-reactor reactions plus one reaction claiming a
+  nonexistent item — the real one correctly ranked with count 3, the spoofed
+  one correctly dropped; invalid `period` values correctly rejected. Public
+  gallery page at `/gallery` (`app/routes/gallery/`, no auth required)
+  renders this ranked list with day/week/month tabs, verified in a real
+  browser (screenshot: `#1 :blobcat: 3 reactors` with an `18+` badge),
+  linked from the homepage for both signed-in and signed-out visitors.
+  Discovered along the way: local same-origin SSR `fetch("/xrpc/...")`
+  calls (used by both this page and the pre-existing packs page) fail
+  outright without `ORIGIN`/`PORT` env vars set — documented as hatk gotcha
+  #7 in CLAUDE.md and fixed in `.claude/launch.json` for local preview
+  testing; not confirmed whether this affects production the same way.
+  OpenGraph cards for pack embeds — **done**: `server/og/pack.ts` renders a real satori image
   (icon/emoji, name, description, item count, creator handle) at
   `/og/packs/:handle/:rkey`, verified end-to-end (200 OK, real 1200x630 PNG
   with actual pack content, confirmed via `file`). hatk's built-in

@@ -29,10 +29,11 @@ export function validateMain<V>(v: V) {
   return validate<Main & V>(v, id, hashMain);
 }
 
+/** SECURITY: did/name/formats are self-attested by the posting client, like blue.moji.richtext.facet. Verify against the record strongRef (or by re-deriving the rkey from name and looking up did's blue.moji.collection.item) before rendering an image, if the render surface matters for trust. */
 export interface Sticker {
   $type?: "blue.moji.embed.sticker#sticker";
   record?: ComAtprotoRepoStrongRef.Main;
-  /** DID of the repo that owns the sticker record. Combined with the format CIDs to construct blob/CDN URLs without a getRecord round-trip, mirroring blue.moji.richtext.facet. */
+  /** DID of the repo that owns the sticker record. Combined with the format CIDs to construct blob/CDN URLs without a getRecord round-trip, mirroring blue.moji.richtext.facet. Self-attested; see security note on this object. */
   did: string;
   /** Colon-wrapped alias of the source Bluemoji (e.g. :blobcat:). Implementers should use this as fallback text when assets are unavailable. */
   name: string;
@@ -97,6 +98,7 @@ export interface ViewSticker {
   alt?: string;
   aspectRatio?: AppBskyEmbedDefs.AspectRatio;
   record?: ComAtprotoRepoStrongRef.Main;
+  /** AppViews producing this view MUST populate labels (and reflect the source item's adultOnly) from the verified blue.moji.collection.item record, not from the embed's own self-attested fields — see the security note on #sticker. Consumers SHOULD warn or blur before rendering fullsize/thumb when present. */
   labels?: ComAtprotoLabelDefs.Label[];
 }
 

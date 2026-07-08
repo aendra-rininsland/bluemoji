@@ -100,7 +100,21 @@ developers.
    (`XrpcContext`) — includes `packCursor`/`unpackCursor` for keyset
    pagination, `blobUrl`, `search`, `exists`, PDS-proxied record writes.
 7. SSR pages can call our own XRPC same-origin with SvelteKit's relative
-   `fetch("/xrpc/...")` — cookies forward, viewer state works.
+   `fetch("/xrpc/...")` — cookies forward, viewer state works. **Locally**,
+   this same-origin fetch fails outright (`TypeError: fetch failed`, raw
+   undici error) unless `ORIGIN` and `PORT` env vars are set when starting
+   hatk — SvelteKit's server-side `fetch` needs an explicit origin to
+   self-resolve in this setup, and hatk doesn't infer one. `.claude/
+launch.json`'s "hatk" config wraps the start command in `env ORIGIN=http://
+localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
+   outside that (bare terminal, a different script) needs the same env vars
+   or every page using this pattern (packs, gallery) will silently 500 on
+   its data load and render an empty/default state. Not confirmed whether
+   Railway's production env supplies an equivalent automatically —
+   `RAILWAY_PUBLIC_DOMAIN` is read by hatk's OAuth issuer logic, not
+   confirmed wired to `ORIGIN` — but the packs page has used this exact
+   fetch pattern in production already, so if it's broken there too it's a
+   latent, currently-unnoticed issue, not something introduced recently.
 8. **`array`-typed query params on `query` (GET) endpoints are broken in
    hatk's XRPC dispatch**: `server.js`'s param builder does
    `for (const [k,v] of url.searchParams) params[k] = v`, which silently

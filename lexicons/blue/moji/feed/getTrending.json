@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.feed.getTrending",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "AppView-computed \"Weekly Top Bluemoji\": the custom emoji reacted with by the most distinct actors in a recent window. Purely a discovery/trending signal derived from indexed blue.moji.feed.reaction records verified against their source blue.moji.collection.item — not a network-wide count (only reflects reactions this AppView has indexed), and not the same per-post cap applied by getReactions/getReactionCounts.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "period": {
+            "type": "string",
+            "default": "week",
+            "description": "Trending window: 'day', 'week', or 'month'. Any other value is rejected."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["period", "items"],
+          "properties": {
+            "period": { "type": "string" },
+            "items": {
+              "type": "array",
+              "description": "blue.moji.feed.defs#reactionGroup entries reused here: 'count' is the distinct-reactor count within the window (not a per-post count), and 'viewer' is always omitted since there's no single subject.",
+              "items": { "type": "ref", "ref": "blue.moji.feed.defs#reactionGroup" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

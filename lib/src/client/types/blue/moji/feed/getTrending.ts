@@ -6,20 +6,23 @@ import { type ValidationResult, BlobRef } from "@atproto/lexicon";
 import { CID } from "multiformats/cid";
 import { validate as _validate } from "../../../../lexicons";
 import { type $Typed, is$typed as _is$typed, type OmitKey } from "../../../../util";
-import type * as BlueMojiPacksDefs from "./defs.js";
+import type * as BlueMojiFeedDefs from "./defs.js";
 
 const is$typed = _is$typed,
   validate = _validate;
-const id = "blue.moji.packs.getPacks";
+const id = "blue.moji.feed.getTrending";
 
 export type QueryParams = {
-  /** Send as a single comma-joined value (e.g. 'uris=at://a,at://b'), not repeated 'uris=' keys — this AppView's implementation currently only sees the last occurrence of a repeated query key. AT-URIs never contain commas (record keys exclude them), so this is unambiguous. */
-  uris: string[];
+  /** Trending window: 'day', 'week', or 'month'. Any other value is rejected. */
+  period?: string;
+  limit?: number;
 };
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  packs: BlueMojiPacksDefs.PackViewBasic[];
+  period: string;
+  /** blue.moji.feed.defs#reactionGroup entries reused here: 'count' is the distinct-reactor count within the window (not a per-post count), and 'viewer' is always omitted since there's no single subject. */
+  items: BlueMojiFeedDefs.ReactionGroup[];
 }
 
 export interface CallOptions {

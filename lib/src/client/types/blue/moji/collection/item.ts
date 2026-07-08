@@ -38,6 +38,7 @@ export function validateMain<V>(v: V) {
 
 export { type Main as Record, isMain as isRecord, validateMain as validateRecord };
 
+/** DEPRECATED. apng_128/lottie are raw Bytes (not Blob), which makes them invisible to blob-based image moderation pipelines and requires a getRecord round-trip to render. New writes MUST use #formats_v1. Retained only so existing v0 records remain readable. */
 export interface Formats_v0 {
   $type?: "blue.moji.collection.item#formats_v0";
   original?: BlobRef;

@@ -6,20 +6,25 @@ import { type ValidationResult, BlobRef } from "@atproto/lexicon";
 import { CID } from "multiformats/cid";
 import { validate as _validate } from "../../../../lexicons";
 import { type $Typed, is$typed as _is$typed, type OmitKey } from "../../../../util";
-import type * as BlueMojiPacksDefs from "./defs.js";
+import type * as BlueMojiCollectionItem from "./item.js";
 
 const is$typed = _is$typed,
   validate = _validate;
-const id = "blue.moji.packs.getPacks";
+const id = "blue.moji.collection.searchItems";
 
 export type QueryParams = {
-  /** Send as a single comma-joined value (e.g. 'uris=at://a,at://b'), not repeated 'uris=' keys — this AppView's implementation currently only sees the last occurrence of a repeated query key. AT-URIs never contain commas (record keys exclude them), so this is unambiguous. */
-  uris: string[];
+  /** Search query, matched against the alias and alt text. */
+  q: string;
+  /** Restrict results to a single repo's collection, using substring matching. Network-wide whole-word search when omitted. */
+  repo?: string;
+  limit?: number;
+  cursor?: string;
 };
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  packs: BlueMojiPacksDefs.PackViewBasic[];
+  cursor?: string;
+  items: BlueMojiCollectionItem.ItemView[];
 }
 
 export interface CallOptions {

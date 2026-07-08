@@ -45,7 +45,7 @@ export interface EmojiRef {
   name: string;
   alt?: string;
   /** MUST be populated by AppViews from the source item's adultOnly at hydration time (the source item is the trust anchor; do not trust a reactor-supplied value on write). Consumers SHOULD warn or blur before rendering when true, consistent with how the same item's adultOnly is handled elsewhere (facets, collection views). */
-  adultOnly?: boolean;
+  adultOnly: boolean;
   formats:
     | $Typed<BlueMojiRichtextFacet.Formats_v0>
     | $Typed<BlueMojiRichtextFacet.Formats_v1>

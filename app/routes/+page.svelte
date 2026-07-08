@@ -45,6 +45,9 @@
       <a href="/packs" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; text-decoration: none; color: var(--text);">
         My packs
       </a>
+      <a href="/gallery" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; text-decoration: none; color: var(--text);">
+        Trending
+      </a>
       <button onclick={handleLogout}>Sign out</button>
     </div>
   {:else}
@@ -65,5 +68,8 @@
     {#if error}
       <p style="color: red;">{error}</p>
     {/if}
+    <p style="margin-top: 1rem;">
+      <a href="/gallery" style="color: var(--text);">See what's trending →</a>
+    </p>
   {/if}
 </main>
