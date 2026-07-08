@@ -33,13 +33,19 @@ export default defineConfig({
   },
   oauth: {
     issuer: isProd && prodDomain ? `https://${prodDomain}` : undefined,
+    // repo:app.bsky.feed.post was added here for the sticker composer
+    // (Phase 4.6) and caused a severe regression: every previously-
+    // authenticated session started getting ScopeMissingError from the PDS
+    // on ALL protected writes (uploadBlob included, not just post
+    // creation), breaking uploads for every existing user. Reverted
+    // 2026-07-08 as an emergency fix — see ROADMAP.md for the incident
+    // writeup and what a safe re-rollout needs to look like.
     scopes: [
       "atproto",
       "repo:blue.moji.collection.item",
       "repo:blue.moji.packs.pack",
       "repo:blue.moji.packs.packitem",
       "repo:blue.moji.feed.reaction",
-      "repo:app.bsky.feed.post",
       "blob",
     ],
     clients: [
@@ -49,7 +55,7 @@ export default defineConfig({
               client_id: `https://${prodDomain}/oauth-client-metadata.json`,
               client_name: "moji.blue",
               scope:
-                "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction repo:app.bsky.feed.post blob",
+                "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob",
               redirect_uris: [
                 `https://${prodDomain}/oauth/callback`,
                 `https://${prodDomain}/admin`,
@@ -61,7 +67,7 @@ export default defineConfig({
         client_id: "http://127.0.0.1:3000/oauth-client-metadata.json",
         client_name: "bluemoji",
         scope:
-          "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction repo:app.bsky.feed.post blob",
+          "atproto repo:blue.moji.collection.item repo:blue.moji.packs.pack repo:blue.moji.packs.packitem repo:blue.moji.feed.reaction blob",
         redirect_uris: ["http://127.0.0.1:3000/oauth/callback"],
       },
     ],
