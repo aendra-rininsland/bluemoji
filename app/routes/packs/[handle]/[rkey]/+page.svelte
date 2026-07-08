@@ -180,7 +180,31 @@
       busy = null
     }
   }
+
+  const packRkey = data.packUri.split('/').pop() ?? ''
+  const ogTitle = `${data.pack.name} — a Bluemoji pack`
+  const ogDescription =
+    data.pack.description ??
+    `${data.pack.packItemCount ?? data.items.length} custom emoji, shared via moji.blue`
+  const ogImage = `https://moji.blue/og/packs/${encodeURIComponent(data.pack.creator.did)}/${encodeURIComponent(packRkey)}`
+  const ogUrl = `https://moji.blue/packs/${data.pack.creator.did}/${packRkey}`
 </script>
+
+<svelte:head>
+  <title>{ogTitle}</title>
+  <meta name="description" content={ogDescription} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={ogTitle} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content={ogUrl} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={ogTitle} />
+  <meta name="twitter:description" content={ogDescription} />
+  <meta name="twitter:image" content={ogImage} />
+</svelte:head>
 
 <main style="max-width: 900px; margin: 0 auto; padding: 2rem;">
   <h1 style="margin-bottom: 1.5rem;">

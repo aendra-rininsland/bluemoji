@@ -207,8 +207,35 @@ picker.ts`) is a debounced search-as-you-type Custom Element dispatching a
   accounts with delegation — the Discord "server emoji" model mapped onto
   ATProto identity.
 - **Trending & discovery**: firehose-derived usage stats ("Weekly Top
-  Bluemoji"), public gallery at moji.blue, OpenGraph cards for pack embeds
-  (hatk has an `og` module).
+  Bluemoji"), public gallery at moji.blue — still pending. OpenGraph cards
+  for pack embeds — **done**: `server/og/pack.ts` renders a real satori image
+  (icon/emoji, name, description, item count, creator handle) at
+  `/og/packs/:handle/:rkey`, verified end-to-end (200 OK, real 1200x630 PNG
+  with actual pack content, confirmed via `file`). hatk's built-in
+  `publicDir`/`defineRenderer` auto meta-tag injection turned out to be
+  **unwired for this project** — it requires a `public/index.html` with a
+  `<!--ssr-outlet-->` placeholder, but this app builds via
+  `@sveltejs/adapter-node` (`build/`, SvelteKit's own template/placeholders)
+  and has no custom renderer registered; confirmed live that moji.blue's
+  homepage currently has zero `og:*` tags anywhere, a pre-existing gap.
+  Fixed at the actual rendering layer instead: standard SvelteKit
+  `<svelte:head>` meta tags in `app/routes/packs/[handle]/[rkey]/+page.svelte`
+  point `og:image`/`twitter:image` at the working OG endpoint, using pack
+  data the page loader already fetches — no new round-trip. Verified with a
+  real seeded pack row + rebuilt SSR bundle (`vp build`) + live curl: the
+  page HTML actually contains the correct `og:title`/`og:description`/
+  `og:image`/`twitter:*` tags. Note for local testing: booting `hatk start`
+  bare and curling the pack page fails the loader's same-origin
+  `fetch("/xrpc/...")` call with a raw `TypeError: fetch failed` — setting
+  `ORIGIN`/`PORT` env vars (e.g. `ORIGIN=http://localhost:3000 PORT=3000`)
+  fixes it locally, so SvelteKit's server-side fetch needs an explicit origin
+  to self-resolve in this setup. Not yet confirmed whether Railway's env
+  already supplies an equivalent (`RAILWAY_PUBLIC_DOMAIN` is read by hatk's
+  OAuth issuer logic, not confirmed wired to `ORIGIN`) — the packs page
+  itself predates this session and is already live in production using the
+  same fetch pattern, so this is pre-existing local-only friction, not a new
+  regression; flagging as worth a direct prod check if OG cards don't
+  unfurl correctly once deployed.
 - **Verified/first-party sets**: artists publish signed packs; `copyOf`
   chains already give attribution for "created by" credits and tip-jar
   links.
