@@ -206,6 +206,10 @@
     <span style="color: var(--muted); font-weight: 400;"> › upload</span>
   </h1>
 
+  <p style="margin-bottom: 1rem; font-size: 0.875rem; color: var(--muted);">
+    Coming from Mastodon? <a href="/import/mastodon">Import your server's custom emoji</a> in bulk.
+  </p>
+
   <form
     onsubmit={(e) => { e.preventDefault(); upload() }}
     style="display: flex; flex-direction: column; gap: 1.25rem;"

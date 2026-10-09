@@ -410,7 +410,21 @@ Stickers.proto` via `gh api`, not guessed), a `manifest.json` mirror, one
   item in the local dev DB is inline-only) — the 502 "couldn't fetch any
   sticker images" path was confirmed instead, and every other stage
   (protobuf, zip, ffmpeg conversion) was verified independently for real.
-  Import from Slack/Discord/Mastodon not attempted this pass.
+  Mastodon import shipped at `/import/mastodon` (see below); Slack/Discord
+  import not attempted.
+
+- **Mastodon emoji import** (`/import/mastodon`): the user logs in to their
+  Mastodon server via OAuth (app registered dynamically per login, PKCE,
+  `read:accounts` only; token kept in an httpOnly cookie scoped to `/import`,
+  revoked on disconnect), picks emoji from the server's `custom_emojis`
+  list, and the browser re-uses the upload page's pipeline to write them as
+  items (optionally into a new/existing pack). Server code is
+  `app/lib/server/mastodon.ts` (SSRF guards, tests alongside); browser code
+  is `app/lib/mastodon-import.ts`. Not verified against a live Mastodon
+  server or PDS (no egress/Docker in the authoring session) — only unit
+  tests against a faked Mastodon API plus a build and route smoke-boot.
+  Follow-ups: the upload page still has its own copy of the resize/upload
+  pipeline; DNS-rebinding is only mitigated by resolve-then-fetch.
 
 - **Cloudflare-native port** (optional cost play): Workers + D1 + a
   cron-triggered Jetstream drain (`wantedCollections=blue.moji.*`) fits the

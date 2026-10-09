@@ -33,6 +33,9 @@ link that instead of this file for adopters past the RENDERING.md stage.
   `/packs`, `/packs/[handle]/[rkey]`, `/profile/[handle]/post/[rkey]`
   (post renderer with facets, sticker embed, reaction bar), and
   `/img/[did]/[cid]` (+server.ts blob proxy).
+  `/import/mastodon` imports a Mastodon server's custom emoji (OAuth login,
+  SSRF-guarded fetches in `app/lib/server/mastodon.ts`; the image proxy takes
+  a shortcode, never a URL).
 - `app/lib/alias.ts` — canonical RFC 0005 implementation (alias
   canonicalisation + Punycode rkey encoding). **Duplicated** in
   `lib/src/util/alias.ts` for the published package; keep the two in sync.
