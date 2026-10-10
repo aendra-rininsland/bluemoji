@@ -427,6 +427,11 @@ Stickers.proto` via `gh api`, not guessed), a `manifest.json` mirror, one
   Custom Emojis" permission (`canImportEmoji`, from `verify_credentials`'s
   `role`; fails closed on servers with no role data). This is a policy gate,
   not a security boundary — `custom_emojis` is public.
+  Post-launch fixes: `putItem` 500'd on any item without alt text (explicit
+  `alt: undefined` fails lexicon validation, and hatk reports ProxyErrors as
+  bare 500s — now mapped to 400 with the message); animated WebP renditions
+  weren't shown by the app's pages; ffmpeg transcodes stretched non-square
+  sources (now letterboxed with transparency).
   Follow-ups: the upload page still has its own copy of the resize/upload
   pipeline; DNS-rebinding is only mitigated by resolve-then-fetch.
 

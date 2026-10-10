@@ -123,6 +123,8 @@ export async function importMastodonEmoji(o: ImportOptions): Promise<ImportResul
     repo: o.did,
     item: {
       name: `:${alias}:`,
+      // Mastodon emoji carry no description; the humanised shortcode beats none
+      alt: alias.replace(/[_.-]+/g, " "),
       createdAt: new Date().toISOString(),
       adultOnly: o.adultOnly,
       formats,

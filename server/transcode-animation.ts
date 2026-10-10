@@ -24,7 +24,9 @@ async function transcodeToWebp(inputPath: string, size: number, workdir: string)
         "-i",
         inputPath,
         "-vf",
-        `scale=${size}:${size}`,
+        // Fit inside a size×size square without distorting, letterboxing
+        // with transparency (plain scale=N:N stretched non-square sources).
+        `scale=${size}:${size}:force_original_aspect_ratio=decrease:flags=lanczos,format=rgba,pad=${size}:${size}:(ow-iw)/2:(oh-ih)/2:color=0x00000000`,
         "-loop",
         "0",
         "-an",
