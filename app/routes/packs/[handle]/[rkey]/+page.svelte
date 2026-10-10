@@ -12,6 +12,28 @@
   let copied = $state<Set<string>>(new Set())
   let shareCopied = $state(false)
 
+  // Admin-only "Featured" toggle (blue.moji.featured.setFeatured).
+  let featured = $state<Set<string>>(new Set(data.featuredUris))
+  let featureBusy = $state<string | null>(null)
+
+  async function toggleFeatured(uri: string | undefined) {
+    if (!uri) return
+    featureBusy = uri
+    error = ''
+    const next = !featured.has(uri)
+    try {
+      await callXrpc('blue.moji.featured.setFeatured', { uri, featured: next })
+      const set = new Set(featured)
+      if (next) set.add(uri)
+      else set.delete(uri)
+      featured = set
+    } catch (e: any) {
+      error = e.message ?? 'Failed to update featured'
+    } finally {
+      featureBusy = null
+    }
+  }
+
   // Values must match an identifier registered via defineLabel() in
   // server/labels/ — dev.hatk.createReport rejects any other label.
   const REPORT_REASONS = [
@@ -249,6 +271,15 @@
           Export as Signal stickers
         </a>
       {/if}
+      {#if data.viewerIsAdmin}
+        <button
+          onclick={() => toggleFeatured(data.pack.uri)}
+          disabled={featureBusy !== null}
+          style="padding: 0.375rem 0.875rem; border: 1px solid var(--border); background: none; color: var(--text); border-radius: 4px; font-size: 0.875rem; cursor: pointer;"
+        >
+          {featured.has(data.pack.uri) ? '★ Unfeature pack' : '☆ Feature pack'}
+        </button>
+      {/if}
       {#if data.viewer && !data.isOwner}
         <button
           onclick={() => openReport(data.pack.uri, data.pack.cid, data.pack.name)}
@@ -415,6 +446,15 @@
               style="font-size: 0.75rem; padding: 0.25rem 0.625rem; border: 1px solid var(--border); background: none; color: var(--text); border-radius: 4px; cursor: pointer; opacity: {copied.has(item.subject.uri ?? '') ? 0.5 : 1};"
             >
               {copied.has(item.subject.uri ?? '') ? 'Copied ✓' : busy === item.subject.uri ? 'Copying…' : 'Copy'}
+            </button>
+          {/if}
+          {#if data.viewerIsAdmin && item.subject.uri}
+            <button
+              onclick={() => toggleFeatured(item.subject.uri)}
+              disabled={featureBusy !== null}
+              style="font-size: 0.6875rem; padding: 0.125rem 0.5rem; border: none; background: none; color: var(--muted); cursor: pointer; text-decoration: underline;"
+            >
+              {featured.has(item.subject.uri) ? '★ Unfeature' : '☆ Feature'}
             </button>
           {/if}
           {#if data.viewer && item.subject.uri && item.subject.cid}

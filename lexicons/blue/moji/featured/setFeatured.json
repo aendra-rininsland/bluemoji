@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.featured.setFeatured",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Feature or un-feature an emoji, sticker or pack on this AppView's Featured page. Requires auth as an AppView administrator. Implemented by AppView.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "featured"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "AT-URI of a blue.moji.collection.item or blue.moji.packs.pack record. Features of items require the item to be indexed."
+            },
+            "featured": { "type": "boolean" }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "featured"],
+          "properties": {
+            "uri": { "type": "string", "format": "at-uri" },
+            "featured": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "blue.moji.featured.getFeatured",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "AppView-curated list of featured emoji, stickers and packs, chosen by this AppView's administrators. Public. Subjects are re-derived from indexed records, so deleted or taken-down subjects are omitted. An item with stickerFormats is returned under 'stickers' (it may also be used inline); items with only 'formats' are returned under 'emoji'.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["emoji", "stickers", "packs", "viewerIsAdmin"],
+          "properties": {
+            "emoji": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "blue.moji.collection.item#itemView" }
+            },
+            "stickers": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "blue.moji.collection.item#itemView" }
+            },
+            "packs": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "blue.moji.packs.defs#packViewBasic" }
+            },
+            "featuredUris": {
+              "type": "array",
+              "description": "Only populated for administrators: every featured subject URI, including ones that currently fail to resolve, so they can be un-featured.",
+              "items": { "type": "string", "format": "at-uri" }
+            },
+            "viewerIsAdmin": {
+              "type": "boolean",
+              "description": "Whether the authenticated viewer may call setFeatured."
+            }
+          }
+        }
+      }
+    }
+  }
+}

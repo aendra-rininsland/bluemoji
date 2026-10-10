@@ -6,6 +6,7 @@
 
   const navItems = [
     { href: '/', label: 'Home', icon: 'A' },
+    { href: '/featured', label: 'Featured', icon: 'F' },
     { href: '/gallery', label: 'Trending', icon: 'B' },
     { href: '/packs', label: 'Packs', icon: 'C' },
   ]

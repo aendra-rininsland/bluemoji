@@ -115,28 +115,6 @@ CREATE TABLE _repos (
   retry_after INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE "app.bsky.feed.postgate" (
-  uri TEXT PRIMARY KEY,
-  cid TEXT,
-  did TEXT NOT NULL,
-  indexed_at TEXT NOT NULL,
-  post TEXT NOT NULL,
-  created_at TEXT NOT NULL,
-  embedding_rules TEXT,
-  detached_embedding_uris TEXT
-);
-
-CREATE TABLE "app.bsky.feed.threadgate" (
-  uri TEXT PRIMARY KEY,
-  cid TEXT,
-  did TEXT NOT NULL,
-  indexed_at TEXT NOT NULL,
-  post TEXT NOT NULL,
-  allow TEXT,
-  created_at TEXT NOT NULL,
-  hidden_replies TEXT
-);
-
 CREATE TABLE "blue.moji.collection.item" (
   uri TEXT PRIMARY KEY,
   cid TEXT,
@@ -146,11 +124,11 @@ CREATE TABLE "blue.moji.collection.item" (
   alt TEXT,
   created_at TEXT NOT NULL,
   formats TEXT NOT NULL,
+  sticker_formats TEXT,
   adult_only INTEGER,
   labels TEXT,
   copy_of TEXT,
-  fallback_text TEXT,
-  "sticker_formats" TEXT
+  fallback_text TEXT
 );
 
 CREATE TABLE "blue.moji.collection.item__formats_formats_v0" (
@@ -230,4 +208,11 @@ CREATE TABLE "blue.moji.packs.packitem" (
   subject TEXT NOT NULL,
   pack TEXT NOT NULL,
   created_at TEXT NOT NULL
+);
+
+CREATE TABLE featured_items (
+  uri TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  featured_by TEXT NOT NULL,
+  featured_at TEXT NOT NULL
 );
