@@ -423,6 +423,10 @@ Stickers.proto` via `gh api`, not guessed), a `manifest.json` mirror, one
   is `app/lib/mastodon-import.ts`. Not verified against a live Mastodon
   server or PDS (no egress/Docker in the authoring session) — only unit
   tests against a faked Mastodon API plus a build and route smoke-boot.
+  Login is gated to instance administrators and holders of the "Manage
+  Custom Emojis" permission (`canImportEmoji`, from `verify_credentials`'s
+  `role`; fails closed on servers with no role data). This is a policy gate,
+  not a security boundary — `custom_emojis` is public.
   Follow-ups: the upload page still has its own copy of the resize/upload
   pipeline; DNS-rebinding is only mitigated by resolve-then-fetch.
 

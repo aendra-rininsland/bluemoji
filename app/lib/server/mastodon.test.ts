@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   beginAuth,
+  canImportEmoji,
   completeAuth,
   fetchEmojiImage,
   listEmojis,
@@ -71,6 +72,18 @@ t("sniffImage", () => {
   assert.equal(sniffImage(Buffer.from("<html>")), null);
 });
 
+t("canImportEmoji allows administrators and emoji managers only", () => {
+  assert.ok(canImportEmoji({ permissions: "1" }), "administrator");
+  assert.ok(canImportEmoji({ permissions: String(1 << 14) }), "manage custom emojis");
+  assert.ok(canImportEmoji({ permissions: String((1 << 14) | (1 << 3)) }), "emojis + dashboard");
+  assert.ok(canImportEmoji({ permissions: 1 }), "numeric permissions");
+  assert.ok(!canImportEmoji({ permissions: "0" }), "plain user");
+  assert.ok(!canImportEmoji({ permissions: String(1 << 16) }), "invite_users only");
+  assert.ok(!canImportEmoji({ permissions: "garbage" }), "malformed");
+  assert.ok(!canImportEmoji({}), "no permissions");
+  assert.ok(!canImportEmoji(null), "no role (Mastodon < 4.0)");
+});
+
 // --- OAuth + emoji flow against a faked Mastodon (public IP literal, so no DNS) ---
 const HOST = "93.184.216.34";
 const png = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 13, 10, 26, 10]);
@@ -89,7 +102,12 @@ globalThis.fetch = (async (input: any, init?: RequestInit) => {
   }
   if (u.pathname === "/api/v1/accounts/verify_credentials") {
     assert.equal((init!.headers as any).authorization, "Bearer tok");
-    return json({ username: "me", acct: "me", display_name: "Me" });
+    return json({
+      username: "me",
+      acct: "me",
+      display_name: "Me",
+      role: { name: "Admin", permissions: "1" },
+    });
   }
   if (u.pathname === "/api/v1/custom_emojis") {
     return json([
@@ -125,6 +143,26 @@ const session = await completeAuth(pending, "the-code");
 assert.equal(session.acct, `me@${HOST}`);
 n++;
 console.log("ok - completeAuth exchanges the code and verifies credentials");
+
+// A plain member is rejected and their token revoked
+const realFetch2 = globalThis.fetch;
+let revoked = false;
+globalThis.fetch = (async (input: any, init?: RequestInit) => {
+  const u = new URL(String(input));
+  if (u.pathname === "/oauth/revoke") {
+    revoked = true;
+    return new Response("{}");
+  }
+  if (u.pathname === "/api/v1/accounts/verify_credentials") {
+    return new Response(JSON.stringify({ username: "joe", role: { permissions: "0" } }));
+  }
+  return realFetch2(input, init);
+}) as typeof fetch;
+await assert.rejects(completeAuth(pending, "the-code"), /Manage Custom Emojis/);
+assert.ok(revoked, "token revoked on rejection");
+globalThis.fetch = realFetch2;
+n++;
+console.log("ok - completeAuth rejects non-admins and revokes their token");
 
 const emojis = await listEmojis(session);
 assert.deepEqual(

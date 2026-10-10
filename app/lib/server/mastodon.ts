@@ -272,6 +272,31 @@ interface MastodonAccount {
   username: string;
   display_name?: string;
   avatar?: string;
+  role?: { name?: string; permissions?: string | number } | null;
+}
+
+// Mastodon's UserRole::FLAGS (app/models/user_role.rb). Administrator implies
+// every permission, but is checked explicitly so we don't depend on the
+// server expanding the bitmask for us.
+const PERM_ADMINISTRATOR = 1n << 0n;
+const PERM_MANAGE_CUSTOM_EMOJIS = 1n << 14n;
+
+/**
+ * Whether a verify_credentials `role` may import the server's emoji: the
+ * account must be an administrator or hold "Manage Custom Emojis". Fails
+ * closed for servers that report no role (Mastodon < 4.0, most non-Mastodon
+ * implementations) or a malformed one.
+ */
+export function canImportEmoji(role: MastodonAccount["role"]): boolean {
+  if (!role || (typeof role.permissions !== "string" && typeof role.permissions !== "number")) {
+    return false;
+  }
+  try {
+    const perms = BigInt(role.permissions);
+    return (perms & (PERM_ADMINISTRATOR | PERM_MANAGE_CUSTOM_EMOJIS)) !== 0n;
+  } catch {
+    return false;
+  }
 }
 
 /** Exchange the authorization code and look up who just logged in. */
@@ -292,7 +317,7 @@ export async function completeAuth(pending: PendingAuth, code: string): Promise<
   const me = await apiJson<MastodonAccount>(pending.domain, "/api/v1/accounts/verify_credentials", {
     token: tok.access_token,
   });
-  return {
+  const session: MastodonSession = {
     domain: pending.domain,
     token: tok.access_token,
     clientId: pending.clientId,
@@ -301,6 +326,14 @@ export async function completeAuth(pending: PendingAuth, code: string): Promise<
     displayName: me.display_name || me.username || me.acct,
     avatar: me.avatar,
   };
+  if (!canImportEmoji(me.role)) {
+    await revokeToken(session);
+    throw new MastodonError(
+      `Only administrators of ${pending.domain}, or accounts with the "Manage Custom Emojis" permission, can import its emoji.`,
+      403,
+    );
+  }
+  return session;
 }
 
 /** Best-effort token revocation on logout. */

@@ -121,7 +121,8 @@
   {#if !data.mastodon}
     <p style="color: var(--muted); margin-bottom: 1.25rem;">
       Copy your Mastodon server's custom emoji into your own Bluemoji collection. Log in to your
-      Mastodon account so we know which server to read from — we only ask for read-only access to
+      Mastodon account so we know which server to read from. Only administrators (or accounts with
+      the “Manage Custom Emojis” permission) can import a server's emoji — we only ask for read-only access to
       your profile, and never post or change anything.
     </p>
     <form
