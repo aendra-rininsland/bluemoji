@@ -54,8 +54,14 @@ async function upload(blob: Blob): Promise<unknown> {
   return (await callXrpc("dev.hatk.uploadBlob", blob)).blob;
 }
 
-/** Imports one emoji; resolves with the new item's AT-URI. */
-export async function importMastodonEmoji(o: ImportOptions): Promise<string> {
+export interface ImportResult {
+  uri: string;
+  /** Set when the emoji imported but not exactly as asked (e.g. animation dropped). */
+  warning?: string;
+}
+
+/** Imports one emoji. */
+export async function importMastodonEmoji(o: ImportOptions): Promise<ImportResult> {
   const alias = normalizeAlias(o.shortcode);
 
   const res = await fetch(`/import/mastodon/image?shortcode=${encodeURIComponent(o.shortcode)}`);
@@ -72,14 +78,21 @@ export async function importMastodonEmoji(o: ImportOptions): Promise<string> {
   if (png128.size > MAX_INLINE_BYTES) throw new Error("Too large after resizing to 128px");
   formats.png_128 = await upload(png128);
 
-  if (o.animated && source.size <= MAX_TRANSCODE_INPUT) {
+  let warning: string | undefined;
+  if (o.animated && source.size > MAX_TRANSCODE_INPUT) {
+    warning = "animation skipped: file too large to convert";
+  } else if (o.animated) {
     try {
       const data = toBase64(await source.arrayBuffer());
       const { webp128, webp512 } = await callXrpc("blue.moji.collection.transcodeAnimation", {
         data,
       });
       const webp128Blob = fromBase64(webp128 as string, "image/webp");
-      if (webp128Blob.size <= MAX_INLINE_BYTES) formats.webp_128 = await upload(webp128Blob);
+      if (webp128Blob.size <= MAX_INLINE_BYTES) {
+        formats.webp_128 = await upload(webp128Blob);
+      } else {
+        warning = "animation skipped: converted file exceeds the 128 KB limit";
+      }
       if (o.sticker && webp512) {
         const s = fromBase64(webp512 as string, "image/webp");
         if (s.size <= MAX_STICKER_BYTES) {
@@ -92,6 +105,7 @@ export async function importMastodonEmoji(o: ImportOptions): Promise<string> {
     } catch (e) {
       // Animation is a nicety: the emoji still imports with its static rendition.
       console.warn(`Animation transcode failed for :${alias}:`, e);
+      warning = `animation skipped: ${e instanceof Error ? e.message : "conversion failed"}`;
     }
   }
 
@@ -115,7 +129,7 @@ export async function importMastodonEmoji(o: ImportOptions): Promise<string> {
       ...(stickerFormats ? { stickerFormats } : {}),
     } as any,
   });
-  return uri;
+  return { uri, warning };
 }
 
 /** Create a pack and return its AT-URI. */
