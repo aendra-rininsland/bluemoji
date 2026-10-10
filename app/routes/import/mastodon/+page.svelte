@@ -77,7 +77,7 @@
         const e = queue[next++]
         statuses[e.shortcode] = { state: 'working' }
         try {
-          const uri = await importMastodonEmoji({
+          const { uri, warning } = await importMastodonEmoji({
             did,
             shortcode: e.shortcode,
             animated: e.animated,
@@ -89,11 +89,11 @@
               await addToPack(did, await ensurePack(), uri)
             } catch (err: any) {
               packError = err.message ?? 'Could not add to pack'
-              statuses[e.shortcode] = { state: 'done', message: `imported, but not added to pack: ${packError}` }
+              statuses[e.shortcode] = { state: 'done', message: [warning, `not added to pack: ${packError}`].filter(Boolean).join('; ') }
               continue
             }
           }
-          statuses[e.shortcode] = { state: 'done' }
+          statuses[e.shortcode] = { state: 'done', message: warning }
           const nextSel = new Set(selected)
           nextSel.delete(e.shortcode)
           selected = nextSel

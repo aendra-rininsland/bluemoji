@@ -31,6 +31,31 @@ export function blobUrl(pds: string, did: string, ref: unknown): string | null {
   return `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`;
 }
 
+/** Format slots that hold an animation, in the order renderers should prefer them. */
+const ANIMATED_SLOTS = ["apng_128", "gif_128", "webp_128"] as const;
+
+/**
+ * URL of the item's animated rendition, if it has one (an animated WebP from
+ * the Mastodon importer / APNG transcode lives in `webp_128`, which can also
+ * hold a plain static WebP — harmless, it just looks the same). Pass a
+ * `formats` object whose values are BlobRefs or CID strings.
+ */
+export function animatedImgUrl(did: string, formats: Record<string, unknown> | undefined) {
+  for (const slot of ANIMATED_SLOTS) {
+    const url = imgUrl(did, formats?.[slot]);
+    if (url) return url;
+  }
+  return null;
+}
+
+/**
+ * Best single image for inline display, matching the @aendra/bluemoji
+ * renderer's order: animated renditions first, then the static PNG.
+ */
+export function bestImgUrl(did: string, formats: Record<string, unknown> | undefined) {
+  return animatedImgUrl(did, formats) ?? imgUrl(did, formats?.png_128);
+}
+
 /**
  * Same-origin blob URL through the /img proxy, so assets are edge-cacheable
  * and same-origin for client-side fetches. Accepts a BlobRef or raw CID.

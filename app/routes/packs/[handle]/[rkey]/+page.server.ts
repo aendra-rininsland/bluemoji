@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { parseViewer } from "$hatk/client";
-import { resolvePds, imgUrl } from "$lib/pds";
+import { resolvePds, imgUrl, animatedImgUrl } from "$lib/pds";
 import type { PageServerLoad } from "./$types";
 
 interface ItemView {
@@ -51,7 +51,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
         imgUrl(subject.did, formats.webp_128) ??
         imgUrl(subject.did, formats.gif_128))
       : null;
-    const animatedUrl = subject.did ? imgUrl(subject.did, formats.apng_128) : null;
+    const animatedUrl = subject.did ? animatedImgUrl(subject.did, formats) : null;
     return { ...item, imageUrl, animatedUrl };
   });
 

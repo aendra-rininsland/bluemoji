@@ -1,4 +1,4 @@
-import { imgUrl } from "$lib/pds";
+import { bestImgUrl } from "$lib/pds";
 import type { PageServerLoad } from "./$types";
 
 interface EmojiRef {
@@ -27,11 +27,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
   const hydrated = items.map((item) => {
     const did = item.emoji.uri.match(/^at:\/\/(did:[^/]+)\//)?.[1];
     const formats = item.emoji.formats ?? {};
-    const imageUrl = did
-      ? (imgUrl(did, formats.png_128) ??
-        imgUrl(did, formats.webp_128) ??
-        imgUrl(did, formats.gif_128))
-      : null;
+    const imageUrl = did ? bestImgUrl(did, formats) : null;
     return { ...item, imageUrl };
   });
 
