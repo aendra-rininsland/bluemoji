@@ -50,6 +50,12 @@ link that instead of this file for adopters past the RENDERING.md stage.
   editable before import). Both importers share `app/lib/emoji-import.ts`
   (the per-emoji pipeline), `import-runner.ts` (queue + pack handling) and
   `components/ImportSettings.svelte`.
+  `/collection` lists (and searches) your emoji; its inline editor changes an
+  emoji's description (`alt`) and deletes emoji. Edits `dev.hatk.putRecord` the
+  _whole_ raw record (fetched fresh via `/collection/record`) with one field
+  changed — never `putItem`, which rebuilds the record and would drop
+  `labels`/`copyOf`/`fallbackText`. Deleting first removes the viewer's own
+  `packitem` entries for the emoji (`/collection/references`).
 - `app/lib/alias.ts` — canonical RFC 0005 implementation (alias
   canonicalisation + Punycode rkey encoding). **Duplicated** in
   `lib/src/util/alias.ts` for the published package; keep the two in sync.

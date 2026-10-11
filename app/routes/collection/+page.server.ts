@@ -3,6 +3,8 @@ import { parseViewer } from "$hatk/client";
 import { resolvePds, imgUrl, animatedImgUrl } from "$lib/pds";
 import type { PageServerLoad } from "./$types";
 
+const MAX_PAGES = 20; // 2,000 emoji
+
 export const load: PageServerLoad = async ({ cookies, fetch }) => {
   const viewer = await parseViewer(cookies);
   if (!viewer) redirect(302, "/");
@@ -10,17 +12,30 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
   const { did } = viewer;
   const pds = await resolvePds(did, fetch);
 
-  const url = new URL(`${pds}/xrpc/com.atproto.repo.listRecords`);
-  url.searchParams.set("repo", did);
-  url.searchParams.set("collection", "blue.moji.collection.item");
-  url.searchParams.set("limit", "100");
+  // Page through the whole collection (imports can add hundreds), capped so a
+  // runaway repo can't hang the page.
+  const records: any[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const url = new URL(`${pds}/xrpc/com.atproto.repo.listRecords`);
+    url.searchParams.set("repo", did);
+    url.searchParams.set("collection", "blue.moji.collection.item");
+    url.searchParams.set("limit", "100");
+    if (cursor) url.searchParams.set("cursor", cursor);
 
-  const res = await fetch(url);
-  if (!res.ok) return { items: [] };
+    const res = await fetch(url);
+    if (!res.ok) {
+      if (page === 0) return { items: [], truncated: false };
+      break;
+    }
+    const body = (await res.json()) as { records?: any[]; cursor?: string };
+    records.push(...(body.records ?? []));
+    cursor = body.cursor;
+    if (!cursor || !body.records?.length) break;
+  }
+  const truncated = !!cursor;
 
-  const { records } = (await res.json()) as { records: any[] };
-
-  const items = (records ?? []).map((r: any) => {
+  const items = records.map((r: any) => {
     const v = r.value;
     const formats = v?.formats;
     // png_128 is a BlobRef in both formats_v0 and formats_v1
@@ -42,5 +57,5 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
     };
   });
 
-  return { items };
+  return { items, truncated };
 };

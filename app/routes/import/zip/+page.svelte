@@ -4,13 +4,14 @@
   import { aliasToRkey, normalizeAlias } from '$lib/alias'
   import { addToPack, createPack, importEmoji } from '$lib/emoji-import'
   import { runImportQueue, type ItemStatus } from '$lib/import-runner'
-  import { packTargetProblem } from '$lib/packs'
+  import { ALT_MAX_GRAPHEMES, altError, defaultAlt } from '$lib/alt'
+  import { graphemeCount, packTargetProblem } from '$lib/packs'
   import { scanEmojiZip, type ZipImage, type ZipSkip } from '$lib/zip-emoji'
   import ImportSettings from '$lib/components/ImportSettings.svelte'
 
   let { data } = $props()
 
-  type Row = { image: ZipImage; name: string; selected: boolean; url: string }
+  type Row = { image: ZipImage; name: string; alt: string; selected: boolean; url: string }
 
   let rows = $state<Row[]>([])
   let skipped = $state<ZipSkip[]>([])
@@ -51,9 +52,12 @@
   })
   const problemFor = (i: number) =>
     checks[i].error || (duplicateRkeys.has(checks[i].rkey) && rows[i].selected ? 'Another file has this name' : '')
+  const altProblemFor = (i: number) => altError(rows[i].alt) ?? ''
 
   const selectedRows = $derived(rows.filter(r => r.selected))
-  const blocking = $derived(rows.reduce((n, r, i) => n + (r.selected && problemFor(i) ? 1 : 0), 0))
+  const blocking = $derived(
+    rows.reduce((n, r, i) => n + (r.selected && (problemFor(i) || altProblemFor(i)) ? 1 : 0), 0)
+  )
   const packProblem = $derived(
     packTargetProblem({ mode: packMode, uri: packUri, name: packName, description: packDescription })
   )
@@ -87,6 +91,7 @@
       rows = result.images.map(image => ({
         image,
         name: image.suggestedName,
+        alt: '',
         // Don't pre-select files that would overwrite something the user already has
         selected: !existing.has(check(image.suggestedName).rkey),
         url: URL.createObjectURL(image.blob)
@@ -131,6 +136,7 @@
             name: r.name,
             source: r.image.blob,
             animated: r.image.animated,
+            alt: r.alt.trim() || undefined,
             sticker: asSticker,
             adultOnly
           })
@@ -161,7 +167,7 @@
   {#if !rows.length}
     <p style="color: var(--muted); margin-bottom: 1.25rem;">
       Upload a zip of emoji images (PNG, GIF, WebP, JPEG or SVG — SVGs are converted to PNG). Each file's name becomes the emoji's
-      name, and you can rename them before importing. The zip is opened in your browser — it isn't
+      name, and you can rename them and add descriptions before importing. The zip is opened in your browser — it isn't
       uploaded anywhere until you import.
     </p>
 
@@ -260,6 +266,20 @@
                 {row.image.filename} · {kb(row.image.blob.size)}{row.image.notice ? ` · ${row.image.notice}` : ''}
               {/if}
             </p>
+            <input
+              bind:value={row.alt}
+              disabled={running}
+              aria-label="Description for {row.image.filename}"
+              aria-invalid={altProblemFor(i) ? 'true' : 'false'}
+              placeholder={defaultAlt(checks[i].alias || row.name) || 'Description (optional)'}
+              autocomplete="off"
+              style="display: block; width: 100%; max-width: 32rem; margin-top: 0.375rem; padding: 0.25rem 0.5rem; font-size: 0.8125rem; {control} border-color: {altProblemFor(i) && row.selected ? 'var(--danger)' : 'var(--border)'};"
+            />
+            {#if altProblemFor(i) && row.selected}
+              <p style="font-size: 0.75rem; margin-top: 0.125rem; color: var(--danger);">
+                {altProblemFor(i)} ({graphemeCount(row.alt.trim())}/{ALT_MAX_GRAPHEMES})
+              </p>
+            {/if}
           </div>
           <span style="font-size: 0.75rem; color: var(--muted); text-align: right; min-width: 7rem;">
             {#if st?.state === 'working'}importing…

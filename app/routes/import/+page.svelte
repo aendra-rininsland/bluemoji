@@ -27,8 +27,8 @@
       <p style="font-size: 1.5rem; margin-bottom: 0.25rem;" aria-hidden="true">🗜️</p>
       <p style="font-weight: 600; margin-bottom: 0.25rem;">From a zip file</p>
       <p style="font-size: 0.875rem; color: var(--muted);">
-        Upload a zip of images. File names become emoji names, and you can rename them before
-        importing.
+        Upload a zip of images. File names become emoji names, and you can rename them and add
+        descriptions before importing.
       </p>
     </a>
   </div>
