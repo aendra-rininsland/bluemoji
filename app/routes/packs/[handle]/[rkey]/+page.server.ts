@@ -80,5 +80,26 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
     }
   }
 
-  return { viewer, pack, items: hydrated, isOwner, packUri, collection };
+  // Admins get feature/un-feature controls; everyone else just gets false.
+  let viewerIsAdmin = false;
+  let featuredUris: string[] = [];
+  if (viewer) {
+    const featRes = await fetch("/xrpc/blue.moji.featured.getFeatured");
+    if (featRes.ok) {
+      const feat = (await featRes.json()) as { viewerIsAdmin: boolean; featuredUris?: string[] };
+      viewerIsAdmin = feat.viewerIsAdmin;
+      featuredUris = feat.featuredUris ?? [];
+    }
+  }
+
+  return {
+    viewer,
+    pack,
+    items: hydrated,
+    isOwner,
+    packUri,
+    collection,
+    viewerIsAdmin,
+    featuredUris,
+  };
 };

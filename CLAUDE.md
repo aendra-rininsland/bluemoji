@@ -24,7 +24,13 @@ link that instead of this file for adopters past the RENDERING.md stage.
   lexicons (do not edit except to re-vendor).
 - `server/` — hatk XRPC handlers (`get-pack.ts`, `get-actor-packs.ts`,
   `get-packs.ts`, `get-reactions.ts`, `get-item.ts`, `list-collection.ts`,
-  `put-item.ts`) and hooks (`on-login.ts`). `get-item.ts`
+  `put-item.ts`, `get-featured.ts`/`set-featured.ts`) and hooks
+  (`on-login.ts`). `setup-featured.ts` is a hatk setup script (setup scripts
+  must live in `server/` and use `defineSetup` from `$hatk`; a top-level
+  `setup/` dir is ignored once `server/` exists) creating the
+  admin-curated `featured_items` table; `set-featured.ts` is gated by
+  `isAdmin()` (`server/_admin.ts`), which reads the same `ADMINS` env var as
+  hatk's `/admin` routes. `/featured` is the public page. `get-item.ts`
   (`blue.moji.collection.getItem`) is the verification primitive everything
   else in this list uses to check self-attested claims — see the "Facet/
   sticker/reaction claims" design decision above before touching it. Files

@@ -231,3 +231,10 @@ CREATE TABLE "blue.moji.packs.packitem" (
   pack TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
+
+CREATE TABLE featured_items (
+  uri TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  featured_by TEXT NOT NULL,
+  featured_at TEXT NOT NULL
+);
