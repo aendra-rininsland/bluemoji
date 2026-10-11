@@ -176,6 +176,17 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
    into a JSON field instead of declaring a binary `input.encoding` and
    expecting raw bytes in `ctx.input` — confirmed by reading `server.js`'s
    dispatch before assuming otherwise.
+10. **OG (link-preview) cards render with hatk's bundled `Inter-Regular.woff`,
+    a ~500-glyph subset** (Basic Latin, Latin-1, a few punctuation marks).
+    Anything else — emoji, CJK, Greek, Cyrillic, most Latin Extended — is drawn
+    as Satori's "NO GLYPH" box (this is what a literal `📦` placeholder did in
+    Discord embeds). So never put user text or emoji characters straight into
+    `server/og/*`: pass text through `cardText()` (`server/og/_card-text.ts`,
+    which folds accents and drops the rest; `INTER_RANGES` is checked against
+    the font by its test) and show the pack's own emoji as images instead.
+    Satori can't draw WebP, so card images are `png_128` only, fetched via
+    `fetchCardImage()` (PNG/JPEG by magic bytes, size-capped). The card is
+    public: adult-only items/packs and taken-down accounts are never shown.
 
 ## Verification workflow
 
