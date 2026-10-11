@@ -2,6 +2,7 @@
   import { callXrpc } from '$hatk/client'
   import { invalidateAll } from '$app/navigation'
   import { aliasToRkey } from '$lib/alias'
+  import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
 
   let { data } = $props()
 
@@ -11,6 +12,45 @@
   let error = $state('')
   let copied = $state<Set<string>>(new Set())
   let shareCopied = $state(false)
+
+  // Owner: edit the pack's name and description in place.
+  let editing = $state(false)
+  let editName = $state('')
+  let editDescription = $state('')
+  let editBusy = $state(false)
+  const editError = $derived(packNameError(editName) ?? packDescriptionError(editDescription))
+
+  function startEdit() {
+    editName = data.pack.name
+    editDescription = data.pack.description ?? ''
+    error = ''
+    editing = true
+  }
+
+  async function saveEdit() {
+    if (editError || !data.packRecord) return
+    editBusy = true
+    error = ''
+    try {
+      const { description: _old, ...rest } = data.packRecord as Record<string, unknown>
+      await callXrpc('dev.hatk.putRecord', {
+        collection: 'blue.moji.packs.pack',
+        rkey: packRkey,
+        record: {
+          ...rest,
+          name: editName.trim(),
+          // Omit the key when empty: an explicit undefined fails lexicon validation
+          ...(editDescription.trim() ? { description: editDescription.trim() } : {})
+        }
+      } as any)
+      editing = false
+      await invalidateAll()
+    } catch (e: any) {
+      error = e.message ?? 'Failed to save pack'
+    } finally {
+      editBusy = false
+    }
+  }
 
   // Admin-only "Featured" toggle (blue.moji.featured.setFeatured).
   let featured = $state<Set<string>>(new Set(data.featuredUris))
@@ -208,7 +248,7 @@
   const packRkey = data.packUri.split('/').pop() ?? ''
   const ogTitle = `${data.pack.name} — a Bluemoji pack`
   const ogDescription =
-    data.pack.description ??
+    data.pack.description?.replace(/\s+/g, ' ').trim() ||
     `${data.pack.packItemCount ?? data.items.length} custom emoji, shared via moji.blue`
   const ogImage = `https://moji.blue/og/packs/${encodeURIComponent(data.pack.creator.did)}/${encodeURIComponent(packRkey)}`
   const ogUrl = `https://moji.blue/packs/${data.pack.creator.did}/${packRkey}`
@@ -246,12 +286,52 @@
       </div>
     {/if}
     <div style="flex: 1; min-width: 200px;">
-      <h2 style="margin-bottom: 0.25rem;">{data.pack.name}</h2>
-      <p style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">
-        by @{data.pack.creator.handle} · {data.pack.packItemCount ?? data.items.length} emoji{(data.pack.packItemCount ?? data.items.length) === 1 ? '' : 's'}
-      </p>
-      {#if data.pack.description}
-        <p style="font-size: 0.9375rem;">{data.pack.description}</p>
+      {#if editing}
+        <form onsubmit={(e) => { e.preventDefault(); saveEdit() }} style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <input
+            bind:value={editName}
+            aria-label="Pack name"
+            required
+            style="padding: 0.375rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); font-size: 1.125rem; font-weight: 600;"
+          />
+          <textarea
+            bind:value={editDescription}
+            aria-label="Pack description"
+            rows="3"
+            placeholder="What's in this pack, who it's for, where the art came from…"
+            style="padding: 0.375rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); resize: vertical;"
+          ></textarea>
+          <p style="font-size: 0.75rem; color: {editError ? 'var(--danger)' : 'var(--muted)'};">
+            {editError ?? `${graphemeCount(editDescription)}/${PACK_DESCRIPTION_MAX_GRAPHEMES}`}
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <button
+              type="submit"
+              disabled={!!editError || editBusy}
+              style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {editError || editBusy ? 0.5 : 1};"
+            >
+              {editBusy ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              type="button"
+              onclick={() => (editing = false)}
+              disabled={editBusy}
+              style="padding: 0.375rem 0.875rem; border: 1px solid var(--border); background: none; color: var(--text); border-radius: 4px; font-size: 0.875rem; cursor: pointer;"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      {:else}
+        <h2 style="margin-bottom: 0.25rem;">{data.pack.name}</h2>
+        <p style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">
+          by @{data.pack.creator.handle} · {data.pack.packItemCount ?? data.items.length} emoji{(data.pack.packItemCount ?? data.items.length) === 1 ? '' : 's'}
+        </p>
+        {#if data.pack.description}
+          <p style="font-size: 0.9375rem; white-space: pre-line; overflow-wrap: anywhere;">{data.pack.description}</p>
+        {:else if data.isOwner}
+          <p style="font-size: 0.875rem; color: var(--muted);">No description yet.</p>
+        {/if}
       {/if}
     </div>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -296,6 +376,14 @@
           style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {busy !== null ? 0.5 : 1};"
         >
           {busy === '*' ? 'Copying…' : 'Copy all to my collection'}
+        </button>
+      {/if}
+      {#if data.isOwner && data.packRecord && !editing}
+        <button
+          onclick={startEdit}
+          style="padding: 0.375rem 0.875rem; border: 1px solid var(--border); background: none; color: var(--text); border-radius: 4px; font-size: 0.875rem; cursor: pointer;"
+        >
+          Edit details
         </button>
       {/if}
       {#if data.isOwner}
