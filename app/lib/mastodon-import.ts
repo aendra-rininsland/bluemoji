@@ -135,13 +135,20 @@ export async function importMastodonEmoji(o: ImportOptions): Promise<ImportResul
 }
 
 /** Create a pack and return its AT-URI. */
-export async function createPack(did: string, name: string, adultOnly: boolean): Promise<string> {
+export async function createPack(
+  did: string,
+  name: string,
+  description: string,
+  adultOnly: boolean,
+): Promise<string> {
   const res = await callXrpc("dev.hatk.createRecord", {
     collection: "blue.moji.packs.pack",
     repo: did,
     record: {
       $type: "blue.moji.packs.pack",
-      name: name.trim().slice(0, 64),
+      name: name.trim(),
+      // Omit the key when empty — an explicit undefined fails lexicon validation
+      ...(description.trim() ? { description: description.trim() } : {}),
       adultOnly,
       createdAt: new Date().toISOString(),
     },

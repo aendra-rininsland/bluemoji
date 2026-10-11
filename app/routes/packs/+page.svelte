@@ -1,6 +1,7 @@
 <script lang="ts">
   import { callXrpc, getViewer } from '$hatk/client'
   import { invalidateAll } from '$app/navigation'
+  import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
 
   let { data } = $props()
 
@@ -13,6 +14,7 @@
   let error = $state('')
 
   const viewer = $derived(data.viewer ?? getViewer())
+  const textError = $derived((name.trim() ? packNameError(name) : null) ?? packDescriptionError(description))
 
   function packHref(uri: string): string {
     // at://did/blue.moji.packs.pack/rkey -> /packs/did/rkey
@@ -22,7 +24,7 @@
 
   async function createPack() {
     const v = viewer
-    if (!v || !name.trim()) return
+    if (!v || !name.trim() || textError) return
     loading = true
     error = ''
     try {
@@ -82,7 +84,6 @@
           id="pack-name"
           type="text"
           bind:value={name}
-          maxlength="64"
           required
           placeholder="My favourite blobs"
           style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text);"
@@ -96,9 +97,12 @@
           id="pack-desc"
           bind:value={description}
           rows="2"
-          maxlength="300"
+          placeholder="What's in this pack, who it's for, where the art came from…"
           style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); resize: vertical;"
         ></textarea>
+        <p style="margin-top: 0.25rem; font-size: 0.75rem; color: {textError ? 'var(--danger)' : 'var(--muted)'};">
+          {textError ?? `${graphemeCount(description)}/${PACK_DESCRIPTION_MAX_GRAPHEMES}`}
+        </p>
       </div>
       <div>
         <label for="pack-icon" style="display: block; margin-bottom: 0.375rem; font-weight: 500;">
@@ -160,7 +164,7 @@
           <div style="flex: 1; min-width: 0;">
             <p style="font-weight: 600;">{pack.name}</p>
             {#if pack.description}
-              <p style="font-size: 0.875rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <p style="font-size: 0.875rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;">
                 {pack.description}
               </p>
             {/if}

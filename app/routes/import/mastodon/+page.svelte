@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms'
   import { invalidateAll } from '$app/navigation'
   import { addToPack, createPack, importMastodonEmoji } from '$lib/mastodon-import'
+  import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
 
   let { data, form } = $props()
 
@@ -17,6 +18,7 @@
   let packMode = $state<'none' | 'existing' | 'new'>('none')
   let packUri = $state('')
   let newPackName = $state('')
+  let newPackDescription = $state('')
   let running = $state(false)
   let statuses = $state<Record<string, Status>>({})
   let connecting = $state(false)
@@ -36,12 +38,15 @@
   const doneCount = $derived(Object.values(statuses).filter(s => s.state === 'done').length)
   const failedCount = $derived(Object.values(statuses).filter(s => s.state === 'error').length)
   const total = $derived(Object.keys(statuses).length)
+  const packTextError = $derived(
+    packMode === 'new' ? (packNameError(newPackName) ?? packDescriptionError(newPackDescription)) : null
+  )
   const canImport = $derived(
     !running &&
       selected.size > 0 &&
       (packMode === 'none' ||
         (packMode === 'existing' && packUri) ||
-        (packMode === 'new' && newPackName.trim()))
+        (packMode === 'new' && !packTextError))
   )
 
   function toggle(code: string) {
@@ -67,7 +72,7 @@
     let packPromise: Promise<string> | null = null
     const ensurePack = () => {
       if (targetPack) return Promise.resolve(targetPack)
-      packPromise ??= createPack(did, newPackName, adultOnly).then(u => (targetPack = u))
+      packPromise ??= createPack(did, newPackName, newPackDescription, adultOnly).then(u => (targetPack = u))
       return packPromise
     }
 
@@ -274,6 +279,17 @@
               disabled={running}
               style="padding: 0.375rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text);"
             />
+            <textarea
+              bind:value={newPackDescription}
+              rows="2"
+              placeholder="Description (optional) — e.g. where these came from"
+              aria-label="New pack description"
+              disabled={running}
+              style="flex-basis: 100%; padding: 0.375rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); resize: vertical;"
+            ></textarea>
+            <span style="flex-basis: 100%; font-size: 0.75rem; color: {packTextError && newPackName.trim() ? 'var(--danger)' : 'var(--muted)'};">
+              {#if newPackName.trim() && packTextError}{packTextError}{:else}{graphemeCount(newPackDescription)}/{PACK_DESCRIPTION_MAX_GRAPHEMES}{/if}
+            </span>
           {/if}
         </div>
 

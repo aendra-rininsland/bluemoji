@@ -124,7 +124,7 @@
             <div>
               <p style="font-weight: 600;">{pack.name}</p>
               {#if pack.description}
-                <p style="font-size: 0.8125rem; color: var(--muted);">{pack.description}</p>
+                <p style="font-size: 0.8125rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;">{pack.description}</p>
               {/if}
               <p style="font-size: 0.75rem; color: var(--muted);">{pack.itemCount ?? 0} emoji</p>
             </div>

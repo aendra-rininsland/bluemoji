@@ -80,6 +80,22 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
     }
   }
 
+  // Owners can edit name/description. A put replaces the whole record, so
+  // fetch the raw one (icon blob ref, adultOnly, labels…) to edit in place.
+  let packRecord: Record<string, unknown> | null = null;
+  if (isOwner && viewer) {
+    const pds = await resolvePds(viewer.did, fetch).catch(() => null);
+    if (pds) {
+      const recUrl = new URL(`${pds}/xrpc/com.atproto.repo.getRecord`);
+      recUrl.searchParams.set("repo", viewer.did);
+      recUrl.searchParams.set("collection", "blue.moji.packs.pack");
+      recUrl.searchParams.set("rkey", rkey);
+      const recRes = await fetch(recUrl).catch(() => null);
+      if (recRes?.ok)
+        packRecord = ((await recRes.json()) as { value: Record<string, unknown> }).value;
+    }
+  }
+
   // Admins get feature/un-feature controls; everyone else just gets false.
   let viewerIsAdmin = false;
   let featuredUris: string[] = [];
@@ -97,6 +113,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
     pack,
     items: hydrated,
     isOwner,
+    packRecord,
     packUri,
     collection,
     viewerIsAdmin,
