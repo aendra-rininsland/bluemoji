@@ -39,6 +39,9 @@ link that instead of this file for adopters past the RENDERING.md stage.
   `/packs`, `/packs/[handle]/[rkey]`, `/profile/[handle]/post/[rkey]`
   (post renderer with facets, sticker embed, reaction bar), and
   `/img/[did]/[cid]` (+server.ts blob proxy).
+  `/compose` writes a post: text with inline `:emoji:` (autocomplete + picker;
+  `app/lib/compose.ts` builds the `blue.moji.richtext.facet` byte ranges) and an
+  optional sticker embed.
   `/import/mastodon` imports a Mastodon server's custom emoji (OAuth login,
   SSRF-guarded fetches in `app/lib/server/mastodon.ts`; the image proxy takes
   a shortcode, never a URL).
