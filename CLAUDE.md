@@ -80,6 +80,10 @@ link that instead of this file for adopters past the RENDERING.md stage.
   makes packs fault-resistant to source-account deletion.
 - **All image URLs go through `/img/{did}/{cid}`** (same-origin, immutable
   cache headers) — never link PDS `getBlob` URLs directly from the app.
+  The proxy (`app/lib/server/blob-proxy.ts`, policy in `app/lib/blob-policy.ts`)
+  refuses SVG/XML/HTML blobs and adds a sandboxing CSP: blobs are
+  attacker-controlled and re-served from our origin, so an SVG there would be
+  stored XSS. Never store SVGs — importers rasterise them to PNG first.
 - **Facet/sticker/reaction claims are self-attested and must be verified**
   (RFC 0001 self-attestation amendment): `did`, `formats`, `alt`, `adultOnly`,
   `labels` on a `blue.moji.richtext.facet`, `blue.moji.embed.sticker#sticker`,
