@@ -45,6 +45,11 @@ link that instead of this file for adopters past the RENDERING.md stage.
   `/import/mastodon` imports a Mastodon server's custom emoji (OAuth login,
   SSRF-guarded fetches in `app/lib/server/mastodon.ts`; the image proxy takes
   a shortcode, never a URL).
+  `/import/zip` imports emoji from a zip entirely in the browser (reader in
+  `app/lib/zip.ts`, no dependencies; names default to file names and are
+  editable before import). Both importers share `app/lib/emoji-import.ts`
+  (the per-emoji pipeline), `import-runner.ts` (queue + pack handling) and
+  `components/ImportSettings.svelte`.
 - `app/lib/alias.ts` — canonical RFC 0005 implementation (alias
   canonicalisation + Punycode rkey encoding). **Duplicated** in
   `lib/src/util/alias.ts` for the published package; keep the two in sync.

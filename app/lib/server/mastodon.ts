@@ -8,6 +8,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import type { Cookies } from "@sveltejs/kit";
+import { sniffImage } from "../image.ts";
 
 export const SCOPE = "read:accounts";
 export const MAX_IMAGE_BYTES = 1_000_000;
@@ -387,17 +388,7 @@ export async function listEmojis(s: Pick<MastodonSession, "domain" | "token">, f
   return emojis;
 }
 
-export type ImageType = "image/png" | "image/gif" | "image/webp" | "image/jpeg";
-
-/** Identify an image by magic bytes — never trust the upstream Content-Type. */
-export function sniffImage(b: Uint8Array): ImageType | null {
-  const eq = (off: number, sig: number[]) => sig.every((v, i) => b[off + i] === v);
-  if (eq(0, [0x89, 0x50, 0x4e, 0x47])) return "image/png";
-  if (eq(0, [0x47, 0x49, 0x46, 0x38])) return "image/gif";
-  if (eq(0, [0x52, 0x49, 0x46, 0x46]) && eq(8, [0x57, 0x45, 0x42, 0x50])) return "image/webp";
-  if (eq(0, [0xff, 0xd8, 0xff])) return "image/jpeg";
-  return null;
-}
+export { sniffImage, type ImageType } from "../image.ts";
 
 /**
  * Download one emoji image from a URL taken from the instance's own emoji

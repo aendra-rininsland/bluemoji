@@ -207,7 +207,7 @@
   </h1>
 
   <p style="margin-bottom: 1rem; font-size: 0.875rem; color: var(--muted);">
-    Coming from Mastodon? <a href="/import/mastodon">Import your server's custom emoji</a> in bulk.
+    Have a lot to add? <a href="/import">Import in bulk</a> from a zip file or a Mastodon server.
   </p>
 
   <form
