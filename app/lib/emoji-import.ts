@@ -4,6 +4,7 @@
 // png_128, animated webp_128 via the server-side ffmpeg transcode, optional
 // 512px sticker rendition).
 import { callXrpc } from "$hatk/client";
+import { defaultAlt } from "./alt";
 import { normalizeAlias } from "./alias";
 import { rasteriseSvg } from "./svg";
 import type { ImportResult } from "./import-runner";
@@ -151,7 +152,7 @@ export async function importEmoji(o: ImportOptions): Promise<ImportResult> {
     item: {
       name: `:${alias}:`,
       // Sources rarely carry a description; the humanised name beats none
-      alt: o.alt ?? alias.replace(/[_.-]+/g, " "),
+      alt: o.alt || defaultAlt(alias),
       createdAt: new Date().toISOString(),
       adultOnly: o.adultOnly,
       formats,
