@@ -36,3 +36,18 @@ export function packNameError(name: string): string | null {
   }
   return null;
 }
+
+export interface PackTarget {
+  mode: "none" | "existing" | "new";
+  /** AT-URI of the chosen pack, when mode is "existing" */
+  uri: string;
+  name: string;
+  description: string;
+}
+
+/** What's wrong with the chosen pack destination, or null if it's usable (or there is none). */
+export function packTargetProblem(t: PackTarget): string | null {
+  if (t.mode === "existing") return t.uri ? null : "Choose a pack";
+  if (t.mode === "new") return packNameError(t.name) ?? packDescriptionError(t.description);
+  return null;
+}

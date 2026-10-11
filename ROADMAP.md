@@ -432,6 +432,12 @@ Stickers.proto` via `gh api`, not guessed), a `manifest.json` mirror, one
   bare 500s — now mapped to 400 with the message); animated WebP renditions
   weren't shown by the app's pages; ffmpeg transcodes stretched non-square
   sources (now letterboxed with transparency).
+  Zip import (`/import/zip`) reads the archive in the browser (own minimal
+  reader: stored+deflate only, no ZIP64/encryption, entry/size caps, CRC
+  checked). SVGs are rasterised to PNG in the browser (`app/lib/svg.ts`:
+  sanitised, 512px, transparent; the PNG is the item's `original` — an SVG is
+  never stored; animation isn't kept). Animated WebP sources import as stills — the server's ffmpeg
+  can't decode animated WebP.
   Follow-ups: the upload page still has its own copy of the resize/upload
   pipeline; DNS-rebinding is only mitigated by resolve-then-fetch.
 

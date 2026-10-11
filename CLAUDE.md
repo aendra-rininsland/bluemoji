@@ -45,6 +45,11 @@ link that instead of this file for adopters past the RENDERING.md stage.
   `/import/mastodon` imports a Mastodon server's custom emoji (OAuth login,
   SSRF-guarded fetches in `app/lib/server/mastodon.ts`; the image proxy takes
   a shortcode, never a URL).
+  `/import/zip` imports emoji from a zip entirely in the browser (reader in
+  `app/lib/zip.ts`, no dependencies; names default to file names and are
+  editable before import). Both importers share `app/lib/emoji-import.ts`
+  (the per-emoji pipeline), `import-runner.ts` (queue + pack handling) and
+  `components/ImportSettings.svelte`.
 - `app/lib/alias.ts` — canonical RFC 0005 implementation (alias
   canonicalisation + Punycode rkey encoding). **Duplicated** in
   `lib/src/util/alias.ts` for the published package; keep the two in sync.
@@ -75,6 +80,10 @@ link that instead of this file for adopters past the RENDERING.md stage.
   makes packs fault-resistant to source-account deletion.
 - **All image URLs go through `/img/{did}/{cid}`** (same-origin, immutable
   cache headers) — never link PDS `getBlob` URLs directly from the app.
+  The proxy (`app/lib/server/blob-proxy.ts`, policy in `app/lib/blob-policy.ts`)
+  refuses SVG/XML/HTML blobs and adds a sandboxing CSP: blobs are
+  attacker-controlled and re-served from our origin, so an SVG there would be
+  stored XSS. Never store SVGs — importers rasterise them to PNG first.
 - **Facet/sticker/reaction claims are self-attested and must be verified**
   (RFC 0001 self-attestation amendment): `did`, `formats`, `alt`, `adultOnly`,
   `labels` on a `blue.moji.richtext.facet`, `blue.moji.embed.sticker#sticker`,

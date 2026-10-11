@@ -1,12 +1,13 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { invalidateAll } from '$app/navigation'
-  import { addToPack, createPack, importMastodonEmoji } from '$lib/mastodon-import'
-  import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
+  import { addToPack, createPack } from '$lib/emoji-import'
+  import { runImportQueue, type ItemStatus } from '$lib/import-runner'
+  import { importMastodonEmoji } from '$lib/mastodon-import'
+  import { packTargetProblem } from '$lib/packs'
+  import ImportSettings from '$lib/components/ImportSettings.svelte'
 
   let { data, form } = $props()
-
-  type Status = { state: 'pending' | 'working' | 'done' | 'error'; message?: string }
 
   let query = $state('')
   let category = $state('')
@@ -17,10 +18,10 @@
   let adultOnly = $state(false)
   let packMode = $state<'none' | 'existing' | 'new'>('none')
   let packUri = $state('')
-  let newPackName = $state('')
-  let newPackDescription = $state('')
+  let packName = $state('')
+  let packDescription = $state('')
   let running = $state(false)
-  let statuses = $state<Record<string, Status>>({})
+  let statuses = $state<Record<string, ItemStatus>>({})
   let connecting = $state(false)
 
   const categories = $derived([...new Set(data.emojis.map(e => e.category).filter(Boolean))].sort())
@@ -38,20 +39,15 @@
   const doneCount = $derived(Object.values(statuses).filter(s => s.state === 'done').length)
   const failedCount = $derived(Object.values(statuses).filter(s => s.state === 'error').length)
   const total = $derived(Object.keys(statuses).length)
-  const packTextError = $derived(
-    packMode === 'new' ? (packNameError(newPackName) ?? packDescriptionError(newPackDescription)) : null
+  const packProblem = $derived(
+    packTargetProblem({ mode: packMode, uri: packUri, name: packName, description: packDescription })
   )
-  const canImport = $derived(
-    !running &&
-      selected.size > 0 &&
-      (packMode === 'none' ||
-        (packMode === 'existing' && packUri) ||
-        (packMode === 'new' && !packTextError))
-  )
+  const canImport = $derived(!running && selected.size > 0 && !packProblem)
 
   function toggle(code: string) {
     const next = new Set(selected)
-    next.has(code) ? next.delete(code) : next.add(code)
+    if (next.has(code)) next.delete(code)
+    else next.add(code)
     selected = next
   }
   function selectAllVisible() {
@@ -63,51 +59,29 @@
   async function run() {
     const did = data.viewer.did
     const queue = data.emojis.filter(e => selected.has(e.shortcode))
-    statuses = Object.fromEntries(queue.map(e => [e.shortcode, { state: 'pending' } as Status]))
     running = true
-
-    let targetPack = packMode === 'existing' ? packUri : ''
-    let packError = ''
-    // Created lazily so a run where every emoji fails doesn't leave an empty pack behind
-    let packPromise: Promise<string> | null = null
-    const ensurePack = () => {
-      if (targetPack) return Promise.resolve(targetPack)
-      packPromise ??= createPack(did, newPackName, newPackDescription, adultOnly).then(u => (targetPack = u))
-      return packPromise
-    }
-
-    let next = 0
-    async function worker() {
-      while (next < queue.length) {
-        const e = queue[next++]
-        statuses[e.shortcode] = { state: 'working' }
-        try {
-          const { uri, warning } = await importMastodonEmoji({
+    statuses = {}
+    const summary = await runImportQueue({
+      did,
+      items: queue.map(e => ({
+        key: e.shortcode,
+        run: () =>
+          importMastodonEmoji({
             did,
             shortcode: e.shortcode,
             animated: e.animated,
             sticker: asSticker,
             adultOnly
           })
-          if (packMode !== 'none') {
-            try {
-              await addToPack(did, await ensurePack(), uri)
-            } catch (err: any) {
-              packError = err.message ?? 'Could not add to pack'
-              statuses[e.shortcode] = { state: 'done', message: [warning, `not added to pack: ${packError}`].filter(Boolean).join('; ') }
-              continue
-            }
-          }
-          statuses[e.shortcode] = { state: 'done', message: warning }
-          const nextSel = new Set(selected)
-          nextSel.delete(e.shortcode)
-          selected = nextSel
-        } catch (err: any) {
-          statuses[e.shortcode] = { state: 'error', message: err.message ?? 'Import failed' }
-        }
-      }
-    }
-    await Promise.all([worker(), worker()])
+      })),
+      pack: { mode: packMode, uri: packUri, name: packName, description: packDescription },
+      adultOnly,
+      createPack,
+      addToPack,
+      onStatus: (key, status) => (statuses[key] = status)
+    })
+    // Imported emoji leave the selection; failures stay selected so they can be retried
+    selected = new Set([...selected].filter(code => !summary.done.includes(code)))
     running = false
     await invalidateAll()
   }
@@ -116,7 +90,7 @@
 <main style="max-width: 960px; margin: 0 auto; padding: 2rem;">
   <h1 style="margin-bottom: 0.5rem;">
     <a href="/" style="color: inherit;">bluemoji</a>
-    <span style="color: var(--muted); font-weight: 400;"> › import from Mastodon</span>
+    <span style="color: var(--muted); font-weight: 400;"> › <a href="/import" style="color: inherit;">import</a> › Mastodon</span>
   </h1>
 
   {#if data.error || form?.error}
@@ -251,47 +225,16 @@
       <section
         style="position: sticky; bottom: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;"
       >
-        <div style="display: flex; gap: 1.25rem; flex-wrap: wrap;">
-          <label title="Also create a 512px rendition so these can be posted as stickers (upscaled from the original, so it may look soft)">
-            <input type="checkbox" bind:checked={asSticker} disabled={running} /> Also make stickers
-          </label>
-          <label><input type="checkbox" bind:checked={adultOnly} disabled={running} /> Mark as adult-only</label>
-        </div>
-
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-          <label for="pack-mode">Add to pack:</label>
-          <select id="pack-mode" bind:value={packMode} disabled={running} style="padding: 0.375rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text);">
-            <option value="none">None</option>
-            <option value="existing" disabled={!data.packs.length}>An existing pack</option>
-            <option value="new">A new pack</option>
-          </select>
-          {#if packMode === 'existing'}
-            <select bind:value={packUri} disabled={running} aria-label="Pack" style="padding: 0.375rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text);">
-              <option value="">Choose a pack…</option>
-              {#each data.packs as p (p.uri)}<option value={p.uri}>{p.name}</option>{/each}
-            </select>
-          {:else if packMode === 'new'}
-            <input
-              bind:value={newPackName}
-              maxlength="64"
-              placeholder="Pack name"
-              aria-label="New pack name"
-              disabled={running}
-              style="padding: 0.375rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text);"
-            />
-            <textarea
-              bind:value={newPackDescription}
-              rows="2"
-              placeholder="Description (optional) — e.g. where these came from"
-              aria-label="New pack description"
-              disabled={running}
-              style="flex-basis: 100%; padding: 0.375rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); resize: vertical;"
-            ></textarea>
-            <span style="flex-basis: 100%; font-size: 0.75rem; color: {packTextError && newPackName.trim() ? 'var(--danger)' : 'var(--muted)'};">
-              {#if newPackName.trim() && packTextError}{packTextError}{:else}{graphemeCount(newPackDescription)}/{PACK_DESCRIPTION_MAX_GRAPHEMES}{/if}
-            </span>
-          {/if}
-        </div>
+        <ImportSettings
+          packs={data.packs}
+          disabled={running}
+          bind:sticker={asSticker}
+          bind:adultOnly
+          bind:packMode
+          bind:packUri
+          bind:packName
+          bind:packDescription
+        />
 
         <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
           <button
