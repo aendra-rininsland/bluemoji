@@ -82,3 +82,20 @@ export function isAnimated(
       return false;
   }
 }
+
+/**
+ * True when the bytes look like an SVG document: text whose first element is
+ * <svg> (allowing a BOM, XML prolog, doctype and comments before it). A cheap
+ * content check — the real validation is the browser's XML parser.
+ */
+export function looksLikeSvg(b: Uint8Array): boolean {
+  const head = new TextDecoder("utf-8").decode(b.subarray(0, 4096)).replace(/^﻿/, "");
+  if (head.includes("\u0000")) return false; // binary
+  const stripped = head
+    .replace(/^\s+/, "")
+    .replace(
+      /^(?:<\?xml[\s\S]*?\?>\s*|<!--[\s\S]*?-->\s*|<!DOCTYPE[^>[]*(?:\[[\s\S]*?\])?\s*>\s*)+/i,
+      "",
+    );
+  return /^<svg[\s/>]/i.test(stripped);
+}

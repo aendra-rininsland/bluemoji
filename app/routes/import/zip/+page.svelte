@@ -160,7 +160,7 @@
 
   {#if !rows.length}
     <p style="color: var(--muted); margin-bottom: 1.25rem;">
-      Upload a zip of emoji images (PNG, GIF, WebP or JPEG). Each file's name becomes the emoji's
+      Upload a zip of emoji images (PNG, GIF, WebP, JPEG or SVG — SVGs are converted to PNG). Each file's name becomes the emoji's
       name, and you can rename them before importing. The zip is opened in your browser — it isn't
       uploaded anywhere until you import.
     </p>
@@ -257,7 +257,7 @@
               {:else if !checks[i].error && checks[i].alias !== row.name}
                 saved as :{checks[i].alias}:
               {:else}
-                {row.image.filename} · {kb(row.image.blob.size)}
+                {row.image.filename} · {kb(row.image.blob.size)}{row.image.notice ? ` · ${row.image.notice}` : ''}
               {/if}
             </p>
           </div>

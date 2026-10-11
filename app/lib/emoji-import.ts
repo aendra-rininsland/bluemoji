@@ -5,6 +5,7 @@
 // 512px sticker rendition).
 import { callXrpc } from "$hatk/client";
 import { normalizeAlias } from "./alias";
+import { rasteriseSvg } from "./svg";
 import type { ImportResult } from "./import-runner";
 
 export type { ImportResult };
@@ -50,7 +51,9 @@ async function renderSquare(src: Blob, size: number): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  canvas.getContext("2d")!.drawImage(bitmap, (size - w) / 2, (size - h) / 2, w, h);
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(bitmap, (size - w) / 2, (size - h) / 2, w, h);
   bitmap.close();
   return new Promise((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Image export failed"))), "image/png"),
@@ -61,10 +64,29 @@ async function upload(blob: Blob): Promise<unknown> {
   return (await callXrpc("dev.hatk.uploadBlob", blob)).blob;
 }
 
+const SVG_RASTER_SIDES = [512, 256]; // fall back to a smaller render if the PNG is too big
+const MAX_ORIGINAL_BYTES = 1_000_000; // lexicon limit for formats.original
+
+/** Rasterise an SVG to a PNG small enough to be the emoji's `original`. */
+async function rasteriseOriginal(svg: Blob): Promise<Blob> {
+  for (const side of SVG_RASTER_SIDES) {
+    const png = await rasteriseSvg(svg, side);
+    if (png.size <= MAX_ORIGINAL_BYTES) return png;
+  }
+  throw new Error("The SVG is too complex to rasterise within the 1 MB limit");
+}
+
 /** Imports one emoji. */
 export async function importEmoji(o: ImportOptions): Promise<ImportResult> {
   const alias = normalizeAlias(o.name);
-  const { source } = o;
+  let { source, animated } = o;
+
+  // SVGs are never stored (they can carry scripts, and the blob proxy would
+  // serve them from our origin): rasterise to PNG and use that as the original.
+  if (source.type === "image/svg+xml") {
+    source = await rasteriseOriginal(source);
+    animated = false;
+  }
 
   const formats: Record<string, unknown> = {
     $type: "blue.moji.collection.item#formats_v1",
@@ -77,12 +99,12 @@ export async function importEmoji(o: ImportOptions): Promise<ImportResult> {
   formats.png_128 = await upload(png128);
 
   let warning: string | undefined;
-  if (o.animated && source.size > MAX_TRANSCODE_INPUT) {
+  if (animated && source.size > MAX_TRANSCODE_INPUT) {
     warning = "animation skipped: file too large to convert";
-  } else if (o.animated && source.type === "image/webp") {
+  } else if (animated && source.type === "image/webp") {
     // The server-side ffmpeg can't decode animated WebP, so don't pretend to try
     warning = "animation skipped: animated WebP files can't be converted yet";
-  } else if (o.animated) {
+  } else if (animated) {
     try {
       const data = toBase64(await source.arrayBuffer());
       const { webp128, webp512 } = await callXrpc("blue.moji.collection.transcodeAnimation", {
@@ -101,6 +123,8 @@ export async function importEmoji(o: ImportOptions): Promise<ImportResult> {
             $type: "blue.moji.collection.item#stickerFormats_v0",
             webp_512: await upload(s),
           };
+        } else {
+          warning ??= "sticker skipped: the 512px version exceeds the 512 KB limit";
         }
       }
     } catch (e) {
@@ -110,13 +134,15 @@ export async function importEmoji(o: ImportOptions): Promise<ImportResult> {
     }
   }
 
-  if (o.sticker && !stickerFormats && !o.animated) {
+  if (o.sticker && !stickerFormats && !animated) {
     const png512 = await renderSquare(source, 512);
     if (png512.size <= MAX_STICKER_BYTES) {
       stickerFormats = {
         $type: "blue.moji.collection.item#stickerFormats_v0",
         png_512: await upload(png512),
       };
+    } else {
+      warning ??= "sticker skipped: the 512px version exceeds the 512 KB limit";
     }
   }
 

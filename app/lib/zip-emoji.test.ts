@@ -90,6 +90,17 @@ const z = buildZip([
   { name: "pack/sub/Party.GIF", data: GIF },
   { name: "pack/fake.png", data: new Uint8Array(Buffer.from("this is not an image")) },
   { name: "pack/logo.svg", data: new Uint8Array(Buffer.from("<svg/>")) },
+  {
+    name: "pack/spin.svg",
+    data: new Uint8Array(
+      Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg"><rect><animateTransform attributeName="transform"/></rect></svg>',
+      ),
+    ),
+  },
+  { name: "pack/fake.svg", data: new Uint8Array(Buffer.from("<html><body>not svg</body></html>")) },
+  { name: "pack/icon.svg.png", data: new Uint8Array(Buffer.from("<svg/>")) },
+  { name: "pack/old.svgz", data: new Uint8Array([0x1f, 0x8b, 8, 0]) },
   { name: "pack/readme.txt", data: new Uint8Array(Buffer.from("hi")) },
   { name: "pack/.DS_Store", data: new Uint8Array([1]) },
   { name: "__MACOSX/pack/._blob cat.png", data: new Uint8Array([1]) },
@@ -97,17 +108,22 @@ const z = buildZip([
 ]);
 const r = await scanEmojiZip(z);
 assert.deepEqual(
-  r.images.map((i) => [i.filename, i.suggestedName, i.type, i.animated]),
+  r.images.map((i) => [i.filename, i.suggestedName, i.type, i.animated, i.notice]),
   [
-    ["blob cat.png", "blob_cat", "image/png", false],
-    ["Party.GIF", "Party", "image/gif", false],
+    ["blob cat.png", "blob_cat", "image/png", false, undefined],
+    ["Party.GIF", "Party", "image/gif", false, undefined],
+    ["logo.svg", "logo", "image/svg+xml", false, "SVG → PNG"],
+    ["spin.svg", "spin", "image/svg+xml", false, "SVG → PNG (animation isn't kept)"],
   ],
 );
+assert.equal(r.images[2].blob.type, "image/svg+xml");
 assert.deepEqual(
   Object.fromEntries(r.skipped.map((s) => [s.path, s.reason])),
   {
-    "pack/fake.png": "not a PNG, GIF, WebP or JPEG image",
-    "pack/logo.svg": "SVG isn't supported",
+    "pack/fake.png": "not a PNG, GIF, WebP, JPEG or SVG image",
+    "pack/fake.svg": "not a valid SVG file",
+    "pack/icon.svg.png": "not a PNG, GIF, WebP, JPEG or SVG image",
+    "pack/old.svgz": "compressed SVG (.svgz) isn't supported — unzip it to .svg",
     "pack/readme.txt": "not an image file",
     "pack/huge.png": "larger than 1 MB",
   },

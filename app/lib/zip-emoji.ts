@@ -1,13 +1,16 @@
 // Turns a zip archive into emoji candidates for the zip importer: picks out
 // the image files, sniffs their real type (never trusting the extension),
 // detects animation, and suggests an alias from each file name.
-import { isAnimated, sniffImage, type ImageType } from "./image";
+import { isAnimated, looksLikeSvg, sniffImage, type ImageType } from "./image";
 import { extractEntry, listZip, ZipError } from "./zip";
 
 /** Per-image cap: the same 1 MB the manual upload page allows. */
 export const MAX_IMAGE_BYTES = 1_000_000;
 /** Cap on all extracted images together (they're held in memory until import). */
 export const MAX_TOTAL_BYTES = 200_000_000;
+
+/** What the file is; SVG is rasterised to PNG at import time. */
+export type SourceImageType = ImageType | "image/svg+xml";
 
 export interface ZipImage {
   /** Stable id for list keys (index in the archive) */
@@ -17,8 +20,10 @@ export interface ZipImage {
   /** File name without folders */
   filename: string;
   blob: Blob;
-  type: ImageType;
+  type: SourceImageType;
   animated: boolean;
+  /** Something worth telling the user about this file (shown under its name) */
+  notice?: string;
   /** Default emoji name, derived from the file name */
   suggestedName: string;
 }
@@ -28,7 +33,10 @@ export interface ZipSkip {
   reason: string;
 }
 
-const IMAGE_EXTENSIONS = new Set(["png", "apng", "gif", "webp", "jpg", "jpeg"]);
+const IMAGE_EXTENSIONS = new Set(["png", "apng", "gif", "webp", "jpg", "jpeg", "svg"]);
+
+/** SVG animation (SMIL or CSS) isn't carried over: only the first frame is rasterised. */
+const SVG_ANIMATION = /<(?:animate|animateTransform|animateMotion|set)[\s/>]|@keyframes/i;
 
 const baseName = (path: string) => path.slice(path.lastIndexOf("/") + 1);
 
@@ -84,8 +92,11 @@ export async function scanEmojiZip(file: Blob): Promise<ScanResult> {
     if (entry.directory || isJunk(entry.name)) continue;
 
     const ext = baseName(entry.name).split(".").pop()?.toLowerCase() ?? "";
-    if (ext === "svg") {
-      skipped.push({ path: entry.name, reason: "SVG isn't supported" });
+    if (ext === "svgz") {
+      skipped.push({
+        path: entry.name,
+        reason: "compressed SVG (.svgz) isn't supported — unzip it to .svg",
+      });
       continue;
     }
     if (!IMAGE_EXTENSIONS.has(ext)) {
@@ -111,11 +122,16 @@ export async function scanEmojiZip(file: Blob): Promise<ScanResult> {
       });
       continue;
     }
-    const type = sniffImage(bytes);
-    if (!type) {
-      skipped.push({ path: entry.name, reason: "not a PNG, GIF, WebP or JPEG image" });
+    const raster = sniffImage(bytes);
+    const svg = !raster && ext === "svg" && looksLikeSvg(bytes);
+    if (!raster && !svg) {
+      skipped.push({
+        path: entry.name,
+        reason: ext === "svg" ? "not a valid SVG file" : "not a PNG, GIF, WebP, JPEG or SVG image",
+      });
       continue;
     }
+    const type: SourceImageType = raster ?? "image/svg+xml";
     total += bytes.length;
     const filename = baseName(entry.name);
     images.push({
@@ -124,8 +140,15 @@ export async function scanEmojiZip(file: Blob): Promise<ScanResult> {
       filename,
       blob: new Blob([bytes as BlobPart], { type }),
       type,
-      animated: isAnimated(bytes, type),
+      animated: raster ? isAnimated(bytes, raster) : false,
       suggestedName: suggestName(filename),
+      ...(svg
+        ? {
+            notice: SVG_ANIMATION.test(new TextDecoder().decode(bytes))
+              ? "SVG → PNG (animation isn't kept)"
+              : "SVG → PNG",
+          }
+        : {}),
     });
   }
   return { images, skipped };
