@@ -232,6 +232,11 @@ CREATE TABLE "blue.moji.packs.packitem" (
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE cache_purge_state (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
 CREATE TABLE featured_items (
   uri TEXT PRIMARY KEY,
   kind TEXT NOT NULL,
