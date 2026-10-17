@@ -12,6 +12,8 @@ interface ItemRow {
   sticker_formats: string | null;
   adult_only: number | null;
   copy_of: string | null;
+  source: string | null;
+  license: string | null;
 }
 
 function parseJson(text: string | null): unknown {
@@ -48,7 +50,7 @@ export default defineQuery("blue.moji.collection.listCollection", async (ctx) =>
   }
 
   const rows = (await ctx.db.query(
-    `SELECT uri, did, name, alt, created_at, cid, formats, sticker_formats, adult_only, copy_of
+    `SELECT uri, did, name, alt, created_at, cid, formats, sticker_formats, adult_only, copy_of, source, license
      FROM "blue.moji.collection.item"
      WHERE did = $1 ${cursorClause}
      ORDER BY created_at ${order}, cid ${order}
@@ -72,6 +74,8 @@ export default defineQuery("blue.moji.collection.listCollection", async (ctx) =>
         stickerFormats: parseJson(row.sticker_formats),
         adultOnly: row.adult_only,
         copyOf: row.copy_of,
+        source: row.source,
+        license: row.license,
       }),
     ),
   );

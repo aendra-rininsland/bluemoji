@@ -22,6 +22,10 @@ export interface PackViewBasic {
   name: string;
   description?: string;
   descriptionFacets?: BlueMojiRichtextFacet.Main[];
+  /** URL of where this was originally published, if it was re-uploaded from somewhere else (an artist's page, another site, a Mastodon server). Informational provenance, self-asserted by the record's owner and not verified. Clients SHOULD only render http(s) URLs as links and MUST NOT navigate to other schemes (javascript:, data:, …). */
+  source?: string;
+  /** SPDX license expression (https://spdx.org/licenses/) describing how this may be reused, e.g. 'CC-BY-4.0', 'CC0-1.0' or 'MIT OR Apache-2.0'; use a 'LicenseRef-…' identifier for terms with no SPDX id. Absent means unspecified, which is NOT the same as public domain. Self-asserted by the record's owner: not verified, and not legal advice. */
+  license?: string;
   avatar?: string;
   itemCount?: number;
   labels?: ComAtprotoLabelDefs.Label[];
@@ -47,6 +51,10 @@ export interface PackView {
   name: string;
   description?: string;
   descriptionFacets?: AppBskyRichtextFacet.Main[];
+  /** URL of where this was originally published, if it was re-uploaded from somewhere else (an artist's page, another site, a Mastodon server). Informational provenance, self-asserted by the record's owner and not verified. Clients SHOULD only render http(s) URLs as links and MUST NOT navigate to other schemes (javascript:, data:, …). */
+  source?: string;
+  /** SPDX license expression (https://spdx.org/licenses/) describing how this may be reused, e.g. 'CC-BY-4.0', 'CC0-1.0' or 'MIT OR Apache-2.0'; use a 'LicenseRef-…' identifier for terms with no SPDX id. Absent means unspecified, which is NOT the same as public domain. Self-asserted by the record's owner: not verified, and not legal advice. */
+  license?: string;
   avatar?: string;
   packItemCount?: number;
   labels?: ComAtprotoLabelDefs.Label[];

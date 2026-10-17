@@ -10,6 +10,8 @@ interface ItemRecord {
   stickerFormats?: unknown;
   adultOnly?: boolean;
   copyOf?: string;
+  source?: string;
+  license?: string;
 }
 
 // The AppView-indexed lookup that verification elsewhere in this codebase
@@ -50,6 +52,8 @@ export default defineQuery("blue.moji.collection.getItem", async (ctx) => {
       stickerFormats: record.value.stickerFormats,
       adultOnly: record.value.adultOnly,
       copyOf: record.value.copyOf,
+      source: record.value.source,
+      license: record.value.license,
     }),
   });
 });

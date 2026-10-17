@@ -1,4 +1,5 @@
 import type { XrpcContext } from "@hatk/hatk/xrpc";
+import { viewProvenance } from "../app/lib/provenance.ts";
 
 // Underscore prefix keeps this module out of the server/ scanner.
 
@@ -32,6 +33,8 @@ export interface PackRow {
   description_facets: string | null;
   icon: string | null;
   adult_only: number | null;
+  source: string | null;
+  license: string | null;
   created_at: string;
   labels: string | null;
 }
@@ -102,6 +105,7 @@ export function packViewBasic(
     description: row.description ?? undefined,
     descriptionFacets: parseJson(row.description_facets),
     avatar: ctx.blobUrl(row.did, parseJson(row.icon)),
+    ...viewProvenance(row.license, row.source),
     itemCount,
     labels,
     indexedAt: row.indexed_at,
@@ -177,6 +181,8 @@ export interface ItemViewInput {
   stickerFormats?: unknown;
   adultOnly?: unknown;
   copyOf?: string | null;
+  source?: string | null;
+  license?: string | null;
 }
 
 export interface OriginalCreator {
@@ -234,6 +240,7 @@ export async function itemView(ctx: Pick<XrpcContext, "getRecords" | "db">, inpu
     stickerFormats: normalizeFormats(input.stickerFormats),
     adultOnly: Boolean(input.adultOnly),
     copyOf: input.copyOf ?? undefined,
+    ...viewProvenance(input.license, input.source),
     originalCreator: originalCreator
       ? {
           $type: "blue.moji.collection.item#originalCreator",
@@ -272,6 +279,7 @@ export async function packView(
     description: row.description ?? undefined,
     descriptionFacets: parseJson(row.description_facets),
     avatar: ctx.blobUrl(row.did, parseJson(row.icon)),
+    ...viewProvenance(row.license, row.source),
     packItemCount: itemCount,
     labels,
     indexedAt: row.indexed_at,

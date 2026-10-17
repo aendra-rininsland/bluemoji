@@ -8,7 +8,8 @@ moji.blue AppView (hatk framework), and the `@aendra/bluemoji` client library.
 **Read [ROADMAP.md](ROADMAP.md) before planning any feature work** — it holds
 the prioritised backlog, the remaining lexicon-hygiene items, and the
 ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
-0003 stickers, 0004 reactions, 0005 internationalised aliases).
+0003 stickers, 0004 reactions, 0005 internationalised aliases, 0006 license &
+source).
 [RENDERING.md](RENDERING.md) is the third-party-facing "render a Bluemoji
 facet in ~20 lines" adoption doc — link that, not this file, to external
 developers. [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) is the
@@ -56,6 +57,12 @@ link that instead of this file for adopters past the RENDERING.md stage.
   changed — never `putItem`, which rebuilds the record and would drop
   `labels`/`copyOf`/`fallbackText`. Deleting first removes the viewer's own
   `packitem` entries for the emoji (`/collection/references`).
+- `app/lib/provenance.ts` — RFC 0006 `license` (SPDX expression) and `source`
+  (URL) on items and packs. Both are self-asserted, so **validate on write
+  (`cleanProvenance`) and re-validate on every read** (`viewProvenance` in the
+  AppView views, `safeHref`/`Provenance.svelte` in the UI): a stored `source`
+  may be `javascript:`/`data:`, and only http(s) may ever become a link. Forms
+  use `ProvenanceFields.svelte`; a copy (`copyItem`) carries the license over.
 - `app/lib/alias.ts` — canonical RFC 0005 implementation (alias
   canonicalisation + Punycode rkey encoding). **Duplicated** in
   `lib/src/util/alias.ts` for the published package; keep the two in sync.
