@@ -2,6 +2,9 @@
   import { callXrpc } from '$hatk/client'
   import { invalidateAll } from '$app/navigation'
   import { aliasToRkey } from '$lib/alias'
+  import { cleanProvenance, provenanceError } from '$lib/provenance'
+  import Provenance from '$lib/components/Provenance.svelte'
+  import ProvenanceFields from '$lib/components/ProvenanceFields.svelte'
   import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
 
   let { data } = $props()
@@ -17,12 +20,21 @@
   let editing = $state(false)
   let editName = $state('')
   let editDescription = $state('')
+  let editLicense = $state('')
+  let editSource = $state('')
   let editBusy = $state(false)
-  const editError = $derived(packNameError(editName) ?? packDescriptionError(editDescription))
+  const editProvenanceProblem = $derived(provenanceError(editLicense, editSource))
+  const editError = $derived(
+    packNameError(editName) ?? packDescriptionError(editDescription) ?? editProvenanceProblem
+  )
 
   function startEdit() {
     editName = data.pack.name
     editDescription = data.pack.description ?? ''
+    // Edit the stored values (not the sanitised view), so a bad one is visible and fixable
+    const rec = (data.packRecord ?? {}) as Record<string, unknown>
+    editLicense = typeof rec.license === 'string' ? rec.license : ''
+    editSource = typeof rec.source === 'string' ? rec.source : ''
     error = ''
     editing = true
   }
@@ -32,7 +44,9 @@
     editBusy = true
     error = ''
     try {
-      const { description: _old, ...rest } = data.packRecord as Record<string, unknown>
+      const prov = cleanProvenance(editLicense, editSource)
+      if ('error' in prov) return
+      const { description: _d, license: _l, source: _s, ...rest } = data.packRecord as Record<string, unknown>
       await callXrpc('dev.hatk.putRecord', {
         collection: 'blue.moji.packs.pack',
         rkey: packRkey,
@@ -40,7 +54,8 @@
           ...rest,
           name: editName.trim(),
           // Omit the key when empty: an explicit undefined fails lexicon validation
-          ...(editDescription.trim() ? { description: editDescription.trim() } : {})
+          ...(editDescription.trim() ? { description: editDescription.trim() } : {}),
+          ...prov
         }
       } as any)
       editing = false
@@ -205,6 +220,9 @@
         createdAt: new Date().toISOString(),
         adultOnly: subject.adultOnly ?? false,
         copyOf: subject.uri,
+        // A copy keeps the license it was shared under (and any source it already had)
+        ...(subject.license ? { license: subject.license } : {}),
+        ...(subject.source ? { source: subject.source } : {}),
         formats,
       },
     })
@@ -304,6 +322,7 @@
           <p style="font-size: 0.75rem; color: {editError ? 'var(--danger)' : 'var(--muted)'};">
             {editError ?? `${graphemeCount(editDescription)}/${PACK_DESCRIPTION_MAX_GRAPHEMES}`}
           </p>
+          <ProvenanceFields bind:license={editLicense} bind:source={editSource} disabled={editBusy} idPrefix="packedit" noun="pack" />
           <div style="display: flex; gap: 0.5rem;">
             <button
               type="submit"
@@ -332,6 +351,9 @@
         {:else if data.isOwner}
           <p style="font-size: 0.875rem; color: var(--muted);">No description yet.</p>
         {/if}
+        <div style="margin-top: 0.5rem;">
+          <Provenance license={data.pack.license} source={data.pack.source} />
+        </div>
       {/if}
     </div>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -512,6 +534,7 @@
               by @{item.subject.originalCreator.handle}
             </span>
           {/if}
+          <Provenance license={item.subject.license} source={item.subject.source} compact />
           {#if item.subject.adultOnly}
             <span style="font-size: 0.625rem; padding: 0.125rem 0.375rem; background: var(--border); color: var(--muted); border-radius: 999px;">18+</span>
           {/if}

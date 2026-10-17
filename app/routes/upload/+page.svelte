@@ -1,6 +1,8 @@
 <script lang="ts">
   import { callXrpc, getViewer } from '$hatk/client'
   import { aliasToRkey, normalizeAlias } from '$lib/alias'
+  import { provenanceError } from '$lib/provenance'
+  import ProvenanceFields from '$lib/components/ProvenanceFields.svelte'
 
   let { data } = $props()
 
@@ -8,6 +10,8 @@
   let file = $state<File | null>(null)
   let emojiName = $state('')
   let altText = $state('')
+  let license = $state('')
+  let source = $state('')
   let adultOnly = $state(false)
   let asSticker = $state(true)
   let loading = $state(false)
@@ -178,6 +182,8 @@
         item: {
           name: `:${alias}:`,
           alt: altText || undefined,
+          license: license.trim() || undefined,
+          source: source.trim() || undefined,
           createdAt: new Date().toISOString(),
           adultOnly,
           formats,
@@ -190,6 +196,8 @@
       emojiName = ''
       altText = ''
       adultOnly = false
+      // A batch of uploads usually shares a license, but each has its own source
+      source = ''
       if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = '' }
       if (fileInput) fileInput.value = ''
     } catch (e: any) {
@@ -303,6 +311,8 @@
       />
     </div>
 
+    <ProvenanceFields bind:license bind:source disabled={loading} idPrefix="upload" />
+
     <!-- Sticker -->
     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
       <input type="checkbox" bind:checked={asSticker} />
@@ -318,8 +328,8 @@
     <div>
       <button
         type="submit"
-        disabled={loading || !file || !!aliasCheck.error}
-        style="padding: 0.5rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; opacity: {loading || !file || aliasCheck.error ? 0.5 : 1};"
+        disabled={loading || !file || !!aliasCheck.error || !!provenanceError(license, source)}
+        style="padding: 0.5rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; opacity: {loading || !file || aliasCheck.error || provenanceError(license, source) ? 0.5 : 1};"
       >
         {loading ? 'Uploading…' : 'Upload emoji'}
       </button>

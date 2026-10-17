@@ -49,6 +49,8 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
       rkey: (r.uri as string).split("/").pop()!,
       name: (v?.name as string) ?? "",
       alt: (v?.alt as string) ?? "",
+      license: typeof v?.license === "string" ? v.license : "",
+      source: typeof v?.source === "string" ? v.source : "",
       adultOnly: Boolean(v?.adultOnly),
       createdAt: (v?.createdAt as string) ?? "",
       imageUrl,

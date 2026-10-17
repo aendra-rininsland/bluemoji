@@ -4,6 +4,9 @@
   import { invalidateAll } from '$app/navigation'
   import { ALT_MAX_GRAPHEMES, altError } from '$lib/alt'
   import { graphemeCount } from '$lib/packs'
+  import { cleanProvenance, provenanceError } from '$lib/provenance'
+  import Provenance from '$lib/components/Provenance.svelte'
+  import ProvenanceFields from '$lib/components/ProvenanceFields.svelte'
 
   let { data } = $props()
   const items = $derived(data.items)
@@ -14,20 +17,23 @@
   let query = $state('')
   const shown = $derived(
     query.trim()
-      ? items.filter(i => `${i.name} ${i.alt}`.toLowerCase().includes(query.trim().toLowerCase()))
+      ? items.filter(i => `${i.name} ${i.alt} ${i.license ?? ''}`.toLowerCase().includes(query.trim().toLowerCase()))
       : items
   )
 
-  // Editing one emoji's description. The whole record is put back with only
-  // `alt` changed, so formats, stickers, labels and provenance are untouched.
+  // Editing one emoji's description, license and source. The whole record is
+  // put back with only those fields changed, so formats, stickers, labels and
+  // copy provenance (`copyOf`) are untouched.
   type Item = (typeof data.items)[number]
-  let editing = $state<{ item: Item; record: Record<string, unknown> | null; text: string; busy: boolean; error: string } | null>(null)
+  let editing = $state<{ item: Item; record: Record<string, unknown> | null; text: string; license: string; source: string; busy: boolean; error: string } | null>(null)
   let editor = $state<HTMLTextAreaElement | null>(null)
   const textError = $derived(editing ? altError(editing.text) : null)
+  const provenanceProblem = $derived(editing ? provenanceError(editing.license, editing.source) : null)
+  const invalid = $derived(!!textError || !!provenanceProblem)
 
   async function startEdit(item: Item) {
     removal = null
-    editing = { item, record: null, text: item.alt, busy: true, error: '' }
+    editing = { item, record: null, text: item.alt, license: item.license ?? '', source: item.source ?? '', busy: true, error: '' }
     await tick()
     try {
       const res = await fetch(`/collection/record?rkey=${encodeURIComponent(item.rkey)}`)
@@ -35,7 +41,8 @@
       const { value } = await res.json()
       if (editing?.item.uri !== item.uri) return // cancelled or switched meanwhile
       // Edit against the freshest copy of the description too
-      editing = { item, record: value, text: typeof value.alt === 'string' ? value.alt : '', busy: false, error: '' }
+      const str = (v: unknown) => (typeof v === 'string' ? v : '')
+      editing = { item, record: value, text: str(value.alt), license: str(value.license), source: str(value.source), busy: false, error: '' }
       await tick()
       editor?.focus()
     } catch (e: any) {
@@ -44,18 +51,20 @@
   }
 
   async function saveEdit() {
-    if (!editing || !editing.record || textError) return
+    if (!editing || !editing.record || invalid) return
     const { item, record } = editing
     const alt = editing.text.trim()
+    const prov = cleanProvenance(editing.license, editing.source)
+    if ('error' in prov) return
     editing.busy = true
     editing.error = ''
     try {
-      const { alt: _old, ...rest } = record
+      const { alt: _a, license: _l, source: _s, ...rest } = record
       await callXrpc('dev.hatk.putRecord', {
         collection: 'blue.moji.collection.item',
         rkey: item.rkey,
         // Omit the key when empty: an explicit undefined fails lexicon validation
-        record: { ...rest, ...(alt ? { alt } : {}) }
+        record: { ...rest, ...(alt ? { alt } : {}), ...prov }
       } as any)
       editing = null
       await invalidateAll()
@@ -200,14 +209,20 @@
               <p style="font-size: 0.75rem; color: {textError ? 'var(--danger)' : 'var(--muted)'};">
                 {textError ?? `${graphemeCount(editing.text.trim())}/${ALT_MAX_GRAPHEMES}`}
               </p>
+              <ProvenanceFields
+                bind:license={editing.license}
+                bind:source={editing.source}
+                disabled={editing.busy || !editing.record}
+                idPrefix="edit"
+              />
               {#if editing.error}
                 <p role="alert" style="font-size: 0.875rem; color: var(--danger);">{editing.error}</p>
               {/if}
               <div style="display: flex; gap: 0.5rem;">
                 <button
                   type="submit"
-                  disabled={editing.busy || !editing.record || !!textError}
-                  style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {editing.busy || !editing.record || textError ? 0.5 : 1};"
+                  disabled={editing.busy || !editing.record || invalid}
+                  style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {editing.busy || !editing.record || invalid ? 0.5 : 1};"
                 >
                   {editing.busy && editing.record ? 'Saving…' : 'Save'}
                 </button>
@@ -324,13 +339,14 @@
               {item.alt}
             </span>
           {/if}
+          <Provenance license={item.license} source={item.source} compact />
           <button
             type="button"
             onclick={() => startEdit(item)}
-            aria-label={item.alt ? `Edit description of ${item.name}` : `Add description to ${item.name}`}
+            aria-label={`Edit ${item.name}`}
             style="margin-top: auto; padding: 0.125rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: none; color: var(--muted); font-size: 0.6875rem; cursor: pointer;"
           >
-            {item.alt ? '✎ Edit' : '+ Description'}
+            ✎ Edit
           </button>
         </div>
         {/if}

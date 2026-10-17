@@ -31,6 +31,7 @@ export interface RunnerOptions {
     name: string,
     description: string,
     adultOnly: boolean,
+    provenance?: { license?: string; source?: string },
   ) => Promise<string>;
   addToPack: (did: string, packUri: string, itemUri: string) => Promise<void>;
   onStatus: (key: string, status: ItemStatus) => void;
@@ -55,7 +56,10 @@ export async function runImportQueue(o: RunnerOptions): Promise<RunSummary> {
   const ensurePack = (): Promise<string> => {
     if (packUri) return Promise.resolve(packUri);
     creating ??= o
-      .createPack(o.did, o.pack.name, o.pack.description, o.adultOnly)
+      .createPack(o.did, o.pack.name, o.pack.description, o.adultOnly, {
+        license: o.pack.license,
+        source: o.pack.source,
+      })
       .then((u) => (packUri = u));
     return creating;
   };

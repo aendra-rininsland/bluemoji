@@ -2,6 +2,8 @@
   // Options shared by the importers: sticker rendition, adult-only flag, and
   // an optional pack to add the imported emoji to.
   import { graphemeCount, packTargetProblem, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
+  import { provenanceError } from '$lib/provenance'
+  import ProvenanceFields from './ProvenanceFields.svelte'
 
   let {
     packs,
@@ -11,7 +13,9 @@
     packMode = $bindable<'none' | 'existing' | 'new'>('none'),
     packUri = $bindable(''),
     packName = $bindable(''),
-    packDescription = $bindable('')
+    packDescription = $bindable(''),
+    license = $bindable(''),
+    source = $bindable('')
   }: {
     packs: { uri: string; name: string }[]
     disabled?: boolean
@@ -21,6 +25,8 @@
     packUri?: string
     packName?: string
     packDescription?: string
+    license?: string
+    source?: string
   } = $props()
 
   const problem = $derived(
@@ -73,4 +79,19 @@
       </span>
     {/if}
   </div>
+
+  <details open={!!(license || source)}>
+    <summary style="cursor: pointer; font-weight: 500;">
+      License &amp; source <span style="font-weight: 400; color: var(--muted);">(optional{license || source ? ' — set' : ''})</span>
+    </summary>
+    <div style="margin-top: 0.75rem;">
+      <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem;">
+        Applied to every emoji imported here, and to a new pack if you create one. You can change them per emoji later.
+      </p>
+      <ProvenanceFields bind:license bind:source {disabled} idPrefix="import" />
+      {#if provenanceError(license, source)}
+        <p role="alert" style="margin-top: 0.5rem; font-size: 0.8125rem; color: var(--danger);">{provenanceError(license, source)}</p>
+      {/if}
+    </div>
+  </details>
 </div>
