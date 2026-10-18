@@ -48,6 +48,27 @@ assert.strictEquals(
 );
 ```
 
+### Verify
+
+Facets (and sticker embeds, and reaction `emojiRef`s) are written by the poster
+and never checked, so look the emoji up before you trust it:
+
+```typescript
+import { verifyEmojiClaim } from "@aendra/bluemoji/verify";
+
+const verified = await verifyEmojiClaim(
+  { did: facetFeature.did, name: facetFeature.name },
+  { appviews: ["https://moji.blue"] }, // optional; there is no default AppView
+);
+if (verified) show(verified.item); // verified.via: "index" | "appview" | "pds"
+```
+
+It tries your own `index`, then the `appviews` you list in order, then the
+owner's PDS. An AppView that says "not found" is final (so a takedown isn't
+undone by the PDS); one that is down is skipped. `verified.moderated` is
+`false` when only the PDS answered. On a server, pass a `fetch` that refuses
+private addresses. See [RENDERING.md](../RENDERING.md#where-to-do-the-lookup).
+
 ### Render
 
 Once facets are attached to a record, you can render them using the helper libraries in `render/`:
