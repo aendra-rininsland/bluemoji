@@ -9,7 +9,7 @@ moji.blue AppView (hatk framework), and the `@aendra/bluemoji` client library.
 the prioritised backlog, the remaining lexicon-hygiene items, and the
 ideation pipeline. Design rationale lives in `rfcs/` (0001 core, 0002 packs,
 0003 stickers, 0004 reactions, 0005 internationalised aliases, 0006 license &
-source).
+source, 0007 portable moderation — draft).
 [RENDERING.md](RENDERING.md) is the third-party-facing "render a Bluemoji
 facet in ~20 lines" adoption doc — link that, not this file, to external
 developers. [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) is the
@@ -68,7 +68,11 @@ link that instead of this file for adopters past the RENDERING.md stage.
   `lib/src/util/alias.ts` for the published package; keep the two in sync.
 - `lib/` — `@aendra/bluemoji` npm workspace: generated lexicon client
   (`lib/src/client/`, via lex-cli codegen), `BluemojiRichText` + facet
-  detection, renderers, React/RN/web components.
+  detection, renderers, React/RN/web components, and `verifyEmojiClaim()`
+  (`lib/src/verify/`, subpath `@aendra/bluemoji/verify`): verifies a facet /
+  sticker / reaction claim via a local index, listed AppViews, then the owner's
+  PDS — **no default AppView**; an AppView's "not found" is final so a
+  takedown isn't undone by the PDS.
 - `hatk.config.ts` — relay, DB, OAuth scopes, and the **collections
   allowlist** (see gotcha #1 below).
 - `hatk.generated.ts` / `hatk.generated.client.ts` — regenerated artifacts;

@@ -18,6 +18,7 @@
     "src/index.ts",
     "src/facet/**/*.ts",
     "src/render/**/*.ts",
+    "src/verify/**/*.ts",
     "src/client/**/*.ts",
     "src/util/**/*.ts"
   ],

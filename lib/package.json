@@ -29,7 +29,11 @@
       "import": "./dist/render.js"
     },
     "./components/webcomponent/picker": "./src/components/webcomponent/picker.ts",
-    "./components/webcomponent/webcomponent": "./src/components/webcomponent/webcomponent.ts"
+    "./components/webcomponent/webcomponent": "./src/components/webcomponent/webcomponent.ts",
+    "./verify": {
+      "types": "./dist/verify/index.d.ts",
+      "import": "./dist/verify.js"
+    }
   },
   "scripts": {
     "test": "tsx src/**/*.test.ts",
