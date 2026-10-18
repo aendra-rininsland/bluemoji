@@ -110,14 +110,21 @@ export class CloudflarePurger {
   purged = 0;
   failed = 0;
 
+  private readonly config: PurgeConfig | null;
+  private readonly deps: {
+    fetch?: typeof fetch;
+    sleep?: (ms: number) => Promise<void>;
+    log?: Logger;
+  };
+
+  // No parameter properties: hatk loads this under Node's type stripping, which rejects them
   constructor(
-    private readonly config: PurgeConfig | null,
-    private readonly deps: {
-      fetch?: typeof fetch;
-      sleep?: (ms: number) => Promise<void>;
-      log?: Logger;
-    } = {},
-  ) {}
+    config: PurgeConfig | null,
+    deps: { fetch?: typeof fetch; sleep?: (ms: number) => Promise<void>; log?: Logger } = {},
+  ) {
+    this.config = config;
+    this.deps = deps;
+  }
 
   get enabled() {
     return this.config !== null;

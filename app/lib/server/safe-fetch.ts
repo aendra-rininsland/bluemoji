@@ -13,11 +13,11 @@ import { isIP } from "node:net";
 import { Agent, fetch as undiciFetch } from "undici";
 
 export class SafeFetchError extends Error {
-  constructor(
-    message: string,
-    public status = 400,
-  ) {
+  status: number;
+  // No parameter property: hatk loads this under Node's type stripping, which rejects them
+  constructor(message: string, status = 400) {
     super(message);
+    this.status = status;
   }
 }
 
