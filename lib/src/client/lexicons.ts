@@ -2813,6 +2813,45 @@ export const schemaDict = {
     $type: "com.atproto.lexicon.schema",
     lexicon: 1,
   },
+  BlueMojiCollectionCheckBlob: {
+    lexicon: 1,
+    id: "blue.moji.collection.checkBlob",
+    defs: {
+      main: {
+        type: "query",
+        description:
+          "Whether this AppView indexes a blob as part of a Bluemoji: referenced by an emoji or sticker item's formats, or as a pack's icon, in the given repo, and not belonging to a taken-down account. Public. Lets an image proxy serve only Bluemoji assets instead of acting as a general blob CDN. 'available: false' is a definitive no for this AppView (it may simply not have indexed a very new record yet).",
+        parameters: {
+          type: "params",
+          required: ["did", "cid"],
+          properties: {
+            did: {
+              type: "string",
+              format: "did",
+              description: "The repo that holds the blob.",
+            },
+            cid: {
+              type: "string",
+              format: "cid",
+              description: "The blob's CID.",
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["available"],
+            properties: {
+              available: {
+                type: "boolean",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   BlueMojiCollectionDefs: {
     lexicon: 1,
     id: "blue.moji.collection.defs",
@@ -4759,6 +4798,7 @@ export const ids = {
   AppBskyLabelerDefs: "app.bsky.labeler.defs",
   AppBskyNotificationDefs: "app.bsky.notification.defs",
   AppBskyRichtextFacet: "app.bsky.richtext.facet",
+  BlueMojiCollectionCheckBlob: "blue.moji.collection.checkBlob",
   BlueMojiCollectionDefs: "blue.moji.collection.defs",
   BlueMojiCollectionGetItem: "blue.moji.collection.getItem",
   BlueMojiCollectionItem: "blue.moji.collection.item",

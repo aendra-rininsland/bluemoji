@@ -81,6 +81,18 @@ export function getItemUrls(origin: string, repos: string[], name: string): stri
   return [...out];
 }
 
+/**
+ * The cached spellings of an image URL for one blob. A DID has colons, which
+ * clients send either percent-encoded (what the app's own `imgUrl` builds) or
+ * raw. Image URLs have no query string, so these two are the whole set.
+ */
+export function imgUrls(origin: string, did: string, cid: string): string[] {
+  return [
+    `${origin}/img/${encodeURIComponent(did)}/${encodeURIComponent(cid)}`,
+    `${origin}/img/${did}/${cid}`,
+  ];
+}
+
 /** Total URLs held in the queue; beyond this new ones are dropped and logged. */
 const MAX_PENDING = 50_000;
 const MAX_ATTEMPTS = 3;

@@ -50,13 +50,27 @@ export interface BlobProxyOptions {
    * it the proxy serves any blob from any repo, which makes the host a free
    * image CDN; a Bluemoji AppView would typically allow only CIDs referenced
    * by an indexed `blue.moji.collection.item`.
+   *
+   * `true` serves it publicly (immutable, CDN-cacheable). `"private"` serves it
+   * to this requester only and must not be cached by anything shared: use it
+   * for a blob that isn't allowed publicly but that this viewer owns (an upload
+   * the index hasn't caught up with). `false` is a definitive no. Throwing
+   * means "couldn't tell", answered 503 so nothing caches a wrong refusal.
    */
-  authorize?: (did: string, cid: string) => boolean | Promise<boolean>;
+  authorize?: (did: string, cid: string) => boolean | "private" | Promise<boolean | "private">;
   maxBytes?: number;
   /** Injectable DNS resolver, for tests. */
   lookup?: Lookup;
   /** Fetch for the PDS requests, for tests; defaults to one pinned to public addresses. */
   guardedFetch?: typeof globalThis.fetch;
+}
+
+/** A refusal that no cache may keep: a wrong "no" must not outlive the reason for it. */
+function refusal(status: number, message: string, headers: Record<string, string> = {}) {
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: { "content-type": "application/json", "cache-control": "no-store", ...headers },
+  });
 }
 
 export async function proxyBlob(
@@ -71,12 +85,23 @@ export async function proxyBlob(
   const digest = blobCidDigest(cid);
   if (!digest) error(400, "Invalid did or cid");
 
-  // CID-addressed content never changes: any revalidation is a 304.
-  if (request.headers.get("if-none-match")?.includes(cid)) {
-    return new Response(null, { status: 304 });
+  // Ask before anything else, including the 304 below: a CDN revalidating an
+  // entry must not have its life extended for a blob we would now refuse (a
+  // taken-down account's, say).
+  let access: boolean | "private" = true;
+  if (opts.authorize) {
+    try {
+      access = await opts.authorize(did, cid);
+    } catch {
+      return refusal(503, "Could not check this blob", { "retry-after": "5" });
+    }
+    if (!access) return refusal(404, "Blob not available here");
   }
 
-  if (opts.authorize && !(await opts.authorize(did, cid))) error(404, "Blob not available here");
+  // CID-addressed content never changes: any revalidation is a 304.
+  if (access === true && request.headers.get("if-none-match")?.includes(cid)) {
+    return new Response(null, { status: 304 });
+  }
 
   const maxBytes = opts.maxBytes ?? MAX_BLOB_BYTES;
   const pds = await resolvePds(did, fetch, {
@@ -116,8 +141,9 @@ export async function proxyBlob(
   return new Response(bytes as BodyInit, {
     headers: {
       "content-type": contentType,
-      "cache-control": "public, max-age=31536000, immutable",
-      etag: `"${cid}"`,
+      "cache-control":
+        access === "private" ? "private, no-store" : "public, max-age=31536000, immutable",
+      ...(access === "private" ? {} : { etag: `"${cid}"` }),
       ...BLOB_SECURITY_HEADERS,
       "content-disposition": "inline",
       "access-control-allow-origin": "*",

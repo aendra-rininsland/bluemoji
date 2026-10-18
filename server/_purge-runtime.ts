@@ -1,6 +1,7 @@
 // Underscore prefix keeps this module out of the server/ scanner.
 import { rkeyToAlias } from "../app/lib/alias.ts";
-import { CloudflarePurger, getItemUrls, purgeConfigFromEnv } from "./_cache-purge.ts";
+import { blobCidsFor } from "./_blob-lookup.ts";
+import { CloudflarePurger, getItemUrls, imgUrls, purgeConfigFromEnv } from "./_cache-purge.ts";
 
 /** Shared by the on-commit hook and the takedown watcher. */
 export const purger = new CloudflarePurger(purgeConfigFromEnv());
@@ -33,13 +34,23 @@ export async function purgeItem(query: Query, did: string, name: string) {
   }
 }
 
-/** Queue a purge of getItem for every emoji an account owns. */
+const publicOrigin = () =>
+  process.env.PUBLIC_ORIGIN ?? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+
+/**
+ * Queue a purge of everything cached for an account: getItem for every emoji,
+ * and the image of every blob they reference. /img is cached as immutable, so
+ * without this a taken-down account's images would stay served from the edge
+ * (the origin now refuses them, but the edge never asks).
+ */
 export async function purgeAccount(query: Query, did: string) {
   if (!purger.enabled) return;
   const rows = (await query(`SELECT name FROM ${ITEM_TABLE} WHERE did = $1`, [did])) as {
     name: string;
   }[];
   for (const row of rows) await purgeItem(query, did, row.name);
+  for (const cid of await blobCidsFor(query, did))
+    purger.enqueue(imgUrls(publicOrigin(), did, cid));
 }
 
 /** The alias for a record that no longer exists, from its AT-URI. */

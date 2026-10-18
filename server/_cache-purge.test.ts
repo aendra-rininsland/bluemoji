@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { CloudflarePurger, getItemUrls, purgeConfigFromEnv } from "./_cache-purge.ts";
+import { CloudflarePurger, getItemUrls, imgUrls, purgeConfigFromEnv } from "./_cache-purge.ts";
 
 const ORIGIN = "https://moji.blue";
 const DID = "did:plc:abc";
@@ -124,4 +124,13 @@ test("does nothing when not configured", async () => {
   await p.idle();
   assert.equal(p.enabled, false);
   assert.equal(p.purged + p.failed, 0);
+});
+
+test("image URLs cover the encoded and raw-colon spellings of the DID", () => {
+  const cid = "bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  assert.deepEqual(imgUrls(ORIGIN, DID, cid), [
+    `${ORIGIN}/img/${encodeURIComponent(DID)}/${cid}`,
+    `${ORIGIN}/img/${DID}/${cid}`,
+  ]);
+  assert.ok(imgUrls(ORIGIN, DID, cid)[0].includes("%3A"), "matches what the app's imgUrl() emits");
 });
