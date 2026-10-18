@@ -2,7 +2,7 @@
   import { callXrpc } from '$hatk/client'
   import { invalidateAll } from '$app/navigation'
   import { aliasToRkey } from '$lib/alias'
-  import { cleanProvenance, provenanceError } from '$lib/provenance'
+  import { cleanProvenance, isCopyable, provenanceError, viewProvenance } from '$lib/provenance'
   import Provenance from '$lib/components/Provenance.svelte'
   import ProvenanceFields from '$lib/components/ProvenanceFields.svelte'
   import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
@@ -187,10 +187,25 @@
     }
   }
 
+  /**
+   * Copying needs a license grant: an emoji with no license, or marked
+   * all-rights-reserved, can't be copied. The stored value is re-validated
+   * first, so a junk license counts as no license.
+   */
+  function canCopy(item: any): boolean {
+    return isCopyable(viewProvenance(item.subject.license, null).license)
+  }
+
+  const copyableCount = $derived(
+    data.items.filter((i: any) => canCopy(i) && !copied.has(i.subject.uri ?? '')).length
+  )
+  const uncopyableCount = $derived(data.items.filter((i: any) => !canCopy(i)).length)
+
   /** Copy one pack item's blobs + record into the signed-in user's repo. */
   async function copyItem(item: any) {
     const { subject } = item
     if (!data.viewer || !subject.did || !subject.uri) return
+    if (!canCopy(item)) throw new Error(`:${subject.name}: can't be copied — its license doesn't allow it`)
 
     const rkey = aliasToRkey(subject.name as string)
     const formats: Record<string, unknown> = {
@@ -252,7 +267,7 @@
     error = ''
     try {
       for (const item of data.items) {
-        if (!item.subject.uri || copied.has(item.subject.uri ?? '')) continue
+        if (!item.subject.uri || copied.has(item.subject.uri ?? '') || !canCopy(item)) continue
         await copyItem(item)
         copied = new Set([...copied, item.subject.uri as string])
       }
@@ -394,10 +409,11 @@
       {#if data.viewer && !data.isOwner}
         <button
           onclick={copyAll}
-          disabled={busy !== null}
-          style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {busy !== null ? 0.5 : 1};"
+          disabled={busy !== null || copyableCount === 0}
+          title={uncopyableCount > 0 ? `${uncopyableCount} emoji in this pack can't be copied (no license, or all rights reserved)` : undefined}
+          style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {busy !== null || copyableCount === 0 ? 0.5 : 1};"
         >
-          {busy === '*' ? 'Copying…' : 'Copy all to my collection'}
+          {busy === '*' ? 'Copying…' : uncopyableCount > 0 ? `Copy ${copyableCount} to my collection` : 'Copy all to my collection'}
         </button>
       {/if}
       {#if data.isOwner && data.packRecord && !editing}
@@ -550,6 +566,13 @@
             >
               {busy === item.uri ? 'Removing…' : 'Remove'}
             </button>
+          {:else if data.viewer && !canCopy(item)}
+            <span
+              style="font-size: 0.6875rem; color: var(--muted);"
+              title={item.subject.license ? 'Its license reserves all rights' : 'No license was given, so no permission to copy'}
+            >
+              Not copyable
+            </span>
           {:else if data.viewer}
             <button
               onclick={() => copyOne(item)}

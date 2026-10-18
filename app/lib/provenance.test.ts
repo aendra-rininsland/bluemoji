@@ -5,6 +5,7 @@ import {
   SOURCE_MAX_BYTES,
   cleanProvenance,
   licenseError,
+  isCopyable,
   licenseLabel,
   licenseUrl,
   normalizeLicense,
@@ -89,6 +90,17 @@ assert.equal(licenseUrl("LicenseRef-All-Rights-Reserved"), null);
 assert.equal(licenseUrl("../../evil"), null);
 assert.equal(licenseUrl("javascript:alert(1)"), null);
 console.log("ok - labels and SPDX links");
+
+assert.equal(isCopyable(undefined), false);
+assert.equal(isCopyable(null), false);
+assert.equal(isCopyable(""), false);
+assert.equal(isCopyable("LicenseRef-All-Rights-Reserved"), false);
+assert.equal(isCopyable("licenseref-all-rights-reserved"), false);
+assert.equal(isCopyable("LicenseRef-All-Rights-Reserved AND MIT"), false);
+assert.equal(isCopyable("LicenseRef-All-Rights-Reserved OR CC-BY-4.0"), true);
+assert.equal(isCopyable("CC-BY-4.0"), true);
+assert.equal(isCopyable("CC-BY-NC-ND-4.0"), true);
+console.log("ok - copy gating");
 
 // ------------------------------------------------------------------ source
 for (const ok of [

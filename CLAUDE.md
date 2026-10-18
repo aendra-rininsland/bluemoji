@@ -62,7 +62,7 @@ link that instead of this file for adopters past the RENDERING.md stage.
   (`cleanProvenance`) and re-validate on every read** (`viewProvenance` in the
   AppView views, `safeHref`/`Provenance.svelte` in the UI): a stored `source`
   may be `javascript:`/`data:`, and only http(s) may ever become a link. Forms
-  use `ProvenanceFields.svelte`; a copy (`copyItem`) carries the license over.
+  use `ProvenanceFields.svelte`; a copy (`copyItem`) carries the license over, and is only offered when `isCopyable(license)` — no license or `LicenseRef-All-Rights-Reserved` blocks it.
 - `app/lib/alias.ts` — canonical RFC 0005 implementation (alias
   canonicalisation + Punycode rkey encoding). **Duplicated** in
   `lib/src/util/alias.ts` for the published package; keep the two in sync.

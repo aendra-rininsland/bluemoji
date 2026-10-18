@@ -79,10 +79,31 @@ nofollow ugc"`). Third-party clients rendering these fields from raw records
 
 ## Copying
 
-A copy keeps the license it was shared under (a copy is a derivative use and
-must not silently drop the terms) and any `source` already present; its
-`copyOf` field continues to record where it was copied from. The copier may
-edit either afterwards.
+Copying duplicates a work into another repo, so it needs a grant from the
+creator. The reference UI therefore **only offers "copy" when a license is
+present and doesn't withhold copying**:
+
+- no `license` → not copyable (silence is not permission);
+- `LicenseRef-All-Rights-Reserved` → not copyable. This is the explicit
+  "don't copy my work" marker. We use it instead of SPDX `NONE`, which means
+  "no license information" and can be read as public domain; "all rights
+  reserved" says what the creator means, is well-formed SPDX, and is already
+  understood for creative work. (`proprietary` is software-flavoured and
+  vaguer.)
+- an expression with `OR` is copyable (an alternative may grant it); an
+  expression that `AND`s all-rights-reserved with anything is not.
+
+Any other license (including `-ND`/`-NC` Creative Commons ones, which allow
+verbatim non-commercial/attributed copies) is copyable. A copy keeps the
+license it was shared under and any `source` already present; its `copyOf`
+field continues to record where it was copied from. The copier may edit either
+afterwards.
+
+This is a courtesy gate, not enforcement: ATProto lets anyone write a record
+into their own repo, so a modified client can ignore it. Its value is that
+honest apps and the reference AppView respect the creator's wishes by default.
+Items created before this RFC have no license and become non-copyable until
+their owner adds one; copies made earlier are unaffected.
 
 ## Importers
 

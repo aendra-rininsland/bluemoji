@@ -69,6 +69,13 @@ export interface CommonLicense {
   label: string;
 }
 
+/**
+ * The explicit "do not copy" license. SPDX's own `NONE` means "no license
+ * information" and reads ambiguously (is it public domain?), so a creator who
+ * wants to keep their work uncopyable uses this well-formed LicenseRef instead.
+ */
+export const ALL_RIGHTS_RESERVED = "LicenseRef-All-Rights-Reserved";
+
 /** Offered in pickers; anything else can be typed as an SPDX expression. */
 export const COMMON_LICENSES: readonly CommonLicense[] = [
   { id: "CC0-1.0", label: "CC0 1.0 — public domain dedication" },
@@ -81,7 +88,7 @@ export const COMMON_LICENSES: readonly CommonLicense[] = [
   { id: "MIT", label: "MIT" },
   { id: "Apache-2.0", label: "Apache 2.0" },
   { id: "Unlicense", label: "The Unlicense — public domain" },
-  { id: "LicenseRef-All-Rights-Reserved", label: "All rights reserved (shared with permission)" },
+  { id: ALL_RIGHTS_RESERVED, label: "All rights reserved — no copying" },
 ];
 
 const COMMON_BY_LOWER = new Map(COMMON_LICENSES.map((l) => [l.id.toLowerCase(), l]));
@@ -197,6 +204,24 @@ export function licenseError(value: string): string | null {
 /** Human label: "CC BY 4.0 — attribution" for known ids, otherwise the expression itself. */
 export function licenseLabel(expression: string): string {
   return COMMON_BY_LOWER.get(expression.toLowerCase())?.label ?? expression;
+}
+
+/**
+ * Whether the reference UI offers "copy to my collection" for an item with
+ * this license. Copying duplicates the work into another repo, so it needs a
+ * grant: no license at all means no grant, and all-rights-reserved withholds
+ * it. An `OR` expression is copyable (some alternative may grant it).
+ * This is advisory UI behaviour — ATProto can't stop a client writing a record.
+ */
+export function isCopyable(license: string | null | undefined): boolean {
+  const l = license?.trim();
+  if (!l) return false;
+  const tokens = l
+    .replace(/([()])/g, " $1 ")
+    .split(/\s+/)
+    .filter(Boolean);
+  if (tokens.includes("OR")) return true;
+  return !tokens.some((t) => t.toLowerCase() === ALL_RIGHTS_RESERVED.toLowerCase());
 }
 
 /**
