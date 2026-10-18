@@ -218,6 +218,23 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
     proxy, OG cards, the post page and the Mastodon importer all do. Tests that
     stub `globalThis.fetch` must also call `setGuardedFetchForTests` (see
     `mastodon.test.ts`), since the pinned fetch is undici's, not the global.
+12. **Production runs `node --experimental-strip-types`, which is stricter than
+    `hatk start` and `tsx`.** The Dockerfile `CMD` starts hatk with Node's
+    strip-only TypeScript mode, which only deletes type annotations and rejects
+    anything that needs transforming: **parameter properties**
+    (`constructor(private x: T)`, `constructor(public status = 400)`), `enum`,
+    `namespace`/`module` blocks, and `import x = require()`. `hatk start`, `tsx`
+    and the Vite build all accept them, so tests, `vp check` and local boots pass
+    and the crash only shows up on Railway: the process dies on import, the
+    `/_health` check never passes, and the deploy fails. This has taken the app
+    down twice (`CloudflarePurger` in `_cache-purge.ts`, then `SafeFetchError` in
+    `safe-fetch.ts`). Everything under `server/`, and whatever it imports
+    (including `app/lib/**` files it reaches), must use plain fields assigned in
+    the constructor, string-literal unions or `as const` objects instead of
+    enums, and ES modules instead of namespaces. `server/_strip-types.test.ts`
+    checks this for every file hatk loads; run it. SvelteKit-only code under
+    `app/` is compiled by Vite and is exempt, but if a `server/` file starts
+    importing it, it is no longer exempt.
 
 ## Verification workflow
 
@@ -239,6 +256,13 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
 - Local smoke boot without the docker PDS:
   `timeout 12 ./node_modules/.bin/hatk start` — check the `XRPC:` line lists
   all five handlers; relay connection errors are expected locally.
+- **Before merging anything that touches `server/` or what it imports, boot it
+  the way production does** (this catches gotcha #12, which `hatk start` hides):
+  `NODE_ENV=production RAILWAY_PUBLIC_DOMAIN=moji.blue timeout 25 node
+--experimental-strip-types node_modules/@hatk/hatk/dist/main.js hatk.config.ts`
+  (needs a writable `/data`), and expect `hatk running:`. Repeat with fake
+  `CLOUDFLARE_ZONE_ID` / `CLOUDFLARE_API_TOKEN` set, since the cache purger only
+  loads when they are. Run `npx tsx server/_strip-types.test.ts` too.
 - Full local dev (`vp dev`) needs Docker for the local PDS/PLC on ports
   2582/2583; `hatk seed` creates alice.test/bob.test.
 - Endpoint testing pattern: seed rows directly into `data/hatk.db` with
