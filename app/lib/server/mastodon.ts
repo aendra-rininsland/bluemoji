@@ -5,10 +5,12 @@
 // before any request, redirects are followed manually (re-validated each
 // hop), and response bodies are size-capped.
 import { createHash, randomBytes } from "node:crypto";
-import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import type { Cookies } from "@sveltejs/kit";
 import { sniffImage } from "../image.ts";
+import { SafeFetchError, isPrivateAddress, safeFetch as guardedFetch } from "./safe-fetch.ts";
+
+export { isPrivateAddress };
 
 export const SCOPE = "read:accounts";
 export const MAX_IMAGE_BYTES = 1_000_000;
@@ -58,115 +60,22 @@ export function parseInstanceDomain(input: string): string {
   return host;
 }
 
-/** True for loopback, private, link-local, CGNAT, multicast and reserved addresses. */
-export function isPrivateAddress(addr: string): boolean {
-  const v = isIP(addr);
-  if (v === 4) {
-    const [a, b] = addr.split(".").map(Number);
-    return (
-      a === 0 ||
-      a === 10 ||
-      a === 127 ||
-      (a === 100 && b >= 64 && b <= 127) ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) ||
-      (a === 192 && b === 0) ||
-      (a === 198 && (b === 18 || b === 19)) ||
-      a >= 224
-    );
-  }
-  if (v === 6) {
-    const a = addr.toLowerCase();
-    const mapped = a.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-    if (mapped) return isPrivateAddress(mapped[1]);
-    return (
-      a === "::" ||
-      a === "::1" ||
-      a.startsWith("fe8") ||
-      a.startsWith("fe9") ||
-      a.startsWith("fea") ||
-      a.startsWith("feb") ||
-      a.startsWith("fc") ||
-      a.startsWith("fd") ||
-      a.startsWith("ff") ||
-      a.startsWith("::ffff:")
-    );
-  }
-  return true;
-}
-
-async function assertPublicUrl(url: URL): Promise<void> {
-  if (url.protocol !== "https:") throw new MastodonError("Only https URLs are allowed");
-  if (url.username || url.password) throw new MastodonError("Invalid URL");
-  if (url.port && url.port !== "443") throw new MastodonError("Unsupported port");
-  const host = url.hostname.replace(/^\[|\]$/g, "");
-  if (isIP(host)) {
-    if (isPrivateAddress(host)) throw new MastodonError("Address not allowed");
-    return;
-  }
-  let addrs: { address: string }[];
-  try {
-    addrs = await lookup(host, { all: true });
-  } catch {
-    throw new MastodonError("Could not resolve host", 502);
-  }
-  if (!addrs.length || addrs.some((a) => isPrivateAddress(a.address))) {
-    throw new MastodonError("Address not allowed");
-  }
-}
-
-async function readCapped(res: Response, max: number): Promise<Uint8Array> {
-  const declared = Number(res.headers.get("content-length") ?? 0);
-  if (declared > max) throw new MastodonError("Response too large", 413);
-  if (!res.body) return new Uint8Array();
-  const reader = res.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    total += value.length;
-    if (total > max) {
-      await reader.cancel();
-      throw new MastodonError("Response too large", 413);
-    }
-    chunks.push(value);
-  }
-  return Buffer.concat(chunks);
-}
-
-/** fetch() with SSRF validation on every hop, a timeout, and a body cap. */
+/** fetch() with SSRF validation on every hop, a timeout, and a body cap (see ./safe-fetch.ts). */
 async function safeFetch(
   input: string,
   init: RequestInit,
   maxBytes: number,
 ): Promise<{ res: Response; body: Uint8Array }> {
-  let url = new URL(input);
-  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    await assertPublicUrl(url);
-    let res: Response;
-    try {
-      res = await fetch(url, {
-        ...init,
-        redirect: "manual",
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      });
-    } catch {
-      throw new MastodonError("Could not reach the server", 502);
-    }
-    if (res.status >= 300 && res.status < 400 && res.headers.get("location")) {
-      url = new URL(res.headers.get("location")!, url);
-      // Never replay a POST body or credentials across a redirect
-      if (init.method && init.method !== "GET") {
-        throw new MastodonError("Unexpected redirect from the server", 502);
-      }
-      init = { ...init, headers: undefined };
-      continue;
-    }
-    return { res, body: await readCapped(res, maxBytes) };
+  try {
+    return await guardedFetch(input, init, {
+      maxBytes,
+      timeoutMs: FETCH_TIMEOUT_MS,
+      maxRedirects: MAX_REDIRECTS,
+    });
+  } catch (e) {
+    if (e instanceof SafeFetchError) throw new MastodonError(e.message, e.status);
+    throw e;
   }
-  throw new MastodonError("Too many redirects", 502);
 }
 
 async function apiJson<T>(
