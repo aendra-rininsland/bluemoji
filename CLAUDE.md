@@ -72,7 +72,9 @@ link that instead of this file for adopters past the RENDERING.md stage.
   (`lib/src/verify/`, subpath `@aendra/bluemoji/verify`): verifies a facet /
   sticker / reaction claim via a local index, listed AppViews, then the owner's
   PDS — **no default AppView**; an AppView's "not found" is final so a
-  takedown isn't undone by the PDS.
+  takedown isn't undone by the PDS. `labelers: [did]` also honours signed
+  moderation labels (`lib/src/verify/labels.ts`): verified against the key in the
+  labeler's DID document, never trusted on the labeler server's say-so.
 - `hatk.config.ts` — relay, DB, OAuth scopes, and the **collections
   allowlist** (see gotcha #1 below).
 - `hatk.generated.ts` / `hatk.generated.client.ts` — regenerated artifacts;

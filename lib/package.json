@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@atproto/api": "^0.19.11",
+    "@atproto/crypto": "^0.5.7",
     "@atproto/lexicon": "^0.6.2",
     "@dotlottie/dotlottie-js": "^1.6.3",
     "@lottiefiles/dotlottie-react": "^0.19.0",
@@ -52,6 +53,7 @@
     "upng-js": "^2.1.0"
   },
   "devDependencies": {
+    "@atproto/common": "^0.8.6",
     "@atproto/lex-cli": "^0.9.9",
     "@swc/cli": "^0.8.1",
     "@swc/core": "^1.15.30",
