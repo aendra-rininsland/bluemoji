@@ -16,6 +16,8 @@ const isProd = () => process.env.NODE_ENV === "production";
 
 export interface ResolvePdsOptions {
   lookup?: Lookup;
+  /** fetch for the guarded requests (did:web documents); defaults to a pinned one. */
+  guardedFetch?: typeof globalThis.fetch;
   /** Defaults to https://plc.directory in production, the local PLC otherwise. */
   plcUrl?: string;
 }
@@ -47,7 +49,12 @@ export async function resolvePds(
       const { res, body } = await safeFetch(
         `https://${domain}/.well-known/did.json`,
         {},
-        { maxBytes: DID_DOC_MAX_BYTES, fetch, lookup: opts.lookup },
+        {
+          maxBytes: DID_DOC_MAX_BYTES,
+          fetch: opts.guardedFetch,
+          lookup: opts.lookup,
+          allowLocal: !isProd(),
+        },
       );
       if (!res.ok) throw new Error(`Failed to resolve DID: ${did}`);
       doc = JSON.parse(new TextDecoder().decode(body));

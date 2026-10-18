@@ -10,6 +10,11 @@ import {
   parseInstanceDomain,
   sniffImage,
 } from "./mastodon.ts";
+import { setGuardedFetchForTests } from "./safe-fetch.ts";
+
+// These tests stub globalThis.fetch; route the guarded fetch through whatever it is now
+setGuardedFetchForTests(((...args: Parameters<typeof fetch>) =>
+  globalThis.fetch(...args)) as typeof fetch);
 
 let n = 0;
 const t = (name: string, fn: () => void) => {

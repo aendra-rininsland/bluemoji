@@ -1,14 +1,44 @@
 // Calls the real blob proxy (behind /img/[did]/[cid]) with a mocked PDS.
 import assert from "node:assert/strict";
-import { proxyBlob, type BlobProxyOptions } from "./blob-proxy.ts";
+import { createHash } from "node:crypto";
+import { blobCidDigest, proxyBlob as rawProxyBlob, type BlobProxyOptions } from "./blob-proxy.ts";
 import { clearPdsCache } from "../pds.ts";
 
 // The SSRF guard is relaxed outside production (local dev PDS), so test the real thing
 process.env.NODE_ENV = "production";
+// The mock stands in for both SvelteKit's fetch and the pinned one
+const proxyBlob = (
+  did: string,
+  cid: string,
+  f: typeof fetch,
+  req: Request,
+  o: BlobProxyOptions = {},
+) => rawProxyBlob(did, cid, f, req, { guardedFetch: f, ...o });
 const publicDns = async () => [{ address: "93.184.216.34" }];
 
 const DID = "did:plc:ewvi7nxzyoun6zhxrhs64oiz";
-const CID = "bafkreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku";
+/** The CID a PDS would give these bytes: CIDv1, raw, sha2-256, base32. */
+function cidOf(body: string | Uint8Array) {
+  const bytes = Buffer.concat([
+    Buffer.from([1, 0x55, 0x12, 0x20]),
+    createHash("sha256").update(body).digest(),
+  ]);
+  let out = "";
+  let bits = 0;
+  let acc = 0;
+  for (const b of bytes) {
+    acc = (acc << 8) | b;
+    bits += 8;
+    while (bits >= 5) {
+      bits -= 5;
+      out += "abcdefghijklmnopqrstuvwxyz234567"[(acc >> bits) & 31];
+    }
+  }
+  if (bits) out += "abcdefghijklmnopqrstuvwxyz234567"[(acc << (5 - bits)) & 31];
+  return "b" + out;
+}
+const CID = cidOf("x");
+const CID_PNG = cidOf("png");
 
 function mockFetch(contentType: string, body = "x") {
   return (async (input: any) => {
@@ -96,7 +126,7 @@ async function run(
 ) {
   clearPdsCache();
   try {
-    return await proxyBlob(did, CID, r.f, new Request("https://moji.blue/img/x/y"), {
+    return await proxyBlob(did, CID_PNG, r.f, new Request("https://moji.blue/img/x/y"), {
       lookup: publicDns,
       ...opts,
     });
@@ -199,7 +229,7 @@ console.log("ok - the size cap is enforced while the body streams");
     },
   });
   assert.equal(ok.status, 200);
-  assert.deepEqual(asked, ["did:plc:abcdefghijklmnopqrstuvwx", CID]);
+  assert.deepEqual(asked, ["did:plc:abcdefghijklmnopqrstuvwx", CID_PNG]);
 }
 console.log("ok - the authorize hook gates what the proxy will serve");
 
@@ -227,14 +257,14 @@ console.log("ok - the authorize hook gates what the proxy will serve");
   const req = () => new Request("https://moji.blue/img/x/y");
   const did = "did:plc:" + "abcdefghijklmnopqrstuvwx";
   const o = { lookup: publicDns };
-  assert.equal((await proxyBlob(did, CID, f, req(), o).catch((e) => e)).status, 404);
-  await proxyBlob(did, CID, f, req(), o).catch(() => {});
+  assert.equal((await proxyBlob(did, CID_PNG, f, req(), o).catch((e) => e)).status, 404);
+  await proxyBlob(did, CID_PNG, f, req(), o).catch(() => {});
   assert.equal(plc.length, 1, "cached within the TTL");
   const realNow = Date.now;
   Date.now = () => realNow() + 2 * 60 * 60 * 1000;
   try {
     assert.equal(
-      (await proxyBlob(did, CID, f, req(), o)).status,
+      (await proxyBlob(did, CID_PNG, f, req(), o)).status,
       200,
       "migrated PDS is found after the TTL",
     );
@@ -254,7 +284,7 @@ console.log("ok - the DID to PDS cache expires, so a migrated user is not stuck 
   clearPdsCache();
   const res = await proxyBlob(
     "did:web:evil.example",
-    CID,
+    CID_PNG,
     f,
     new Request("https://moji.blue/img/x/y"),
     {
@@ -264,5 +294,53 @@ console.log("ok - the DID to PDS cache expires, so a migrated user is not stuck 
   assert.equal(res.status, 404, "a did:web host that resolves inward is not fetched");
 }
 console.log("ok - did:web documents are fetched through the SSRF guard");
+
+async function rawProxyBlobStatus(cid: string, r: ReturnType<typeof router>) {
+  clearPdsCache();
+  return rawProxyBlob(
+    "did:plc:abcdefghijklmnopqrstuvwx",
+    cid,
+    r.f,
+    new Request("https://moji.blue/img/x/y"),
+    {
+      guardedFetch: r.f,
+      lookup: publicDns,
+    },
+  ).then(
+    (x) => x.status,
+    (e: any) => e.status as number,
+  );
+}
+
+// ---------------------------------------------------- CID verification
+// The well-known CID of zero bytes, so the encoder and decoder are checked against a fixed vector
+const EMPTY = "bafkreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku";
+assert.equal(cidOf(""), EMPTY);
+assert.deepEqual(blobCidDigest(EMPTY), createHash("sha256").update("").digest());
+assert.deepEqual(blobCidDigest(CID_PNG), createHash("sha256").update("png").digest());
+for (const notABlobCid of [
+  "bafyreigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+  "Qmabcdefghijklmnop",
+  "bnotbase32!!!!!!!!",
+  "b",
+]) {
+  assert.equal(blobCidDigest(notABlobCid), null, notABlobCid);
+}
+{
+  // A PDS that returns other bytes under a valid CID is refused
+  const wrong = router({
+    blob: () => new Response("not the png", { headers: { "content-type": "image/png" } }),
+  });
+  assert.equal((await run(wrong)).status, 502);
+  // and so is a CID that is not an ATProto blob CID at all (dag-cbor here)
+  const r = router({ blob: png });
+  const res = await rawProxyBlobStatus(
+    "bafyreigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+    r,
+  );
+  assert.equal(res, 400);
+  assert.equal(r.seen.length, 0, "nothing was fetched");
+}
+console.log("ok - bytes must hash to the CID they are served under");
 
 console.log("blob proxy tests passed");

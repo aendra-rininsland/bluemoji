@@ -1,5 +1,6 @@
 import { defineOG, type OpengraphContext, type SatoriNode } from "@hatk/hatk/opengraph";
 import { handlesForDids } from "../_pack-views.ts";
+import { resolvePds as resolveAppPds } from "../../app/lib/pds.ts";
 import { cardText, clip, fetchCardImage } from "./_card-text.ts";
 
 interface PackRow {
@@ -19,27 +20,8 @@ interface ItemRow {
   formats: string | null;
 }
 
-const pdsCache = new Map<string, string>();
-
-async function resolvePds(did: string): Promise<string | null> {
-  const cached = pdsCache.get(did);
-  if (cached) return cached;
-  try {
-    const isWeb = did.startsWith("did:web:");
-    const url = isWeb
-      ? `https://${did.slice("did:web:".length)}/.well-known/did.json`
-      : `https://plc.directory/${did}`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-    if (!res.ok) return null;
-    const doc = (await res.json()) as { service?: { type: string; serviceEndpoint: string }[] };
-    const svc = doc.service?.find((s) => s.type === "AtprotoPersonalDataServer");
-    if (!svc?.serviceEndpoint) return null;
-    pdsCache.set(did, svc.serviceEndpoint);
-    return svc.serviceEndpoint;
-  } catch {
-    return null;
-  }
-}
+/** The PDS for a DID, or null. Shared with the app: bounded cache, public https endpoints only. */
+const resolvePds = (did: string) => resolveAppPds(did, fetch).catch(() => null);
 
 /** Mirrors the pack page's own handle resolution: DIDs (the common case —
  * every in-app share link uses one) skip the network round-trip entirely. */
