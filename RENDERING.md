@@ -104,13 +104,54 @@ The fix is one extra lookup: resolve `blue.moji.collection.item` at
 alias itself for plain ASCII names, or its RFC 3492 Punycode encoding for
 internationalised ones — see [RFC 0005](rfcs/0005-internationalised-aliases.md)
 for the exact derivation — and render _that_ record's `formats`/`adultOnly`,
-not the facet's. If you're running against an AppView that indexes the
-firehose (rather than talking to PDSes directly), that lookup is a local
-index hit, not a network round-trip — see `blue.moji.collection.getItem` and
-`server/get-item.ts` in this repo for a working implementation, and RFC
-0001's self-attestation amendment for the full reasoning. Treat unverified
-facets the way you'd treat an unverified embed: fine to render, not fine to
-make moderation decisions from.
+not the facet's. RFC 0001's self-attestation amendment has the full
+reasoning. Treat unverified facets the way you'd treat an unverified embed:
+fine to render, not fine to make moderation decisions from.
+
+### Where to do the lookup
+
+You do **not** need moji.blue, or any Bluemoji AppView, to verify. In order of
+preference:
+
+1. **Your own index.** If you already ingest the firehose, add
+   `blue.moji.collection.item` to the collections you keep (Jetstream:
+   `wantedCollections=blue.moji.collection.item`). Verification is then a
+   local read.
+2. **The owner's PDS.** One `com.atproto.repo.getRecord` against the PDS you
+   already resolve for blobs. Nothing else to run or depend on.
+3. **An AppView** that implements `blue.moji.collection.getItem` — moji.blue
+   is the reference one, not a requirement, and nothing here points at it by
+   default. Useful because it also applies moderation (below).
+
+`@aendra/bluemoji` does the whole thing, in that order, with no default
+server:
+
+```ts
+import { verifyEmojiClaim } from "@aendra/bluemoji/verify";
+
+const verified = await verifyEmojiClaim(
+  { did: moji.did, name: moji.name },
+  {
+    appviews: ["https://moji.blue"], // optional; list the ones you choose to trust
+    // index: (did, name) => myDb.findItem(did, name),
+    // fetch: guardedFetch,           // on a server, one that refuses private addresses
+  },
+);
+if (!verified) return renderAsText(moji.name); // missing, or taken down
+// verified.item.formats / .adultOnly / .alt are the real ones
+// verified.moderated === false means the answer came from the PDS alone
+```
+
+**Moderation is the catch.** An AppView can take an account's emoji down; the
+owner's PDS cannot tell you that. If an AppView you listed says "not found",
+`verifyEmojiClaim` stops there rather than asking the PDS and undoing the
+takedown; if the AppView is merely down, it moves on. Going PDS-only is a
+choice to do your own moderation (or accept the owner's word) — see
+[RFC 0007](rfcs/0007-portable-moderation.md) for where that is heading.
+
+**On a server, guard your fetches.** A PDS endpoint comes from a DID document
+anyone can write, so a server that follows it blindly can be pointed at its own
+internal network. Pass a `fetch` that only connects to public https hosts.
 
 ## What else is easy from here
 

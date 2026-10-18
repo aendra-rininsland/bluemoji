@@ -23,6 +23,7 @@ export default defineConfig({
         index: resolve(__dirname, "src/index.ts"),
         facet: resolve(__dirname, "src/facet/index.ts"),
         render: resolve(__dirname, "src/render/index.ts"),
+        verify: resolve(__dirname, "src/verify/index.ts"),
       },
       formats: ["es"],
       fileName: (_format, entryName) => `${entryName}.js`,
