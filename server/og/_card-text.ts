@@ -5,6 +5,7 @@
 // punctuation/symbols). Any character outside it is drawn as Satori's
 // "NO GLYPH" box, so user-supplied text — pack names, descriptions, handles —
 // is reduced to what the font can draw before it reaches the renderer.
+import { safeFetch, type Lookup } from "../../app/lib/server/safe-fetch.ts";
 
 /**
  * Code point ranges present in Inter-Regular.woff (inclusive). Generated from
@@ -109,28 +110,26 @@ function sniff(b: Uint8Array): "image/png" | "image/jpeg" | null {
  */
 export async function fetchCardImage(
   url: string,
-  fetchFn: typeof fetch = fetch,
+  fetchFn?: typeof fetch,
+  lookup?: Lookup,
 ): Promise<string | null> {
   try {
-    const res = await fetchFn(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
-    if (!res.ok || !res.body) return null;
-    if (Number(res.headers.get("content-length") ?? 0) > MAX_CARD_IMAGE_BYTES) return null;
-    const reader = res.body.getReader();
-    const chunks: Uint8Array[] = [];
-    let total = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.length;
-      if (total > MAX_CARD_IMAGE_BYTES) {
-        await reader.cancel();
-        return null;
-      }
-      chunks.push(value);
-    }
-    const bytes = Buffer.concat(chunks);
+    // The PDS host comes from a DID document anyone can write: SSRF-guarded,
+    // size-capped while streaming, no redirects into private space.
+    const { res, body: bytes } = await safeFetch(
+      url,
+      {},
+      {
+        maxBytes: MAX_CARD_IMAGE_BYTES,
+        timeoutMs: FETCH_TIMEOUT_MS,
+        fetch: fetchFn,
+        lookup,
+        allowLocal: process.env.NODE_ENV !== "production",
+      },
+    );
+    if (!res.ok) return null;
     const type = sniff(bytes);
-    return type ? `data:${type};base64,${bytes.toString("base64")}` : null;
+    return type ? `data:${type};base64,${Buffer.from(bytes).toString("base64")}` : null;
   } catch {
     return null;
   }

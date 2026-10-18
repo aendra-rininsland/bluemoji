@@ -195,6 +195,17 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
     `fetchCardImage()` (PNG/JPEG by magic bytes, size-capped). The card is
     public: adult-only items/packs and taken-down accounts are never shown.
 
+11. **Never fetch a host a DID document or user named with a plain `fetch`.**
+    A DID document is writable by anyone who owns a DID, so a PDS endpoint (and
+    a `did:web` host) is attacker-chosen: use `resolvePds()` (`app/lib/pds.ts`:
+    public https endpoints only, bounded 1h cache) and fetch through
+    `safeFetch()` (`app/lib/server/safe-fetch.ts`: https/443, public addresses
+    checked up front and again at connect time via a pinned undici dispatcher,
+    redirects re-validated per hop, body capped while streaming). The blob
+    proxy, OG cards, the post page and the Mastodon importer all do. Tests that
+    stub `globalThis.fetch` must also call `setGuardedFetchForTests` (see
+    `mastodon.test.ts`), since the pinned fetch is undici's, not the global.
+
 ## Verification workflow
 
 - `vp check` (0 errors expected; warnings in generated lib code are normal),

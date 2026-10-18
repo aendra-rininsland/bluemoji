@@ -135,4 +135,42 @@ assert.equal(
   null,
 );
 console.log("ok - fetchCardImage accepts only PNG/JPEG by content, with a size cap");
+
+// ---- fetchCardImage is SSRF-guarded in production (the host comes from a DID document)
+{
+  const prev = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+  try {
+    const seen: string[] = [];
+    const spy = (async (input: any) => {
+      seen.push(String(input));
+      return new Response(PNG, { headers: { "content-type": "image/png" } });
+    }) as typeof fetch;
+    const publicDns = async () => [{ address: "93.184.216.34" }];
+    for (const bad of [
+      "http://pds.example/blob",
+      "https://127.0.0.1/blob",
+      "https://169.254.169.254/latest/meta-data",
+      "https://pds.example:8443/blob",
+    ]) {
+      assert.equal(await fetchCardImage(bad, spy, publicDns), null, bad);
+    }
+    assert.equal(
+      await fetchCardImage("https://internal.example/blob", spy, async () => [
+        { address: "10.0.0.7" },
+      ]),
+      null,
+      "a name that resolves inward",
+    );
+    assert.deepEqual(seen, [], "none of those were requested");
+    assert.match(
+      (await fetchCardImage("https://pds.example/blob", spy, publicDns))!,
+      /^data:image\/png/,
+    );
+    assert.deepEqual(seen, ["https://pds.example/blob"]);
+  } finally {
+    process.env.NODE_ENV = prev;
+  }
+}
+console.log("ok - fetchCardImage refuses non-public hosts in production");
 console.log("og card text tests passed");

@@ -25,6 +25,8 @@ export interface BlobProxyOptions {
   maxBytes?: number;
   /** Injectable DNS resolver, for tests. */
   lookup?: Lookup;
+  /** Fetch for the PDS requests, for tests; defaults to one pinned to public addresses. */
+  guardedFetch?: typeof globalThis.fetch;
 }
 
 export async function proxyBlob(
@@ -44,7 +46,10 @@ export async function proxyBlob(
   if (opts.authorize && !(await opts.authorize(did, cid))) error(404, "Blob not available here");
 
   const maxBytes = opts.maxBytes ?? MAX_BLOB_BYTES;
-  const pds = await resolvePds(did, fetch, { lookup: opts.lookup }).catch(() => null);
+  const pds = await resolvePds(did, fetch, {
+    lookup: opts.lookup,
+    guardedFetch: opts.guardedFetch,
+  }).catch(() => null);
   if (!pds) error(404, "Could not resolve PDS");
 
   let upstream: Response;
@@ -55,7 +60,7 @@ export async function proxyBlob(
       {},
       {
         maxBytes,
-        fetch,
+        fetch: opts.guardedFetch,
         lookup: opts.lookup,
         allowLocal: process.env.NODE_ENV !== "production",
       },

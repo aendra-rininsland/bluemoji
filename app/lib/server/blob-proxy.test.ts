@@ -1,10 +1,18 @@
 // Calls the real blob proxy (behind /img/[did]/[cid]) with a mocked PDS.
 import assert from "node:assert/strict";
-import { proxyBlob, type BlobProxyOptions } from "./blob-proxy.ts";
+import { proxyBlob as rawProxyBlob, type BlobProxyOptions } from "./blob-proxy.ts";
 import { clearPdsCache } from "../pds.ts";
 
 // The SSRF guard is relaxed outside production (local dev PDS), so test the real thing
 process.env.NODE_ENV = "production";
+// The mock stands in for both SvelteKit's fetch and the pinned one
+const proxyBlob = (
+  did: string,
+  cid: string,
+  f: typeof fetch,
+  req: Request,
+  o: BlobProxyOptions = {},
+) => rawProxyBlob(did, cid, f, req, { guardedFetch: f, ...o });
 const publicDns = async () => [{ address: "93.184.216.34" }];
 
 const DID = "did:plc:ewvi7nxzyoun6zhxrhs64oiz";

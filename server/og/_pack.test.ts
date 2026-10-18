@@ -2,6 +2,13 @@
 import assert from "node:assert/strict";
 import { canRender } from "./_card-text.ts";
 import pack from "./pack.ts";
+import { setGuardedFetchForTests } from "../../app/lib/server/safe-fetch.ts";
+
+process.env.PLC_DIRECTORY_URL = "https://plc.directory"; // dev would use the local PLC
+
+// These tests stub globalThis.fetch; route the guarded fetch through whatever it is now
+setGuardedFetchForTests(((...args: Parameters<typeof fetch>) =>
+  globalThis.fetch(...args)) as typeof fetch);
 
 const PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFklEQVR4nGNkYPj/nwEPYMInOXwUAAAQXQIOZWZ6QQAAAABJRU5ErkJggg==",

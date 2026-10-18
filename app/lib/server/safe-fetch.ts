@@ -3,11 +3,14 @@
 // on port 443 and resolve only to public addresses; redirects are followed
 // manually and re-validated; bodies are size-capped while they stream.
 //
-// One gap remains: the name is resolved here and again by fetch(), so a host
-// that changes its answer between the two (DNS rebinding) is not caught.
-// Closing it needs a connect-time hook (an undici dispatcher), not just a check.
+// The up-front check alone leaves a DNS-rebinding window (the name is resolved
+// once to check it and again to connect). So by default requests go through an
+// undici dispatcher whose connect-time lookup applies the same public-address
+// rule to the very addresses it connects to.
+import dns from "node:dns";
 import { lookup as dnsLookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { Agent, fetch as undiciFetch } from "undici";
 
 export class SafeFetchError extends Error {
   constructor(
@@ -56,6 +59,46 @@ export function isPrivateAddress(addr: string): boolean {
   return true;
 }
 
+type LookupCallback = (err: Error | null, address?: unknown, family?: number) => void;
+
+/**
+ * A `net.connect` lookup that refuses non-public addresses. Whatever it
+ * returns is what the socket connects to, so there is no gap between checking
+ * a name and using it. Handles both the single-address and `all: true` forms.
+ */
+export function guardedConnectLookup(inner: typeof dns.lookup = dns.lookup) {
+  return (hostname: string, options: dns.LookupOptions, callback: LookupCallback) => {
+    inner(hostname, { ...options, all: true }, (err, addrs) => {
+      if (err) return callback(err);
+      const list = addrs as unknown as dns.LookupAddress[];
+      if (!list.length || list.some((a) => isPrivateAddress(a.address))) {
+        return callback(new SafeFetchError("Address not allowed"));
+      }
+      if (options.all) return callback(null, list);
+      callback(null, list[0].address, list[0].family);
+    });
+  };
+}
+
+let pinned: typeof globalThis.fetch | undefined;
+let override: typeof globalThis.fetch | undefined;
+
+/** fetch() that connects only to public addresses, checked at connect time. */
+export function pinnedFetch(): typeof globalThis.fetch {
+  if (override) return override;
+  if (!pinned) {
+    const agent = new Agent({ connect: { lookup: guardedConnectLookup() as never } });
+    pinned = ((input: unknown, init?: RequestInit) =>
+      undiciFetch(input as never, { ...init, dispatcher: agent } as never)) as never;
+  }
+  return pinned!;
+}
+
+/** Test seam: replace the fetch used when a caller doesn't inject one. */
+export function setGuardedFetchForTests(fn: typeof globalThis.fetch | undefined) {
+  override = fn;
+}
+
 export type Lookup = (host: string) => Promise<{ address: string }[]>;
 
 export interface SafeFetchOptions {
@@ -63,7 +106,10 @@ export interface SafeFetchOptions {
   maxBytes: number;
   timeoutMs?: number;
   maxRedirects?: number;
-  /** Defaults to the global fetch; the blob proxy passes SvelteKit's. */
+  /**
+   * Defaults to a fetch pinned to public addresses at connect time (or the
+   * plain global fetch with `allowLocal`). Injecting one skips the pinning.
+   */
   fetch?: typeof globalThis.fetch;
   /** Defaults to the system resolver; injectable for tests. */
   lookup?: Lookup;
@@ -127,7 +173,7 @@ export async function safeFetch(
   init: RequestInit,
   opts: SafeFetchOptions,
 ): Promise<{ res: Response; body: Uint8Array }> {
-  const doFetch = opts.fetch ?? globalThis.fetch;
+  const doFetch = opts.fetch ?? (opts.allowLocal ? globalThis.fetch : pinnedFetch());
   const maxRedirects = opts.maxRedirects ?? 3;
   let url: URL;
   try {
