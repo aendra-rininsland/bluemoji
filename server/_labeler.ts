@@ -96,9 +96,15 @@ export async function ensureLabelTable(db: LabelDb) {
       cts TEXT NOT NULL,
       exp TEXT,
       sig TEXT NOT NULL,
-      origin TEXT NOT NULL DEFAULT 'admin'
+      origin TEXT NOT NULL DEFAULT 'admin',
+      applied_by TEXT,
+      reason TEXT
     )
   `);
+  // Tables created before the audit columns existed
+  for (const column of ["applied_by", "reason"]) {
+    await db.run(`ALTER TABLE moderation_labels ADD COLUMN ${column} TEXT`).catch(() => {});
+  }
   await db.run(
     `CREATE INDEX IF NOT EXISTS moderation_labels_subject ON moderation_labels (uri, val, id)`,
   );
@@ -125,7 +131,17 @@ export async function appendLabel(
   db: LabelDb,
   config: LabelerConfig,
   keypair: Secp256k1Keypair,
-  input: { uri: string; cid?: string; val: string; neg?: boolean; exp?: string; origin?: string },
+  input: {
+    uri: string;
+    cid?: string;
+    val: string;
+    neg?: boolean;
+    exp?: string;
+    origin?: string;
+    /** Who made the call, and why. Kept for the audit trail; never published. */
+    appliedBy?: string;
+    reason?: string;
+  },
   now: Date = new Date(),
 ): Promise<Label> {
   const label = await signLabel(
@@ -142,8 +158,8 @@ export async function appendLabel(
     keypair,
   );
   await db.run(
-    `INSERT INTO moderation_labels (uri, cid, val, neg, cts, exp, sig, origin)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    `INSERT INTO moderation_labels (uri, cid, val, neg, cts, exp, sig, origin, applied_by, reason)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
     [
       label.uri,
       label.cid ?? null,
@@ -153,6 +169,8 @@ export async function appendLabel(
       label.exp ?? null,
       Buffer.from(label.sig!).toString("base64"),
       input.origin ?? "admin",
+      input.appliedBy ?? null,
+      input.reason ?? null,
     ],
   );
   return label;
@@ -271,4 +289,49 @@ export async function reconcileTakedowns(
     lifted.push(cur.uri);
   }
   return { labelled, lifted };
+}
+
+// ------------------------------------------------------- applying by hand
+
+export interface ApplyInput {
+  uri: string;
+  val: string;
+  neg?: boolean;
+  exp?: string;
+  reason?: string;
+}
+
+export class LabelInputError extends Error {}
+
+const ITEM_URI =
+  /^at:\/\/(did:(?:plc:[a-z2-7]{24}|web:[a-z0-9.-]+))\/blue\.moji\.collection\.item\/[^/\s]+$/;
+
+/**
+ * Check an administrator's request, returning what to sign. Only emoji (item
+ * records) are labelled by hand; account takedowns come from hatk's own admin
+ * tools and are published automatically, and a second control for the same thing
+ * would let the two disagree. Throws LabelInputError.
+ */
+export function validateApply(
+  input: ApplyInput,
+  now: Date = new Date(),
+): { uri: string; val: LabelValue; neg: boolean; exp?: string; reason?: string } {
+  if (!ITEM_URI.test(input.uri ?? "")) {
+    throw new LabelInputError(
+      "uri must be an emoji record: at://{did}/blue.moji.collection.item/{rkey}",
+    );
+  }
+  if (!(LABEL_VALUES as readonly string[]).includes(input.val)) {
+    throw new LabelInputError(`val must be one of ${LABEL_VALUES.join(", ")}`);
+  }
+  let exp: string | undefined;
+  if (input.exp) {
+    const t = Date.parse(input.exp);
+    if (Number.isNaN(t)) throw new LabelInputError("exp must be a datetime");
+    if (t <= now.getTime()) throw new LabelInputError("exp must be in the future");
+    exp = new Date(t).toISOString();
+  }
+  if (input.neg === true && exp) throw new LabelInputError("A lifted label can't have an expiry");
+  const reason = input.reason?.trim().slice(0, 1000) || undefined;
+  return { uri: input.uri, val: input.val as LabelValue, neg: input.neg === true, exp, reason };
 }

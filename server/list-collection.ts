@@ -25,6 +25,8 @@ function parseJson(text: string | null): unknown {
   }
 }
 
+import { withoutTakenDownItems } from "./_label-effects.ts";
+
 export default defineQuery("blue.moji.collection.listCollection", async (ctx) => {
   const { repo, reverse } = ctx.params;
   const limit = ctx.limit ?? 50;
@@ -61,8 +63,9 @@ export default defineQuery("blue.moji.collection.listCollection", async (ctx) =>
   const hasMore = rows.length > limit;
   const page = rows.slice(0, limit);
 
+  const visible = await withoutTakenDownItems(ctx.db.query, page, (row) => row.uri);
   const items = await Promise.all(
-    page.map((row) =>
+    visible.map((row) =>
       itemView(ctx, {
         uri: row.uri,
         cid: row.cid,

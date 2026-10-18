@@ -37,6 +37,7 @@ import * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReacti
 import * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
 import * as BlueMojiFeedGetTrending from "./types/blue/moji/feed/getTrending.js";
 import * as BlueMojiFeedReaction from "./types/blue/moji/feed/reaction.js";
+import * as BlueMojiModerationApplyLabel from "./types/blue/moji/moderation/applyLabel.js";
 import * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs.js";
 import * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks.js";
 import * as BlueMojiPacksGetPack from "./types/blue/moji/packs/getPack.js";
@@ -81,6 +82,7 @@ export * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReacti
 export * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
 export * as BlueMojiFeedGetTrending from "./types/blue/moji/feed/getTrending.js";
 export * as BlueMojiFeedReaction from "./types/blue/moji/feed/reaction.js";
+export * as BlueMojiModerationApplyLabel from "./types/blue/moji/moderation/applyLabel.js";
 export * as BlueMojiPacksDefs from "./types/blue/moji/packs/defs.js";
 export * as BlueMojiPacksGetActorPacks from "./types/blue/moji/packs/getActorPacks.js";
 export * as BlueMojiPacksGetPack from "./types/blue/moji/packs/getPack.js";
@@ -427,6 +429,7 @@ export class BlueMojiNS {
   embed: BlueMojiEmbedNS;
   featured: BlueMojiFeaturedNS;
   feed: BlueMojiFeedNS;
+  moderation: BlueMojiModerationNS;
   packs: BlueMojiPacksNS;
   richtext: BlueMojiRichtextNS;
 
@@ -436,6 +439,7 @@ export class BlueMojiNS {
     this.embed = new BlueMojiEmbedNS(client);
     this.featured = new BlueMojiFeaturedNS(client);
     this.feed = new BlueMojiFeedNS(client);
+    this.moderation = new BlueMojiModerationNS(client);
     this.packs = new BlueMojiPacksNS(client);
     this.richtext = new BlueMojiRichtextNS(client);
   }
@@ -706,6 +710,21 @@ export class BlueMojiFeedReactionRecord {
       { collection: "blue.moji.feed.reaction", ...params },
       { headers },
     );
+  }
+}
+
+export class BlueMojiModerationNS {
+  _client: XrpcClient;
+
+  constructor(client: XrpcClient) {
+    this._client = client;
+  }
+
+  applyLabel(
+    data?: BlueMojiModerationApplyLabel.InputSchema,
+    opts?: BlueMojiModerationApplyLabel.CallOptions,
+  ): Promise<BlueMojiModerationApplyLabel.Response> {
+    return this._client.call("blue.moji.moderation.applyLabel", opts?.qp, data, opts);
   }
 }
 

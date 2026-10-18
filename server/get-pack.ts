@@ -1,4 +1,5 @@
 import { defineQuery, NotFoundError } from "$hatk";
+import { takendownItemUris } from "./_label-effects.ts";
 import { itemView, packView, type PackRow } from "./_pack-views.ts";
 
 interface PackItemRow {
@@ -63,10 +64,14 @@ export default defineQuery("blue.moji.packs.getPack", async (ctx) => {
     deduped.map((row) => row.subject),
   );
 
+  const hidden = await takendownItemUris(
+    ctx.db.query,
+    deduped.map((row) => row.subject),
+  );
   const items = await Promise.all(
     deduped.flatMap((row) => {
       const subject = subjects.get(row.subject);
-      if (!subject) return [];
+      if (!subject || hidden.has(row.subject)) return [];
       return [
         (async () => ({
           $type: "blue.moji.packs.defs#packItemView",

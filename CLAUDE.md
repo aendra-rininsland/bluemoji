@@ -79,6 +79,13 @@ link that instead of this file for adopters past the RENDERING.md stage.
   automatically from `_repos.status`. Needs env `LABELER_DID` and
   `LABELER_SIGNING_KEY` (generate with `scripts/labeler-keygen.mjs`; never commit
   or log the key); without them it is disabled and `queryLabels` returns 404.
+  Admins apply/lift emoji labels at `/moderation` (`apply-label.ts`,
+  `blue.moji.moderation.applyLabel`; audit columns `applied_by`/`reason`). The
+  AppView honours its own item-level labels via `_label-effects.ts`:
+  `bluemoji-takedown` hides an emoji from getItem, lists, search, packs,
+  featured, OG cards and `/img`; `bluemoji-adult` forces `adultOnly`. Any new
+  read path that returns emoji must go through `withoutTakenDownItems` /
+  `takendownItemUris` and `itemView`, or a taken-down emoji will leak.
 - `hatk.config.ts` — relay, DB, OAuth scopes, and the **collections
   allowlist** (see gotcha #1 below).
 - `hatk.generated.ts` / `hatk.generated.client.ts` — regenerated artifacts;
