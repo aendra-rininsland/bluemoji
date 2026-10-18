@@ -9,6 +9,10 @@ interface UploadBluemojiParams {
   emojiName: string;
   encodings?: string[];
   originalEncoding?: string;
+  /** SPDX license expression, e.g. "CC-BY-4.0" (optional; omitted from the record when empty) */
+  license?: string;
+  /** http(s) URL the emoji was re-uploaded from (optional) */
+  source?: string;
 }
 
 export async function uploadBluemoji({
@@ -18,6 +22,8 @@ export async function uploadBluemoji({
   emojiName,
   encodings = ["png"],
   originalEncoding = "image/png",
+  license,
+  source,
 }: UploadBluemojiParams) {
   const resizedBytes = await resizePngToUintArray(emoji, 128);
   const originalBytes = new Uint8Array(emoji);
@@ -74,6 +80,8 @@ export async function uploadBluemoji({
       record: {
         name: `:${normalizeAlias(emojiName)}:`, // canonical colon-wrapped alias
         alt: alttext,
+        ...(license?.trim() ? { license: license.trim() } : {}),
+        ...(source?.trim() ? { source: source.trim() } : {}),
         createdAt: new Date().toISOString(),
         original: originalBlob.blob,
         formats,

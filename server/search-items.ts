@@ -9,6 +9,8 @@ interface ItemValue {
   stickerFormats?: unknown;
   adultOnly?: boolean;
   copyOf?: string;
+  source?: string;
+  license?: string;
 }
 
 interface ItemRow {
@@ -22,6 +24,8 @@ interface ItemRow {
   sticker_formats: string | null;
   adult_only: number | null;
   copy_of: string | null;
+  source: string | null;
+  license: string | null;
 }
 
 function parseJson(text: string | null | undefined): unknown {
@@ -56,7 +60,7 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
     }
 
     const rows = (await ctx.db.query(
-      `SELECT uri, did, cid, created_at, name, alt, formats, sticker_formats, adult_only, copy_of
+      `SELECT uri, did, cid, created_at, name, alt, formats, sticker_formats, adult_only, copy_of, source, license
        FROM "blue.moji.collection.item"
        WHERE did = $1 AND (name LIKE $2 OR alt LIKE $2) ${cursorClause}
        ORDER BY created_at DESC, cid DESC
@@ -79,6 +83,8 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
           stickerFormats: parseJson(row.sticker_formats),
           adultOnly: row.adult_only,
           copyOf: row.copy_of,
+          source: row.source,
+          license: row.license,
         }),
       ),
     );
@@ -111,6 +117,8 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
         stickerFormats: row.value.stickerFormats,
         adultOnly: row.value.adultOnly,
         copyOf: row.value.copyOf,
+        source: row.value.source,
+        license: row.value.license,
       }),
     ),
   );

@@ -2969,6 +2969,19 @@ export const schemaDict = {
               type: "string",
               format: "at-uri",
             },
+            source: {
+              type: "string",
+              format: "uri",
+              maxLength: 2048,
+              description:
+                "URL of where this was originally published, if it was re-uploaded from somewhere else (an artist's page, another site, a Mastodon server). Informational provenance, self-asserted by the record's owner and not verified. Clients SHOULD only render http(s) URLs as links and MUST NOT navigate to other schemes (javascript:, data:, …).",
+            },
+            license: {
+              type: "string",
+              maxLength: 128,
+              description:
+                "SPDX license expression (https://spdx.org/licenses/) describing how this may be reused, e.g. 'CC-BY-4.0', 'CC0-1.0' or 'MIT OR Apache-2.0'; use a 'LicenseRef-…' identifier for terms with no SPDX id. Absent means unspecified, which is NOT the same as public domain. Self-asserted by the record's owner: not verified, and not legal advice.",
+            },
             fallbackText: {
               type: "string",
               maxLength: 1,
@@ -3141,6 +3154,19 @@ export const schemaDict = {
             format: "at-uri",
             description:
               "AT-URI of the item this was directly copied from, mirroring the record's own copyOf field.",
+          },
+          source: {
+            type: "string",
+            format: "uri",
+            maxLength: 2048,
+            description:
+              "URL of where this was originally published, if it was re-uploaded from somewhere else (an artist's page, another site, a Mastodon server). Informational provenance, self-asserted by the record's owner and not verified. Clients SHOULD only render http(s) URLs as links and MUST NOT navigate to other schemes (javascript:, data:, …).",
+          },
+          license: {
+            type: "string",
+            maxLength: 128,
+            description:
+              "SPDX license expression (https://spdx.org/licenses/) describing how this may be reused, e.g. 'CC-BY-4.0', 'CC0-1.0' or 'MIT OR Apache-2.0'; use a 'LicenseRef-…' identifier for terms with no SPDX id. Absent means unspecified, which is NOT the same as public domain. Self-asserted by the record's owner: not verified, and not legal advice.",
           },
           originalCreator: {
             type: "ref",
@@ -3567,6 +3593,105 @@ export const schemaDict = {
       },
     },
   },
+  BlueMojiFeaturedGetFeatured: {
+    lexicon: 1,
+    id: "blue.moji.featured.getFeatured",
+    defs: {
+      main: {
+        type: "query",
+        description:
+          "AppView-curated list of featured emoji, stickers and packs, chosen by this AppView's administrators. Public. Subjects are re-derived from indexed records, so deleted or taken-down subjects are omitted. An item with stickerFormats is returned under 'stickers' (it may also be used inline); items with only 'formats' are returned under 'emoji'.",
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["emoji", "stickers", "packs", "viewerIsAdmin"],
+            properties: {
+              emoji: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.collection.item#itemView",
+                },
+              },
+              stickers: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.collection.item#itemView",
+                },
+              },
+              packs: {
+                type: "array",
+                items: {
+                  type: "ref",
+                  ref: "lex:blue.moji.packs.defs#packViewBasic",
+                },
+              },
+              featuredUris: {
+                type: "array",
+                description:
+                  "Only populated for administrators: every featured subject URI, including ones that currently fail to resolve, so they can be un-featured.",
+                items: {
+                  type: "string",
+                  format: "at-uri",
+                },
+              },
+              viewerIsAdmin: {
+                type: "boolean",
+                description: "Whether the authenticated viewer may call setFeatured.",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  BlueMojiFeaturedSetFeatured: {
+    lexicon: 1,
+    id: "blue.moji.featured.setFeatured",
+    defs: {
+      main: {
+        type: "procedure",
+        description:
+          "Feature or un-feature an emoji, sticker or pack on this AppView's Featured page. Requires auth as an AppView administrator. Implemented by AppView.",
+        input: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["uri", "featured"],
+            properties: {
+              uri: {
+                type: "string",
+                format: "at-uri",
+                description:
+                  "AT-URI of a blue.moji.collection.item or blue.moji.packs.pack record. Features of items require the item to be indexed.",
+              },
+              featured: {
+                type: "boolean",
+              },
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["uri", "featured"],
+            properties: {
+              uri: {
+                type: "string",
+                format: "at-uri",
+              },
+              featured: {
+                type: "boolean",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   BlueMojiFeedDefs: {
     lexicon: 1,
     id: "blue.moji.feed.defs",
@@ -3899,6 +4024,19 @@ export const schemaDict = {
               ref: "lex:blue.moji.richtext.facet",
             },
           },
+          source: {
+            type: "string",
+            format: "uri",
+            maxLength: 2048,
+            description:
+              "URL of where this was originally published, if it was re-uploaded from somewhere else (an artist's page, another site, a Mastodon server). Informational provenance, self-asserted by the record's owner and not verified. Clients SHOULD only render http(s) URLs as links and MUST NOT navigate to other schemes (javascript:, data:, …).",
+          },
+          license: {
+            type: "string",
+            maxLength: 128,
+            description:
+              "SPDX license expression (https://spdx.org/licenses/) describing how this may be reused, e.g. 'CC-BY-4.0', 'CC0-1.0' or 'MIT OR Apache-2.0'; use a 'LicenseRef-…' identifier for terms with no SPDX id. Absent means unspecified, which is NOT the same as public domain. Self-asserted by the record's owner: not verified, and not legal advice.",
+          },
           avatar: {
             type: "string",
             format: "uri",
@@ -3956,6 +4094,19 @@ export const schemaDict = {
               type: "ref",
               ref: "lex:app.bsky.richtext.facet",
             },
+          },
+          source: {
+            type: "string",
+            format: "uri",
+            maxLength: 2048,
+            description:
+              "URL of where this was originally published, if it was re-uploaded from somewhere else (an artist's page, another site, a Mastodon server). Informational provenance, self-asserted by the record's owner and not verified. Clients SHOULD only render http(s) URLs as links and MUST NOT navigate to other schemes (javascript:, data:, …).",
+          },
+          license: {
+            type: "string",
+            maxLength: 128,
+            description:
+              "SPDX license expression (https://spdx.org/licenses/) describing how this may be reused, e.g. 'CC-BY-4.0', 'CC0-1.0' or 'MIT OR Apache-2.0'; use a 'LicenseRef-…' identifier for terms with no SPDX id. Absent means unspecified, which is NOT the same as public domain. Self-asserted by the record's owner: not verified, and not legal advice.",
           },
           avatar: {
             type: "string",
@@ -4186,6 +4337,19 @@ export const schemaDict = {
             adultOnly: {
               type: "boolean",
               default: false,
+            },
+            source: {
+              type: "string",
+              format: "uri",
+              maxLength: 2048,
+              description:
+                "URL of where this was originally published, if it was re-uploaded from somewhere else (an artist's page, another site, a Mastodon server). Informational provenance, self-asserted by the record's owner and not verified. Clients SHOULD only render http(s) URLs as links and MUST NOT navigate to other schemes (javascript:, data:, …).",
+            },
+            license: {
+              type: "string",
+              maxLength: 128,
+              description:
+                "SPDX license expression (https://spdx.org/licenses/) describing how this may be reused, e.g. 'CC-BY-4.0', 'CC0-1.0' or 'MIT OR Apache-2.0'; use a 'LicenseRef-…' identifier for terms with no SPDX id. Absent means unspecified, which is NOT the same as public domain. Self-asserted by the record's owner: not verified, and not legal advice.",
             },
             createdAt: {
               type: "string",
@@ -4604,6 +4768,8 @@ export const ids = {
   BlueMojiCollectionSearchItems: "blue.moji.collection.searchItems",
   BlueMojiCollectionTranscodeAnimation: "blue.moji.collection.transcodeAnimation",
   BlueMojiEmbedSticker: "blue.moji.embed.sticker",
+  BlueMojiFeaturedGetFeatured: "blue.moji.featured.getFeatured",
+  BlueMojiFeaturedSetFeatured: "blue.moji.featured.setFeatured",
   BlueMojiFeedDefs: "blue.moji.feed.defs",
   BlueMojiFeedGetReactionCounts: "blue.moji.feed.getReactionCounts",
   BlueMojiFeedGetReactions: "blue.moji.feed.getReactions",

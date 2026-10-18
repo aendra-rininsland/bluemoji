@@ -1,6 +1,8 @@
 <script lang="ts">
   import { callXrpc, getViewer } from '$hatk/client'
   import { invalidateAll } from '$app/navigation'
+  import { normalizeLicense, provenanceError } from '$lib/provenance'
+  import ProvenanceFields from '$lib/components/ProvenanceFields.svelte'
   import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
 
   let { data } = $props()
@@ -14,6 +16,9 @@
   let error = $state('')
 
   const viewer = $derived(data.viewer ?? getViewer())
+  let license = $state('')
+  let source = $state('')
+  const provProblem = $derived(provenanceError(license, source))
   const textError = $derived((name.trim() ? packNameError(name) : null) ?? packDescriptionError(description))
 
   function packHref(uri: string): string {
@@ -24,7 +29,7 @@
 
   async function createPack() {
     const v = viewer
-    if (!v || !name.trim() || textError) return
+    if (!v || !name.trim() || textError || provProblem) return
     loading = true
     error = ''
     try {
@@ -41,6 +46,8 @@
           name: name.trim(),
           description: description.trim() || undefined,
           adultOnly,
+          ...(license.trim() ? { license: normalizeLicense(license.trim()) } : {}),
+          ...(source.trim() ? { source: new URL(source.trim()).href } : {}),
           ...(icon ? { icon } : {}),
           createdAt: new Date().toISOString(),
         },
@@ -48,6 +55,8 @@
       name = ''
       description = ''
       adultOnly = false
+      license = ''
+      source = ''
       iconFile = null
       showCreate = false
       await invalidateAll()
@@ -115,6 +124,7 @@
           onchange={(e) => (iconFile = (e.target as HTMLInputElement).files?.[0] ?? null)}
         />
       </div>
+      <ProvenanceFields bind:license bind:source disabled={loading} idPrefix="newpack" noun="pack" />
       <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;">
         <input type="checkbox" bind:checked={adultOnly} />
         Mark as adult-only content
@@ -122,8 +132,8 @@
       <div>
         <button
           type="submit"
-          disabled={loading || !name.trim()}
-          style="padding: 0.5rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; cursor: pointer; opacity: {loading || !name.trim() ? 0.5 : 1};"
+          disabled={loading || !name.trim() || !!textError || !!provProblem}
+          style="padding: 0.5rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; cursor: pointer; opacity: {loading || !name.trim() || textError || provProblem ? 0.5 : 1};"
         >
           {loading ? 'Creating…' : 'Create pack'}
         </button>

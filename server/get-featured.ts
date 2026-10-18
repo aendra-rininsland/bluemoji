@@ -15,6 +15,8 @@ interface ItemRecord {
   stickerFormats?: unknown;
   adultOnly?: boolean;
   copyOf?: string;
+  source?: string;
+  license?: string;
 }
 
 const MAX_FEATURED = 200;
@@ -54,6 +56,8 @@ export default defineQuery("blue.moji.featured.getFeatured", async (ctx) => {
           stickerFormats: rec.value.stickerFormats,
           adultOnly: rec.value.adultOnly,
           copyOf: rec.value.copyOf,
+          source: rec.value.source,
+          license: rec.value.license,
         }),
       ];
     }),

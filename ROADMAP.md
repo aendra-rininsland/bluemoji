@@ -20,6 +20,11 @@ Shipped and live at <https://moji.blue> (Railway project "Bluemoji", service
   `getReactions` aggregation, reaction bar + picker on post pages.
 - **Internationalised aliases** (RFC 0005): Punycode `xn--` rkeys, Unicode
   alias support end-to-end, relaxed ASCII rule.
+- **License & source** (RFC 0006): optional SPDX `license` and `source` URL on
+  items and packs (and their views), editable in the collection/pack editors
+  and settable on upload and import; copies keep the license. Self-asserted —
+  unverified; views re-validate and drop bad values. Not yet machine-enforced
+  (e.g. no warning when copying an `-ND` or all-rights-reserved emoji).
 - **Infrastructure**: `/img/{did}/{cid}` immutable blob proxy; indexing
   scoped to `blue.moji.*`; OAuth issuer on moji.blue.
 - **Standard hygiene** (Phase 1, below — all done): `formats_v0`

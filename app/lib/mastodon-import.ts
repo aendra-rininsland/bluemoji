@@ -9,6 +9,8 @@ export interface MastodonImportOptions {
   animated: boolean;
   sticker: boolean;
   adultOnly: boolean;
+  license?: string;
+  sourceUrl?: string;
 }
 
 export async function importMastodonEmoji(o: MastodonImportOptions): Promise<ImportResult> {
@@ -21,5 +23,7 @@ export async function importMastodonEmoji(o: MastodonImportOptions): Promise<Imp
     animated: o.animated,
     sticker: o.sticker,
     adultOnly: o.adultOnly,
+    license: o.license,
+    sourceUrl: o.sourceUrl,
   });
 }

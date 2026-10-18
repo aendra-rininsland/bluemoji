@@ -61,12 +61,25 @@ console.log("ok - bounded concurrency, all items finish");
 
 // 2. a new pack is created exactly once, lazily, with the right args, and every success is added
 {
-  const pack: PackTarget = { mode: "new", uri: "", name: "My Pack", description: "from zip" };
+  const pack: PackTarget = {
+    mode: "new",
+    uri: "",
+    name: "My Pack",
+    description: "from zip",
+    license: "CC-BY-4.0",
+    source: "https://example.com/pack",
+  };
   const h = harness({ adultOnly: true }, pack);
   const items = ["a", "b", "c", "d"].map((k) => item(k));
   const r = await runImportQueue({ ...h.opts, items });
   assert.equal(h.log.created.length, 1, "created once despite concurrent workers");
-  assert.deepEqual(h.log.created[0], ["did:plc:me", "My Pack", "from zip", true]);
+  assert.deepEqual(h.log.created[0], [
+    "did:plc:me",
+    "My Pack",
+    "from zip",
+    true,
+    { license: "CC-BY-4.0", source: "https://example.com/pack" },
+  ]);
   assert.equal(h.log.added.length, 4);
   assert.ok(h.log.added.every(([p]) => p === "at://did:plc:me/blue.moji.packs.pack/new1"));
   assert.equal(r.packUri, "at://did:plc:me/blue.moji.packs.pack/new1");

@@ -2,6 +2,9 @@
   import { callXrpc } from '$hatk/client'
   import { invalidateAll } from '$app/navigation'
   import { aliasToRkey } from '$lib/alias'
+  import { cleanProvenance, isCopyable, provenanceError, viewProvenance } from '$lib/provenance'
+  import Provenance from '$lib/components/Provenance.svelte'
+  import ProvenanceFields from '$lib/components/ProvenanceFields.svelte'
   import { graphemeCount, packDescriptionError, packNameError, PACK_DESCRIPTION_MAX_GRAPHEMES } from '$lib/packs'
 
   let { data } = $props()
@@ -17,12 +20,21 @@
   let editing = $state(false)
   let editName = $state('')
   let editDescription = $state('')
+  let editLicense = $state('')
+  let editSource = $state('')
   let editBusy = $state(false)
-  const editError = $derived(packNameError(editName) ?? packDescriptionError(editDescription))
+  const editProvenanceProblem = $derived(provenanceError(editLicense, editSource))
+  const editError = $derived(
+    packNameError(editName) ?? packDescriptionError(editDescription) ?? editProvenanceProblem
+  )
 
   function startEdit() {
     editName = data.pack.name
     editDescription = data.pack.description ?? ''
+    // Edit the stored values (not the sanitised view), so a bad one is visible and fixable
+    const rec = (data.packRecord ?? {}) as Record<string, unknown>
+    editLicense = typeof rec.license === 'string' ? rec.license : ''
+    editSource = typeof rec.source === 'string' ? rec.source : ''
     error = ''
     editing = true
   }
@@ -32,7 +44,9 @@
     editBusy = true
     error = ''
     try {
-      const { description: _old, ...rest } = data.packRecord as Record<string, unknown>
+      const prov = cleanProvenance(editLicense, editSource)
+      if ('error' in prov) return
+      const { description: _d, license: _l, source: _s, ...rest } = data.packRecord as Record<string, unknown>
       await callXrpc('dev.hatk.putRecord', {
         collection: 'blue.moji.packs.pack',
         rkey: packRkey,
@@ -40,7 +54,8 @@
           ...rest,
           name: editName.trim(),
           // Omit the key when empty: an explicit undefined fails lexicon validation
-          ...(editDescription.trim() ? { description: editDescription.trim() } : {})
+          ...(editDescription.trim() ? { description: editDescription.trim() } : {}),
+          ...prov
         }
       } as any)
       editing = false
@@ -172,10 +187,25 @@
     }
   }
 
+  /**
+   * Copying needs a license grant: an emoji with no license, or marked
+   * all-rights-reserved, can't be copied. The stored value is re-validated
+   * first, so a junk license counts as no license.
+   */
+  function canCopy(item: any): boolean {
+    return isCopyable(viewProvenance(item.subject.license, null).license)
+  }
+
+  const copyableCount = $derived(
+    data.items.filter((i: any) => canCopy(i) && !copied.has(i.subject.uri ?? '')).length
+  )
+  const uncopyableCount = $derived(data.items.filter((i: any) => !canCopy(i)).length)
+
   /** Copy one pack item's blobs + record into the signed-in user's repo. */
   async function copyItem(item: any) {
     const { subject } = item
     if (!data.viewer || !subject.did || !subject.uri) return
+    if (!canCopy(item)) throw new Error(`:${subject.name}: can't be copied — its license doesn't allow it`)
 
     const rkey = aliasToRkey(subject.name as string)
     const formats: Record<string, unknown> = {
@@ -205,6 +235,9 @@
         createdAt: new Date().toISOString(),
         adultOnly: subject.adultOnly ?? false,
         copyOf: subject.uri,
+        // A copy keeps the license it was shared under (and any source it already had)
+        ...(subject.license ? { license: subject.license } : {}),
+        ...(subject.source ? { source: subject.source } : {}),
         formats,
       },
     })
@@ -234,7 +267,7 @@
     error = ''
     try {
       for (const item of data.items) {
-        if (!item.subject.uri || copied.has(item.subject.uri ?? '')) continue
+        if (!item.subject.uri || copied.has(item.subject.uri ?? '') || !canCopy(item)) continue
         await copyItem(item)
         copied = new Set([...copied, item.subject.uri as string])
       }
@@ -304,6 +337,7 @@
           <p style="font-size: 0.75rem; color: {editError ? 'var(--danger)' : 'var(--muted)'};">
             {editError ?? `${graphemeCount(editDescription)}/${PACK_DESCRIPTION_MAX_GRAPHEMES}`}
           </p>
+          <ProvenanceFields bind:license={editLicense} bind:source={editSource} disabled={editBusy} idPrefix="packedit" noun="pack" />
           <div style="display: flex; gap: 0.5rem;">
             <button
               type="submit"
@@ -332,6 +366,9 @@
         {:else if data.isOwner}
           <p style="font-size: 0.875rem; color: var(--muted);">No description yet.</p>
         {/if}
+        <div style="margin-top: 0.5rem;">
+          <Provenance license={data.pack.license} source={data.pack.source} />
+        </div>
       {/if}
     </div>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -372,10 +409,11 @@
       {#if data.viewer && !data.isOwner}
         <button
           onclick={copyAll}
-          disabled={busy !== null}
-          style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {busy !== null ? 0.5 : 1};"
+          disabled={busy !== null || copyableCount === 0}
+          title={uncopyableCount > 0 ? `${uncopyableCount} emoji in this pack can't be copied (no license, or all rights reserved)` : undefined}
+          style="padding: 0.375rem 0.875rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-size: 0.875rem; cursor: pointer; opacity: {busy !== null || copyableCount === 0 ? 0.5 : 1};"
         >
-          {busy === '*' ? 'Copying…' : 'Copy all to my collection'}
+          {busy === '*' ? 'Copying…' : uncopyableCount > 0 ? `Copy ${copyableCount} to my collection` : 'Copy all to my collection'}
         </button>
       {/if}
       {#if data.isOwner && data.packRecord && !editing}
@@ -512,6 +550,7 @@
               by @{item.subject.originalCreator.handle}
             </span>
           {/if}
+          <Provenance license={item.subject.license} source={item.subject.source} compact />
           {#if item.subject.adultOnly}
             <span style="font-size: 0.625rem; padding: 0.125rem 0.375rem; background: var(--border); color: var(--muted); border-radius: 999px;">18+</span>
           {/if}
@@ -527,6 +566,13 @@
             >
               {busy === item.uri ? 'Removing…' : 'Remove'}
             </button>
+          {:else if data.viewer && !canCopy(item)}
+            <span
+              style="font-size: 0.6875rem; color: var(--muted);"
+              title={item.subject.license ? 'Its license reserves all rights' : 'No license was given, so no permission to copy'}
+            >
+              Not copyable
+            </span>
           {:else if data.viewer}
             <button
               onclick={() => copyOne(item)}

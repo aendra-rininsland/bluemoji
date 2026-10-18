@@ -29,6 +29,8 @@ import * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collectio
 import * as BlueMojiCollectionSearchItems from "./types/blue/moji/collection/searchItems.js";
 import * as BlueMojiCollectionTranscodeAnimation from "./types/blue/moji/collection/transcodeAnimation.js";
 import * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
+import * as BlueMojiFeaturedGetFeatured from "./types/blue/moji/featured/getFeatured.js";
+import * as BlueMojiFeaturedSetFeatured from "./types/blue/moji/featured/setFeatured.js";
 import * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
 import * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReactionCounts.js";
 import * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
@@ -69,6 +71,8 @@ export * as BlueMojiCollectionSaveToCollection from "./types/blue/moji/collectio
 export * as BlueMojiCollectionSearchItems from "./types/blue/moji/collection/searchItems.js";
 export * as BlueMojiCollectionTranscodeAnimation from "./types/blue/moji/collection/transcodeAnimation.js";
 export * as BlueMojiEmbedSticker from "./types/blue/moji/embed/sticker.js";
+export * as BlueMojiFeaturedGetFeatured from "./types/blue/moji/featured/getFeatured.js";
+export * as BlueMojiFeaturedSetFeatured from "./types/blue/moji/featured/setFeatured.js";
 export * as BlueMojiFeedDefs from "./types/blue/moji/feed/defs.js";
 export * as BlueMojiFeedGetReactionCounts from "./types/blue/moji/feed/getReactionCounts.js";
 export * as BlueMojiFeedGetReactions from "./types/blue/moji/feed/getReactions.js";
@@ -417,6 +421,7 @@ export class BlueMojiNS {
   _client: XrpcClient;
   collection: BlueMojiCollectionNS;
   embed: BlueMojiEmbedNS;
+  featured: BlueMojiFeaturedNS;
   feed: BlueMojiFeedNS;
   packs: BlueMojiPacksNS;
   richtext: BlueMojiRichtextNS;
@@ -425,6 +430,7 @@ export class BlueMojiNS {
     this._client = client;
     this.collection = new BlueMojiCollectionNS(client);
     this.embed = new BlueMojiEmbedNS(client);
+    this.featured = new BlueMojiFeaturedNS(client);
     this.feed = new BlueMojiFeedNS(client);
     this.packs = new BlueMojiPacksNS(client);
     this.richtext = new BlueMojiRichtextNS(client);
@@ -565,6 +571,28 @@ export class BlueMojiEmbedNS {
 
   constructor(client: XrpcClient) {
     this._client = client;
+  }
+}
+
+export class BlueMojiFeaturedNS {
+  _client: XrpcClient;
+
+  constructor(client: XrpcClient) {
+    this._client = client;
+  }
+
+  getFeatured(
+    params?: BlueMojiFeaturedGetFeatured.QueryParams,
+    opts?: BlueMojiFeaturedGetFeatured.CallOptions,
+  ): Promise<BlueMojiFeaturedGetFeatured.Response> {
+    return this._client.call("blue.moji.featured.getFeatured", params, undefined, opts);
+  }
+
+  setFeatured(
+    data?: BlueMojiFeaturedSetFeatured.InputSchema,
+    opts?: BlueMojiFeaturedSetFeatured.CallOptions,
+  ): Promise<BlueMojiFeaturedSetFeatured.Response> {
+    return this._client.call("blue.moji.featured.setFeatured", opts?.qp, data, opts);
   }
 }
 

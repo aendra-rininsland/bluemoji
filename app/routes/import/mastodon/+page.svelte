@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { untrack } from 'svelte'
   import { enhance } from '$app/forms'
   import { invalidateAll } from '$app/navigation'
   import { addToPack, createPack } from '$lib/emoji-import'
   import { runImportQueue, type ItemStatus } from '$lib/import-runner'
   import { importMastodonEmoji } from '$lib/mastodon-import'
   import { packTargetProblem } from '$lib/packs'
+  import { provenanceError } from '$lib/provenance'
   import ImportSettings from '$lib/components/ImportSettings.svelte'
 
   let { data, form } = $props()
@@ -20,6 +22,9 @@
   let packUri = $state('')
   let packName = $state('')
   let packDescription = $state('')
+  let license = $state('')
+  // These emoji come from the connected server, so say so by default (editable)
+  let source = $state(untrack(() => (data.mastodon ? `https://${data.mastodon.domain}/` : '')))
   let running = $state(false)
   let statuses = $state<Record<string, ItemStatus>>({})
   let connecting = $state(false)
@@ -42,7 +47,8 @@
   const packProblem = $derived(
     packTargetProblem({ mode: packMode, uri: packUri, name: packName, description: packDescription })
   )
-  const canImport = $derived(!running && selected.size > 0 && !packProblem)
+  const provenanceProblem = $derived(provenanceError(license, source))
+  const canImport = $derived(!running && selected.size > 0 && !packProblem && !provenanceProblem)
 
   function toggle(code: string) {
     const next = new Set(selected)
@@ -71,10 +77,12 @@
             shortcode: e.shortcode,
             animated: e.animated,
             sticker: asSticker,
-            adultOnly
+            adultOnly,
+            license,
+            sourceUrl: source
           })
       })),
-      pack: { mode: packMode, uri: packUri, name: packName, description: packDescription },
+      pack: { mode: packMode, uri: packUri, name: packName, description: packDescription, license, source },
       adultOnly,
       createPack,
       addToPack,
@@ -234,6 +242,8 @@
           bind:packUri
           bind:packName
           bind:packDescription
+          bind:license
+          bind:source
         />
 
         <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">

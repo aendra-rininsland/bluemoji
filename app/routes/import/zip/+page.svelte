@@ -6,6 +6,7 @@
   import { runImportQueue, type ItemStatus } from '$lib/import-runner'
   import { ALT_MAX_GRAPHEMES, altError, defaultAlt } from '$lib/alt'
   import { graphemeCount, packTargetProblem } from '$lib/packs'
+  import { provenanceError } from '$lib/provenance'
   import { scanEmojiZip, type ZipImage, type ZipSkip } from '$lib/zip-emoji'
   import ImportSettings from '$lib/components/ImportSettings.svelte'
 
@@ -26,6 +27,8 @@
   let packUri = $state('')
   let packName = $state('')
   let packDescription = $state('')
+  let license = $state('')
+  let source = $state('')
   let running = $state(false)
   let statuses = $state<Record<string, ItemStatus>>({})
 
@@ -61,7 +64,10 @@
   const packProblem = $derived(
     packTargetProblem({ mode: packMode, uri: packUri, name: packName, description: packDescription })
   )
-  const canImport = $derived(!running && selectedRows.length > 0 && blocking === 0 && !packProblem)
+  const provenanceProblem = $derived(provenanceError(license, source))
+  const canImport = $derived(
+    !running && selectedRows.length > 0 && blocking === 0 && !packProblem && !provenanceProblem
+  )
   const doneCount = $derived(Object.values(statuses).filter(s => s.state === 'done').length)
   const failedCount = $derived(Object.values(statuses).filter(s => s.state === 'error').length)
   const total = $derived(Object.keys(statuses).length)
@@ -138,10 +144,12 @@
             animated: r.image.animated,
             alt: r.alt.trim() || undefined,
             sticker: asSticker,
-            adultOnly
+            adultOnly,
+            license,
+            sourceUrl: source
           })
       })),
-      pack: { mode: packMode, uri: packUri, name: packName, description: packDescription },
+      pack: { mode: packMode, uri: packUri, name: packName, description: packDescription, license, source },
       adultOnly,
       createPack,
       addToPack,
@@ -304,6 +312,8 @@
         bind:packUri
         bind:packName
         bind:packDescription
+        bind:license
+        bind:source
       />
 
       <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">

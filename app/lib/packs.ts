@@ -43,6 +43,9 @@ export interface PackTarget {
   uri: string;
   name: string;
   description: string;
+  /** Applied to a newly created pack */
+  license?: string;
+  source?: string;
 }
 
 /** What's wrong with the chosen pack destination, or null if it's usable (or there is none). */

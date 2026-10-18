@@ -5,6 +5,7 @@
 // 512px sticker rendition).
 import { callXrpc } from "$hatk/client";
 import { defaultAlt } from "./alt";
+import { cleanProvenance } from "./provenance";
 import { normalizeAlias } from "./alias";
 import { rasteriseSvg } from "./svg";
 import type { ImportResult } from "./import-runner";
@@ -25,6 +26,10 @@ export interface ImportOptions {
   sticker: boolean;
   adultOnly: boolean;
   alt?: string;
+  /** SPDX license expression, applied to the new item */
+  license?: string;
+  /** URL the emoji was re-uploaded from (stored as the record's `source`) */
+  sourceUrl?: string;
 }
 
 function toBase64(bytes: ArrayBuffer): string {
@@ -155,6 +160,9 @@ export async function importEmoji(o: ImportOptions): Promise<ImportResult> {
       alt: o.alt || defaultAlt(alias),
       createdAt: new Date().toISOString(),
       adultOnly: o.adultOnly,
+      // Empty values are omitted; the server validates and normalises both
+      ...(o.license?.trim() ? { license: o.license.trim() } : {}),
+      ...(o.sourceUrl?.trim() ? { source: o.sourceUrl.trim() } : {}),
       formats,
       ...(stickerFormats ? { stickerFormats } : {}),
     } as any,
@@ -168,6 +176,7 @@ export async function createPack(
   name: string,
   description: string,
   adultOnly: boolean,
+  provenance: { license?: string; source?: string } = {},
 ): Promise<string> {
   const res = await callXrpc("dev.hatk.createRecord", {
     collection: "blue.moji.packs.pack",
@@ -178,6 +187,7 @@ export async function createPack(
       // Omit the key when empty — an explicit undefined fails lexicon validation
       ...(description.trim() ? { description: description.trim() } : {}),
       adultOnly,
+      ...cleanPackProvenance(provenance),
       createdAt: new Date().toISOString(),
     },
   } as any);
@@ -197,4 +207,11 @@ export async function addToPack(did: string, packUri: string, itemUri: string): 
       createdAt: new Date().toISOString(),
     },
   } as any);
+}
+
+/** Validated, normalised license/source for a pack record (empty ones omitted); throws with the reason if invalid. */
+function cleanPackProvenance(p: { license?: string; source?: string }) {
+  const clean = cleanProvenance(p.license, p.source);
+  if ("error" in clean) throw new Error(clean.error);
+  return clean;
 }

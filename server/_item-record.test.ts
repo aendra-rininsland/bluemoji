@@ -45,4 +45,33 @@ r = check({
 assert.equal(r.error, null, JSON.stringify(r.error));
 
 assert.throws(() => buildItemRecord({ name: ":_bad:", formats }), /ASCII aliases/);
+// license + source: validated, normalised, omitted when empty, and the record still validates
+r = check({ name: ":art:", formats, license: "cc-by-4.0", source: "https://example.com/artist" });
+assert.equal(r.error, null, JSON.stringify(r.error));
+const withProv = buildItemRecord({
+  name: ":art:",
+  formats,
+  license: "cc-by-4.0",
+  source: " https://example.com/artist ",
+}).record;
+assert.equal(withProv.license, "CC-BY-4.0", "license is normalised");
+assert.equal(withProv.source, "https://example.com/artist");
+const without = buildItemRecord({ name: ":art:", formats, license: "", source: "  " }).record;
+assert.ok(
+  !("license" in without) && !("source" in without),
+  "empty values are omitted, not written as ''",
+);
+assert.equal(check({ name: ":art:", formats, license: "MIT OR Apache-2.0" }).error, null);
+assert.throws(
+  () => buildItemRecord({ name: ":art:", formats, license: "Apache 2.0" }),
+  /license identifier|Unexpected/,
+);
+assert.throws(
+  () => buildItemRecord({ name: ":art:", formats, source: "javascript:alert(1)" }),
+  /https:\/\//,
+);
+assert.throws(
+  () => buildItemRecord({ name: ":art:", formats, source: "https://u:p@example.com/" }),
+  /username/,
+);
 console.log("item-record tests passed");

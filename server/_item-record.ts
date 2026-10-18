@@ -1,4 +1,5 @@
 import { aliasToRkey, normalizeAlias } from "../app/lib/alias.ts";
+import { cleanProvenance } from "../app/lib/provenance.ts";
 
 export interface ItemInput {
   name: string;
@@ -7,6 +8,10 @@ export interface ItemInput {
   adultOnly?: boolean;
   formats?: unknown;
   stickerFormats?: unknown;
+  /** SPDX license expression */
+  license?: string;
+  /** http(s) URL this was re-uploaded from */
+  source?: string;
 }
 
 /**
@@ -14,7 +19,8 @@ export interface ItemInput {
  *
  * Optional keys are omitted rather than set to `undefined`: the lexicon
  * validator rejects an explicit `alt: undefined` ("expected string"), and
- * absent JSON keys arrive here as undefined. Throws on an invalid alias.
+ * absent JSON keys arrive here as undefined. Throws on an invalid alias, license
+ * or source (the message is shown to the client).
  */
 export function buildItemRecord(item: ItemInput): {
   rkey: string;
@@ -38,6 +44,9 @@ export function buildItemRecord(item: ItemInput): {
 
   const stickerSrc = item.stickerFormats as Record<string, unknown> | undefined;
 
+  const provenance = cleanProvenance(item.license, item.source);
+  if ("error" in provenance) throw new Error(provenance.error);
+
   return {
     rkey,
     record: {
@@ -46,6 +55,7 @@ export function buildItemRecord(item: ItemInput): {
       ...(item.alt ? { alt: item.alt } : {}),
       createdAt: item.createdAt ?? new Date().toISOString(),
       adultOnly: item.adultOnly ?? false,
+      ...provenance,
       formats,
       ...(stickerSrc
         ? {

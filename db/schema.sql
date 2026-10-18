@@ -150,7 +150,8 @@ CREATE TABLE "blue.moji.collection.item" (
   labels TEXT,
   copy_of TEXT,
   fallback_text TEXT,
-  "sticker_formats" TEXT
+  "sticker_formats" TEXT,
+  "source" TEXT, "license" TEXT
 );
 
 CREATE TABLE "blue.moji.collection.item__formats_formats_v0" (
@@ -213,7 +214,8 @@ CREATE TABLE "blue.moji.packs.pack" (
   icon TEXT,
   adult_only INTEGER,
   created_at TEXT NOT NULL,
-  labels TEXT
+  labels TEXT,
+  "source" TEXT, "license" TEXT
 );
 
 CREATE TABLE "blue.moji.packs.pack__labels_self_labels" (

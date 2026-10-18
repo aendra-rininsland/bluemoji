@@ -16,6 +16,8 @@ interface ItemRecord {
   stickerFormats?: unknown;
   adultOnly?: boolean;
   copyOf?: string;
+  source?: string;
+  license?: string;
 }
 
 export default defineQuery("blue.moji.packs.getPack", async (ctx) => {
@@ -80,6 +82,8 @@ export default defineQuery("blue.moji.packs.getPack", async (ctx) => {
             stickerFormats: subject.value.stickerFormats,
             adultOnly: subject.value.adultOnly,
             copyOf: subject.value.copyOf,
+            source: subject.value.source,
+            license: subject.value.license,
           }),
         }))(),
       ];
