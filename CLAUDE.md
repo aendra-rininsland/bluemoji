@@ -219,8 +219,25 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
   issuer + client metadata derive from it), `NODE_OPTIONS=--max-old-space-
 size=4096` (backfill CAR imports spike; V8's default 2GB cap crashed prod).
 - moji.blue DNS is on Cloudflare, proxied, SSL mode **Full** (Flexible
-  causes an infinite 301 loop with Railway). Pending: a Cache Rule for
-  `/img/*` (see ROADMAP Phase 2).
+  causes an infinite 301 loop with Railway). Cache Rules: `/img/*` (done, see
+  ROADMAP Phase 2) and `blue.moji.collection.getItem` (Edge TTL override, since
+  the origin sends no `Cache-Control`). Cache only `getItem`: it is the one read
+  every rendered emoji makes, and its URL is predictable enough to purge. The
+  pack and list endpoints take free-form `limit`/`cursor` params, so a purge
+  could not find every cached variant of them.
+- **Cache purging** (`server/_cache-purge.ts`, `setup-cache-purge.ts`,
+  `on-item-purge.ts`): purges Cloudflare's cached `getItem` responses when an
+  account is taken down or reinstated (hatk's `/admin` routes only flip
+  `_repos.status`, so `_takedown-watch.ts` polls for the change every 15s and
+  survives restarts via the `cache_purge_state` table) and when an emoji record
+  is created, replaced or deleted (on-commit hook). Needs env
+  `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_API_TOKEN` (API token with Zone > Cache
+  Purge > Purge on this zone only); without them it logs "disabled" and does
+  nothing. Purge-by-URL is all the free plan offers (no tags or prefixes), so it
+  enumerates the spellings clients send (DID or handle, `:alias:` or bare, both
+  parameter orders, encoded or raw colons). A client spelling a lookup oddly is
+  covered only by the Edge TTL, so keep that modest (an hour or less). Account
+  labels do not affect `getItem`, so label changes are not watched.
 - Prod health checks: `https://moji.blue/_health`,
   `/xrpc/blue.moji.packs.getPacks?uris=…`, `/oauth-client-metadata.json`
   (issuer must be moji.blue), `/img/{did}/{cid}` (expect `immutable` +
