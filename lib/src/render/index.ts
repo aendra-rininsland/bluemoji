@@ -40,6 +40,12 @@ export interface RenderParams {
    * returns undefined.
    */
   adult?: "show" | "hide";
+  /**
+   * Draw an emoji a trusted labeler (`verify.labelers`) has marked
+   * `bluemoji-abusive` or `bluemoji-impersonation`. By default these render as
+   * nothing, so the caller falls back to the `:name:` text.
+   */
+  showLabelled?: boolean;
   fetch?: typeof globalThis.fetch;
 }
 
@@ -111,6 +117,12 @@ export async function render(
 
     const { item } = verified;
     if (item.adultOnly && params.adult === "hide") return undefined;
+    if (
+      !params.showLabelled &&
+      verified.labels?.some((v) => v === "bluemoji-abusive" || v === "bluemoji-impersonation")
+    ) {
+      return undefined;
+    }
 
     const what = pickRenderable(item);
     if (!what) throw new Error("This Bluemoji has no renderable format");

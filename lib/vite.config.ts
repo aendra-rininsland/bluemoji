@@ -32,6 +32,7 @@ export default defineConfig({
       // Never bundle dependencies into the published package.
       external: [
         "@atproto/api",
+        "@atproto/crypto",
         "@atproto/api/src/rich-text/detection",
         "@atproto/api/src/rich-text/unicode",
         "@atproto/lexicon",

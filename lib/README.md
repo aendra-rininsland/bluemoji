@@ -69,6 +69,23 @@ undone by the PDS); one that is down is skipped. `verified.moderated` is
 `false` when only the PDS answered. On a server, pass a `fetch` that refuses
 private addresses. See [RENDERING.md](../RENDERING.md#where-to-do-the-lookup).
 
+To honour moderation without depending on an AppView, list the labelers you
+trust (RFC 0007). They are DIDs; their endpoint and signing key come from their
+DID document, and only labels they signed are believed:
+
+```typescript
+const verified = await verifyEmojiClaim(claim, {
+  labelers: ["did:plc:…"], // e.g. the moji.blue moderation labeler
+  // labelerFailure: "hide", // show nothing if a labeler can't be reached
+});
+// verified.labels            → ["bluemoji-adult", …] in force on the emoji or its owner
+// verified.labelers          → { consulted, unavailable }
+```
+
+A `bluemoji-takedown` on the emoji or its owner makes it unverifiable (`null`);
+`bluemoji-adult` sets `adultOnly`. `render()` also hides `bluemoji-abusive` and
+`bluemoji-impersonation` emoji unless you pass `showLabelled: true`.
+
 ### Render
 
 Once facets are attached to a record, `render()` turns one into an element. It

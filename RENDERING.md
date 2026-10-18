@@ -142,12 +142,27 @@ if (!verified) return renderAsText(moji.name); // missing, or taken down
 // verified.moderated === false means the answer came from the PDS alone
 ```
 
+**Moderation without an AppView.** List the labelers you trust and the same call
+honours their signed labels (`bluemoji-takedown`, `bluemoji-adult`, …) with no
+AppView involved:
+
+```ts
+await verifyEmojiClaim(claim, { labelers: ["did:plc:…"] }); // the moji.blue moderation labeler's DID
+```
+
+A labeler is a DID. Its DID document says where it serves labels
+(`#atproto_labeler`) and which key signs them (`#atproto_label`); a label is
+believed only if that key signed it, it names the labeler as its source, it is
+about this emoji or its owner, and it hasn't expired. A labeler that is down is
+skipped (or hides the emoji, with `labelerFailure: "hide"`); one whose labels
+don't verify is reported as unavailable rather than trusted.
+
 **Moderation is the catch.** An AppView can take an account's emoji down; the
 owner's PDS cannot tell you that. If an AppView you listed says "not found",
 `verifyEmojiClaim` stops there rather than asking the PDS and undoing the
-takedown; if the AppView is merely down, it moves on. Going PDS-only is a
-choice to do your own moderation (or accept the owner's word) — see
-[RFC 0007](rfcs/0007-portable-moderation.md) for where that is heading.
+takedown; if the AppView is merely down, it moves on. Going PDS-only means doing
+your own moderation, accepting the owner's word, or trusting a labeler as above
+([RFC 0007](rfcs/0007-portable-moderation.md)).
 
 **On a server, guard your fetches.** A PDS endpoint comes from a DID document
 anyone can write, so a server that follows it blindly can be pointed at its own

@@ -22,6 +22,30 @@
  * (`via`), and `moderated` is false for the direct path.
  */
 import { aliasToRkey } from "../util/alias";
+import { allowedUrl, getJson as getJsonHttp } from "./http";
+import {
+  checkLabels,
+  LABEL_ADULT,
+  LABEL_TAKEDOWN,
+  type LabelerRef,
+  type LabelOptions,
+} from "./labels";
+
+export {
+  LABEL_ABUSIVE,
+  LABEL_ADULT,
+  LABEL_IMPERSONATION,
+  LABEL_TAKEDOWN,
+  checkLabels,
+  clearLabelCaches,
+  encodeLabel,
+  resolveLabeler,
+  verifyLabelSignature,
+  type LabelCheck,
+  type LabelerInfo,
+  type LabelerRef,
+  type WireLabel,
+} from "./labels";
 import type * as BlueMojiCollectionItem from "../client/types/blue/moji/collection/item";
 
 export type ItemView = BlueMojiCollectionItem.ItemView;
@@ -33,10 +57,14 @@ export interface VerifiedEmoji {
   /** The AppView's base URL when `via` is "appview". */
   appview?: string;
   /**
-   * False when the answer came straight from the owner's PDS, which knows
-   * nothing about takedowns or labels applied by an AppView or labeler.
+   * False when the answer came straight from the owner's PDS and no labeler
+   * was consulted: nothing here knows about takedowns or labels.
    */
   moderated: boolean;
+  /** Label values in force on the emoji or its owner, from the labelers consulted. */
+  labels?: string[];
+  /** Which labelers answered, and which couldn't be reached or verified. */
+  labelers?: { consulted: string[]; unavailable: string[] };
 }
 
 export interface VerifyOptions {
@@ -59,6 +87,23 @@ export interface VerifyOptions {
   timeoutMs?: number;
   /** Allow http:// PDS and AppView URLs (local development only). */
   allowInsecure?: boolean;
+  /**
+   * Moderation labelers to trust (RFC 0007): DIDs, whose endpoint and signing key
+   * come from their DID document, or pinned `{ did, endpoint, key }`. Only
+   * signed labels from these are believed. None by default. Taking an emoji
+   * down (`bluemoji-takedown` on it or its owner) makes it unverifiable;
+   * `bluemoji-adult` sets `adultOnly`; the rest are returned in `labels`.
+   */
+  labelers?: LabelerRef[];
+  /**
+   * What to do when a listed labeler can't be reached or verified. "ignore"
+   * (default) carries on without its labels, and says so in `labelers.unavailable`;
+   * "hide" treats the emoji as unverifiable, for hosts that would rather show
+   * nothing than something a labeler might have taken down.
+   */
+  labelerFailure?: "ignore" | "hide";
+  /** How long to remember a labeler's answer for an emoji. Default 60s; 0 disables. */
+  labelCacheTtlMs?: number;
 }
 
 const COLLECTION = "blue.moji.collection.item";
@@ -76,6 +121,30 @@ export async function verifyEmojiClaim(
   if (!DID_RE.test(claim.did)) throw new Error("claim.did must be a did:plc or did:web");
   const rkey = aliasToRkey(claim.name); // throws on an invalid alias
 
+  const found = await findEmoji(claim, rkey, opts);
+  if (!found || !opts.labelers?.length) return found;
+
+  // Ask the labelers about the emoji and about its owner
+  const itemUri = found.item.uri ?? `at://${claim.did}/${COLLECTION}/${rkey}`;
+  const check = await checkLabels([itemUri, claim.did], opts.labelers, opts as LabelOptions);
+  if (check.values.has(LABEL_TAKEDOWN)) return null;
+  if (check.unavailable.length && opts.labelerFailure === "hide") return null;
+
+  const adult = check.values.has(LABEL_ADULT);
+  return {
+    ...found,
+    item: adult && !found.item.adultOnly ? { ...found.item, adultOnly: true } : found.item,
+    moderated: found.moderated || check.consulted.length > 0,
+    labels: [...check.values],
+    labelers: { consulted: check.consulted, unavailable: check.unavailable },
+  };
+}
+
+async function findEmoji(
+  claim: { did: string; name: string },
+  rkey: string,
+  opts: VerifyOptions,
+): Promise<VerifiedEmoji | null> {
   if (opts.index) {
     const hit = await opts.index(claim.did, claim.name).catch(() => undefined);
     if (hit) return { item: hit, via: "index", moderated: true };
@@ -94,25 +163,8 @@ export async function verifyEmojiClaim(
   return item ? { item, via: "pds", moderated: false } : null;
 }
 
-function allowed(url: URL, opts: VerifyOptions) {
-  if (url.username || url.password) return false;
-  return url.protocol === "https:" || (opts.allowInsecure === true && url.protocol === "http:");
-}
-
-async function getJson(url: URL, opts: VerifyOptions): Promise<{ status: number; body: any }> {
-  const f = opts.fetch ?? globalThis.fetch;
-  const res = await f(url, {
-    signal: AbortSignal.timeout(opts.timeoutMs ?? 8000),
-    headers: { accept: "application/json" },
-  });
-  let body: any = null;
-  try {
-    body = await res.json();
-  } catch {
-    /* non-JSON error body */
-  }
-  return { status: res.status, body };
-}
+const allowed = (url: URL, opts: VerifyOptions) => allowedUrl(url, opts);
+const getJson = (url: URL, opts: VerifyOptions) => getJsonHttp(url, opts);
 
 /** The item, null for a definitive "no", or "error" to try the next source. */
 async function askAppView(
