@@ -1,5 +1,6 @@
-import { defineOG } from "@hatk/hatk/opengraph";
+import { defineOG, type OpengraphContext, type SatoriNode } from "@hatk/hatk/opengraph";
 import { handlesForDids } from "../_pack-views.ts";
+import { cardText, clip, fetchCardImage } from "./_card-text.ts";
 
 interface PackRow {
   uri: string;
@@ -7,7 +8,15 @@ interface PackRow {
   name: string;
   description: string | null;
   icon: string | null;
+  adult_only: number | null;
   created_at: string;
+}
+
+interface ItemRow {
+  uri: string;
+  did: string;
+  adult_only: number | null;
+  formats: string | null;
 }
 
 const pdsCache = new Map<string, string>();
@@ -20,7 +29,7 @@ async function resolvePds(did: string): Promise<string | null> {
     const url = isWeb
       ? `https://${did.slice("did:web:".length)}/.well-known/did.json`
       : `https://plc.directory/${did}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) return null;
     const doc = (await res.json()) as { service?: { type: string; serviceEndpoint: string }[] };
     const svc = doc.service?.find((s) => s.type === "AtprotoPersonalDataServer");
@@ -68,9 +77,67 @@ function blobRefCid(ref: unknown): string | undefined {
   return (ref as { ref?: { $link?: string } } | undefined)?.ref?.$link;
 }
 
+/** Emoji shown in the preview strip */
+const MAX_PREVIEW_EMOJI = 12;
+/** Extra candidates fetched so a few failed or filtered images don't leave gaps */
+const CANDIDATE_SLACK = 6;
+const CARD_PADDING = 64;
+const CONTENT_WIDTH = 1200 - CARD_PADDING * 2;
+
+const blobUrlFor = (pds: string, did: string, cid: string) =>
+  `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`;
+
+/**
+ * Data URLs for up to `limit` of the pack's emoji, in pack order. This is a
+ * public preview, so nothing sensitive is shown: adult-only emoji and emoji
+ * from taken-down accounts are skipped. Only each emoji's static 128px PNG is
+ * used (Satori can't draw WebP). Never throws: a failure just means fewer
+ * (or no) emoji in the preview.
+ */
+async function previewEmoji(ctx: OpengraphContext, packUri: string, limit: number) {
+  try {
+    const links = (await ctx.db.query(
+      `SELECT subject FROM "blue.moji.packs.packitem" WHERE pack = $1 ORDER BY created_at ASC, cid ASC LIMIT ${limit * 4}`,
+      [packUri],
+    )) as { subject: string }[];
+    const subjects = [...new Set(links.map((l) => l.subject))];
+    if (!subjects.length) return [];
+
+    const placeholders = subjects.map((_, i) => `$${i + 1}`).join(",");
+    const rows = (await ctx.db.query(
+      `SELECT uri, did, adult_only, formats FROM "blue.moji.collection.item" WHERE uri IN (${placeholders})`,
+      subjects,
+    )) as ItemRow[];
+    const byUri = new Map(rows.map((r) => [r.uri, r]));
+
+    const takendown = await ctx.filterTakendownDids([...new Set(rows.map((r) => r.did))]);
+    const candidates: { did: string; cid: string }[] = [];
+    for (const uri of subjects) {
+      const row = byUri.get(uri);
+      if (!row || row.adult_only || takendown.has(row.did)) continue;
+      const formats = parseJson(row.formats) as { png_128?: unknown } | undefined;
+      const cid = blobRefCid(formats?.png_128);
+      if (cid) candidates.push({ did: row.did, cid });
+      if (candidates.length >= limit + CANDIDATE_SLACK) break;
+    }
+
+    const pdsFor = new Map<string, Promise<string | null>>();
+    const images = await Promise.all(
+      candidates.map(async ({ did, cid }) => {
+        if (!pdsFor.has(did)) pdsFor.set(did, resolvePds(did));
+        const pds = await pdsFor.get(did)!;
+        return pds ? fetchCardImage(blobUrlFor(pds, did, cid)) : null;
+      }),
+    );
+    return images.filter((i): i is string => !!i).slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
 export default defineOG("/og/packs/:handle/:rkey", async (ctx) => {
   const { handle, rkey } = ctx.params as { handle: string; rkey: string };
-  const bg = { type: "div", props: { style: bgStyle, children: "moji.blue" } };
+  const bg: SatoriNode = { type: "div", props: { style: bgStyle, children: "moji.blue" } };
 
   const did = await resolveDid(handle);
   if (!did) return { element: bg };
@@ -80,68 +147,77 @@ export default defineOG("/og/packs/:handle/:rkey", async (ctx) => {
     uri,
   ])) as PackRow[];
   const pack = rows[0];
-  if (!pack) return { element: bg };
+  if (!pack || (await ctx.isTakendown(pack.did))) return { element: bg };
 
   const counts = await ctx.count("blue.moji.packs.packitem", "pack", [uri]);
   const itemCount = counts.get(uri) ?? 0;
 
   const handles = await handlesForDids(ctx, [did]);
-  const creatorHandle = handles.get(did) ?? "handle.invalid";
+  const creatorHandle = cardText(handles.get(did) ?? "handle.invalid") || "handle.invalid";
 
+  // Pack icon (PNG/JPEG only, size-capped)
   let iconDataUrl: string | null = null;
   const iconCid = blobRefCid(parseJson(pack.icon));
   if (iconCid) {
     const pds = await resolvePds(pack.did);
-    if (pds) {
-      const url = `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(pack.did)}&cid=${encodeURIComponent(iconCid)}`;
-      iconDataUrl = await ctx.fetchImage(url);
-    }
+    if (pds) iconDataUrl = await fetchCardImage(blobUrlFor(pds, pack.did, iconCid));
   }
 
-  const element = {
+  // The pack's own emoji make the best preview — but not for adult-only packs
+  const emoji = pack.adult_only ? [] : await previewEmoji(ctx, uri, MAX_PREVIEW_EMOJI);
+
+  // Only text the card font can draw (anything else would render as "NO GLYPH")
+  const title = cardText(pack.name) || "Bluemoji pack";
+  const description = clip(cardText(pack.description), 140);
+
+  const emojiSize = Math.min(
+    96,
+    Math.floor((CONTENT_WIDTH - (emoji.length - 1) * 16) / Math.max(emoji.length, 1)),
+  );
+
+  const header: SatoriNode = {
     type: "div",
     props: {
-      style: bgStyle,
+      style: { display: "flex", alignItems: "center", width: "100%" },
       children: [
+        ...(iconDataUrl
+          ? [
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    width: 160,
+                    height: 160,
+                    borderRadius: 24,
+                    background: "#26314a",
+                    marginRight: 48,
+                    overflow: "hidden",
+                  },
+                  children: [{ type: "img", props: { src: iconDataUrl, width: 160, height: 160 } }],
+                },
+              },
+            ]
+          : []),
         {
           type: "div",
           props: {
-            style: {
-              display: "flex",
-              width: 160,
-              height: 160,
-              borderRadius: 24,
-              background: "#26314a",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 72,
-              marginRight: 48,
-              overflow: "hidden",
-            },
-            children: iconDataUrl
-              ? { type: "img", props: { src: iconDataUrl, width: 160, height: 160 } }
-              : "📦",
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: { display: "flex", flexDirection: "column", maxWidth: 820 },
+            style: { display: "flex", flexDirection: "column", flex: 1 },
             children: [
               {
                 type: "div",
                 props: {
-                  style: { fontSize: 56, fontWeight: 700, color: "white" },
-                  children: pack.name,
+                  style: { fontSize: 64, color: "white", lineHeight: 1.1 },
+                  children: clip(title, 60),
                 },
               },
-              ...(pack.description
+              ...(description
                 ? [
                     {
                       type: "div",
                       props: {
-                        style: { fontSize: 30, color: "#a0aec0", marginTop: 16 },
-                        children: pack.description.slice(0, 140),
+                        style: { fontSize: 30, color: "#a0aec0", marginTop: 16, lineHeight: 1.3 },
+                        children: description,
                       },
                     },
                   ]
@@ -149,11 +225,54 @@ export default defineOG("/og/packs/:handle/:rkey", async (ctx) => {
               {
                 type: "div",
                 props: {
-                  style: { fontSize: 28, color: "#68d391", marginTop: 32 },
+                  style: { fontSize: 28, color: "#68d391", marginTop: 28 },
                   children: `${itemCount} emoji · by @${creatorHandle}`,
                 },
               },
             ],
+          },
+        },
+      ],
+    },
+  };
+
+  const strip: SatoriNode[] = emoji.length
+    ? [
+        {
+          type: "div",
+          props: {
+            style: { display: "flex", alignItems: "center", marginTop: 48, width: "100%" },
+            children: emoji.map((src, i) => ({
+              type: "img",
+              props: {
+                src,
+                width: emojiSize,
+                height: emojiSize,
+                style: { marginRight: i === emoji.length - 1 ? 0 : 16, objectFit: "contain" },
+              },
+            })),
+          },
+        },
+      ]
+    : [];
+
+  const element: SatoriNode = {
+    type: "div",
+    props: {
+      style: {
+        ...bgStyle,
+        flexDirection: "column",
+        position: "relative",
+        alignItems: "flex-start",
+      },
+      children: [
+        header,
+        ...strip,
+        {
+          type: "div",
+          props: {
+            style: { position: "absolute", right: 40, bottom: 28, fontSize: 24, color: "#4a5568" },
+            children: "moji.blue",
           },
         },
       ],
@@ -177,6 +296,6 @@ const bgStyle = {
   color: "white",
   alignItems: "center",
   justifyContent: "center",
-  padding: 64,
+  padding: CARD_PADDING,
   fontFamily: "Inter",
 };
