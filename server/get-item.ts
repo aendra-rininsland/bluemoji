@@ -1,4 +1,5 @@
 import { defineQuery, InvalidRequestError, NotFoundError } from "$hatk";
+import { takendownItemUris } from "./_label-effects.ts";
 import { itemView, resolveActorDid } from "./_pack-views.ts";
 import { aliasToRkey } from "../app/lib/alias.ts";
 
@@ -38,6 +39,9 @@ export default defineQuery("blue.moji.collection.getItem", async (ctx) => {
   const records = await ctx.getRecords<ItemRecord>("blue.moji.collection.item", [uri]);
   const record = records.get(uri);
   if (!record) throw new NotFoundError("Emoji not found");
+  // Taken down by a moderator's label: indistinguishable from not existing, as for an account takedown
+  if ((await takendownItemUris(ctx.db.query, [uri])).has(uri))
+    throw new NotFoundError("Emoji not found");
 
   return ctx.ok({
     uri: record.uri,

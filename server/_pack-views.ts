@@ -1,4 +1,5 @@
 import type { XrpcContext } from "@hatk/hatk/xrpc";
+import { hasEffect, labelStates } from "./_label-effects.ts";
 import { viewProvenance } from "../app/lib/provenance.ts";
 
 // Underscore prefix keeps this module out of the server/ scanner.
@@ -228,6 +229,8 @@ export async function resolveOriginalCreator(
 
 export async function itemView(ctx: Pick<XrpcContext, "getRecords" | "db">, input: ItemViewInput) {
   const originalCreator = await resolveOriginalCreator(ctx, input.copyOf);
+  // A moderator's bluemoji-adult label wins over whatever the record says
+  const labelled = await labelStates(ctx.db.query, [input.uri]);
   return {
     $type: "blue.moji.collection.item#itemView",
     uri: input.uri,
@@ -238,7 +241,7 @@ export async function itemView(ctx: Pick<XrpcContext, "getRecords" | "db">, inpu
     createdAt: input.createdAt,
     formats: normalizeFormats(input.formats),
     stickerFormats: normalizeFormats(input.stickerFormats),
-    adultOnly: Boolean(input.adultOnly),
+    adultOnly: Boolean(input.adultOnly) || hasEffect(labelled, input.uri, "bluemoji-adult"),
     copyOf: input.copyOf ?? undefined,
     ...viewProvenance(input.license, input.source),
     originalCreator: originalCreator

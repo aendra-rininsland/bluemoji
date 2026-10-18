@@ -12,8 +12,8 @@ subscribe to.
 
 **Status: producer implemented, consumer pending.** moji.blue now publishes signed
 takedown labels from `com.atproto.label.queryLabels` (see "Implementation" below).
-Consuming them in `verifyEmojiClaim()` and a way for admins to apply the other
-values are the next steps.
+Administrators apply and lift emoji labels from `/moderation`, and moji.blue
+honours them itself. Consuming them in `verifyEmojiClaim()` is the next step.
 
 # Motivation
 
@@ -77,6 +77,26 @@ AppView (`server/_labeler.ts`, `query-labels.ts`, `setup-labeler.ts`).
 - **Disabled** unless `LABELER_DID` and `LABELER_SIGNING_KEY` are set; an
   unconfigured AppView answers `queryLabels` with 404, not an empty list, so it
   cannot be mistaken for one that has labelled nothing.
+
+## Applying labels by hand
+
+Administrators (the `ADMINS` list) use `/moderation`, or the
+`blue.moji.moderation.applyLabel` procedure behind it, to apply or lift a label on
+an emoji, with an optional expiry and a private reason. Each label records who
+applied it and why (never published). Only emoji are labelled by hand; account
+takedowns come from the existing admin tools and are labelled automatically.
+
+moji.blue acts on its own decisions (`server/_label-effects.ts`):
+
+- `bluemoji-takedown` on an emoji makes `getItem` answer 404, drops it from
+  `listCollection`, `searchItems`, packs, featured and link-preview cards, and
+  stops `/img` serving its blobs (unless another live emoji uses the same blob).
+- `bluemoji-adult` makes the emoji adult-only in every view, whatever its record says.
+- `bluemoji-abusive` and `bluemoji-impersonation` are published for other clients
+  to act on; moji.blue does not hide anything for them yet.
+
+Packs are not labelled by hand yet; a pack in a taken-down account disappears with
+the account.
 
 ## One-time setup
 

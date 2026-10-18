@@ -1,4 +1,5 @@
 import { defineOG, type OpengraphContext, type SatoriNode } from "@hatk/hatk/opengraph";
+import { takendownItemUris } from "../_label-effects.ts";
 import { handlesForDids } from "../_pack-views.ts";
 import { resolvePds as resolveAppPds } from "../../app/lib/pds.ts";
 import { cardText, clip, fetchCardImage } from "./_card-text.ts";
@@ -93,10 +94,14 @@ async function previewEmoji(ctx: OpengraphContext, packUri: string, limit: numbe
     const byUri = new Map(rows.map((r) => [r.uri, r]));
 
     const takendown = await ctx.filterTakendownDids([...new Set(rows.map((r) => r.did))]);
+    const hiddenItems = await takendownItemUris(
+      ctx.db.query,
+      rows.map((r) => r.uri),
+    );
     const candidates: { did: string; cid: string }[] = [];
     for (const uri of subjects) {
       const row = byUri.get(uri);
-      if (!row || row.adult_only || takendown.has(row.did)) continue;
+      if (!row || row.adult_only || takendown.has(row.did) || hiddenItems.has(uri)) continue;
       const formats = parseJson(row.formats) as { png_128?: unknown } | undefined;
       const cid = blobRefCid(formats?.png_128);
       if (cid) candidates.push({ did: row.did, cid });

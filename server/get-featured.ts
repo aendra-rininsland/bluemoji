@@ -1,4 +1,5 @@
 import { defineQuery } from "$hatk";
+import { takendownItemUris } from "./_label-effects.ts";
 import { isAdmin } from "./_admin.ts";
 import { itemView, normalizeFormats, packViewBasic, type PackRow } from "./_pack-views.ts";
 
@@ -40,10 +41,11 @@ export default defineQuery("blue.moji.featured.getFeatured", async (ctx) => {
   const records = itemUris.length
     ? await ctx.getRecords<ItemRecord>("blue.moji.collection.item", itemUris)
     : new Map();
+  const hiddenItems = await takendownItemUris(ctx.db.query, itemUris);
   const itemViews = await Promise.all(
     itemUris.flatMap((uri) => {
       const rec = records.get(uri);
-      if (!rec || takendown.has(rec.did)) return [];
+      if (!rec || takendown.has(rec.did) || hiddenItems.has(uri)) return [];
       return [
         itemView(ctx, {
           uri: rec.uri,

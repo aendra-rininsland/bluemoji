@@ -37,6 +37,8 @@ function parseJson(text: string | null | undefined): unknown {
   }
 }
 
+import { withoutTakenDownItems } from "./_label-effects.ts";
+
 export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
   const { q, repo } = ctx.params;
   if (!q || !q.trim()) throw new InvalidRequestError("q is required");
@@ -70,8 +72,9 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
 
     const hasMore = rows.length > limit;
     const page = rows.slice(0, limit);
+    const visible = await withoutTakenDownItems(ctx.db.query, page, (row) => row.uri);
     const items = await Promise.all(
-      page.map((row) =>
+      visible.map((row) =>
         itemView(ctx, {
           uri: row.uri,
           did: row.did,
@@ -104,8 +107,9 @@ export default defineQuery("blue.moji.collection.searchItems", async (ctx) => {
     cursor: ctx.cursor,
   });
 
+  const visibleRecords = await withoutTakenDownItems(ctx.db.query, records, (row) => row.uri);
   const items = await Promise.all(
-    records.map((row) =>
+    visibleRecords.map((row) =>
       itemView(ctx, {
         uri: row.uri,
         did: row.did,

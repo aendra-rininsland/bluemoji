@@ -4030,6 +4030,71 @@ export const schemaDict = {
       },
     },
   },
+  BlueMojiModerationApplyLabel: {
+    lexicon: 1,
+    id: "blue.moji.moderation.applyLabel",
+    defs: {
+      main: {
+        type: "procedure",
+        description:
+          "Apply, or lift, a moderation label on an emoji, and publish it as a signed label from this AppView's labeler (see com.atproto.label.queryLabels). Requires auth as an AppView administrator. Account takedowns are made with the AppView's admin tools and are labelled automatically. Implemented by AppView.",
+        input: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["uri", "val"],
+            properties: {
+              uri: {
+                type: "string",
+                format: "at-uri",
+                description:
+                  "AT-URI of an indexed blue.moji.collection.item record (when lifting a label, the record need not be indexed any more).",
+              },
+              val: {
+                type: "string",
+                knownValues: [
+                  "bluemoji-takedown",
+                  "bluemoji-adult",
+                  "bluemoji-abusive",
+                  "bluemoji-impersonation",
+                ],
+                description:
+                  "The label value. 'bluemoji-takedown' removes the emoji from this AppView; 'bluemoji-adult' marks it adult-only.",
+              },
+              neg: {
+                type: "boolean",
+                default: false,
+                description: "Lift the label instead of applying it.",
+              },
+              exp: {
+                type: "string",
+                format: "datetime",
+                description: "When the label expires, in the future. Omit for no expiry.",
+              },
+              reason: {
+                type: "string",
+                maxLength: 1000,
+                description: "A private note for the audit trail. Never published in the label.",
+              },
+            },
+          },
+        },
+        output: {
+          encoding: "application/json",
+          schema: {
+            type: "object",
+            required: ["label"],
+            properties: {
+              label: {
+                type: "ref",
+                ref: "lex:com.atproto.label.defs#label",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   BlueMojiPacksDefs: {
     lexicon: 1,
     id: "blue.moji.packs.defs",
@@ -4876,6 +4941,7 @@ export const ids = {
   BlueMojiFeedGetReactions: "blue.moji.feed.getReactions",
   BlueMojiFeedGetTrending: "blue.moji.feed.getTrending",
   BlueMojiFeedReaction: "blue.moji.feed.reaction",
+  BlueMojiModerationApplyLabel: "blue.moji.moderation.applyLabel",
   BlueMojiPacksDefs: "blue.moji.packs.defs",
   BlueMojiPacksGetActorPacks: "blue.moji.packs.getActorPacks",
   BlueMojiPacksGetPack: "blue.moji.packs.getPack",

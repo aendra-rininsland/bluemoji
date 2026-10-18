@@ -1,5 +1,7 @@
 // Underscore prefix keeps this module out of the server/ scanner.
 
+import { takendownItemUris } from "./_label-effects.ts";
+
 type Query = (sql: string, params?: unknown[]) => Promise<unknown[]>;
 
 // Blob CIDs are CIDv1 base32 (see app/lib/server/blob-proxy.ts), so a valid one
@@ -10,17 +12,25 @@ const CID_RE = /^[a-z2-7]{10,120}$/i;
  * Whether `cid` is referenced by an emoji/sticker item's renditions or a pack's
  * icon in `did`'s repo. The renditions and icon are stored as JSON text with
  * the blob CID under a `$link` key, so a substring match scoped to one repo is
- * enough, and cheap: one account's rows, not the table.
+ * enough, and cheap: one account's rows, not the table. An emoji taken down by
+ * a moderator's label doesn't count (unless another, live item uses the same blob).
  */
 export async function blobIsReferenced(query: Query, did: string, cid: string): Promise<boolean> {
   if (!CID_RE.test(cid)) return false;
   const like = `%"${cid}"%`;
-  const items = await query(
-    `SELECT 1 FROM "blue.moji.collection.item"
-       WHERE did = $1 AND (formats LIKE $2 OR sticker_formats LIKE $2) LIMIT 1`,
+  const items = (await query(
+    `SELECT uri FROM "blue.moji.collection.item"
+       WHERE did = $1 AND (formats LIKE $2 OR sticker_formats LIKE $2) LIMIT 20`,
     [did, like],
-  );
-  if (items.length) return true;
+  )) as { uri: string }[];
+  if (items.length) {
+    // An emoji a moderator has taken down no longer vouches for its blobs
+    const hidden = await takendownItemUris(
+      query,
+      items.map((r) => r.uri),
+    );
+    if (items.some((r) => !hidden.has(r.uri))) return true;
+  }
   const packs = await query(
     `SELECT 1 FROM "blue.moji.packs.pack" WHERE did = $1 AND icon LIKE $2 LIMIT 1`,
     [did, like],
