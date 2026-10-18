@@ -20,6 +20,7 @@ import * as AppBskyGraphDefs from "./types/app/bsky/graph/defs.js";
 import * as AppBskyLabelerDefs from "./types/app/bsky/labeler/defs.js";
 import * as AppBskyNotificationDefs from "./types/app/bsky/notification/defs.js";
 import * as AppBskyRichtextFacet from "./types/app/bsky/richtext/facet.js";
+import * as BlueMojiCollectionCheckBlob from "./types/blue/moji/collection/checkBlob.js";
 import * as BlueMojiCollectionDefs from "./types/blue/moji/collection/defs.js";
 import * as BlueMojiCollectionGetItem from "./types/blue/moji/collection/getItem.js";
 import * as BlueMojiCollectionItem from "./types/blue/moji/collection/item.js";
@@ -62,6 +63,7 @@ export * as AppBskyGraphDefs from "./types/app/bsky/graph/defs.js";
 export * as AppBskyLabelerDefs from "./types/app/bsky/labeler/defs.js";
 export * as AppBskyNotificationDefs from "./types/app/bsky/notification/defs.js";
 export * as AppBskyRichtextFacet from "./types/app/bsky/richtext/facet.js";
+export * as BlueMojiCollectionCheckBlob from "./types/blue/moji/collection/checkBlob.js";
 export * as BlueMojiCollectionDefs from "./types/blue/moji/collection/defs.js";
 export * as BlueMojiCollectionGetItem from "./types/blue/moji/collection/getItem.js";
 export * as BlueMojiCollectionItem from "./types/blue/moji/collection/item.js";
@@ -444,6 +446,13 @@ export class BlueMojiCollectionNS {
   constructor(client: XrpcClient) {
     this._client = client;
     this.item = new BlueMojiCollectionItemRecord(client);
+  }
+
+  checkBlob(
+    params?: BlueMojiCollectionCheckBlob.QueryParams,
+    opts?: BlueMojiCollectionCheckBlob.CallOptions,
+  ): Promise<BlueMojiCollectionCheckBlob.Response> {
+    return this._client.call("blue.moji.collection.checkBlob", params, undefined, opts);
   }
 
   getItem(

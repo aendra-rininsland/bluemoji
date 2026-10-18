@@ -101,6 +101,15 @@ link that instead of this file for adopters past the RENDERING.md stage.
   refuses SVG/XML/HTML blobs and adds a sandboxing CSP: blobs are
   attacker-controlled and re-served from our origin, so an SVG there would be
   stored XSS. Never store SVGs — importers rasterise them to PNG first.
+  The proxy is not a general blob CDN: it serves only blobs this AppView
+  indexes as Bluemoji assets (an item's renditions or a pack icon, account not
+  taken down), asked per request via `blue.moji.collection.checkBlob`
+  (`server/check-blob.ts`, `_blob-lookup.ts`; `app/lib/server/blob-access.ts`
+  remembers a yes for 60s, so a takedown bites within a minute). A blob that
+  isn't indexed yet is served to its owner only, with `private, no-store`, so a
+  fresh upload previews before the firehose catches up and no shared cache keeps
+  it. Refusals are `no-store` 404s and "couldn't check" is a 503. Set
+  `IMG_AUTHORIZE=off` to disable the check if it misbehaves in production.
 - **Facet/sticker/reaction claims are self-attested and must be verified**
   (RFC 0001 self-attestation amendment): `did`, `formats`, `alt`, `adultOnly`,
   `labels` on a `blue.moji.richtext.facet`, `blue.moji.embed.sticker#sticker`,
@@ -252,7 +261,9 @@ size=4096` (backfill CAR imports spike; V8's default 2GB cap crashed prod).
   pack and list endpoints take free-form `limit`/`cursor` params, so a purge
   could not find every cached variant of them.
 - **Cache purging** (`server/_cache-purge.ts`, `setup-cache-purge.ts`,
-  `on-item-purge.ts`): purges Cloudflare's cached `getItem` responses when an
+  `on-item-purge.ts`): purges Cloudflare's cached `getItem` responses (and, on
+  takedown or reinstatement, the `/img` URL of every blob the account
+  references, in both DID spellings) when an
   account is taken down or reinstated (hatk's `/admin` routes only flip
   `_repos.status`, so `_takedown-watch.ts` polls for the change every 15s and
   survives restarts via the `cache_purge_state` table) and when an emoji record

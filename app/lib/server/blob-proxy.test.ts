@@ -343,4 +343,51 @@ for (const notABlobCid of [
 }
 console.log("ok - bytes must hash to the CID they are served under");
 
+// ------------------------------------------------ authorize outcomes
+{
+  const hdr = (r: Response, h: string) => r.headers.get(h);
+  const req = (inm?: string) =>
+    new Request("https://moji.blue/img/x/y", { headers: inm ? { "if-none-match": inm } : {} });
+  const did = "did:plc:abcdefghijklmnopqrstuvwx";
+  const go = (authorize: BlobProxyOptions["authorize"], r: Request = req()) => {
+    clearPdsCache();
+    const m = router({ blob: png });
+    return rawProxyBlob(did, CID_PNG, m.f, r, { guardedFetch: m.f, lookup: publicDns, authorize });
+  };
+
+  const pub = await go(() => true);
+  assert.equal(pub.status, 200);
+  assert.match(hdr(pub, "cache-control")!, /public.*immutable/);
+  assert.equal(hdr(pub, "etag"), `"${CID_PNG}"`);
+
+  const priv = await go(() => "private");
+  assert.equal(priv.status, 200);
+  assert.equal(
+    hdr(priv, "cache-control"),
+    "private, no-store",
+    "a viewer-only blob is never shared-cached",
+  );
+  assert.equal(hdr(priv, "etag"), null);
+
+  const no = await go(() => false);
+  assert.equal(no.status, 404);
+  assert.equal(hdr(no, "cache-control"), "no-store", "a refusal is never cached");
+
+  const unsure = await go(() => {
+    throw new Error("index unreachable");
+  });
+  assert.equal(unsure.status, 503, "can't tell is retryable, not a 404");
+  assert.equal(hdr(unsure, "cache-control"), "no-store");
+  assert.ok(hdr(unsure, "retry-after"));
+
+  // Revalidation is authorised too: a CDN can't keep a taken-down blob alive with If-None-Match
+  assert.equal((await go(() => false, req(`"${CID_PNG}"`))).status, 404);
+  assert.equal((await go(() => true, req(`"${CID_PNG}"`))).status, 304);
+  // and a private blob never answers a conditional request with a shareable 304
+  assert.equal((await go(() => "private", req(`"${CID_PNG}"`))).status, 200);
+}
+console.log(
+  "ok - authorize: public, viewer-only (uncacheable), refused and unavailable are distinct",
+);
+
 console.log("blob proxy tests passed");
