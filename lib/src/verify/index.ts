@@ -197,6 +197,26 @@ async function readFromPds(
   }
 }
 
+/**
+ * The PDS endpoint for a DID (honouring `resolvePds`, `plcUrl`, `fetch`),
+ * for callers that need to build blob URLs; null if it can't be resolved or
+ * isn't an acceptable (https) endpoint.
+ */
+export async function resolvePdsEndpoint(
+  did: string,
+  opts: VerifyOptions = {},
+): Promise<string | null> {
+  const pds = await (opts.resolvePds ?? ((d: string) => defaultResolvePds(d, opts)))(did).catch(
+    () => null,
+  );
+  if (!pds) return null;
+  try {
+    return allowed(new URL(pds), opts) ? new URL(pds).origin : null;
+  } catch {
+    return null;
+  }
+}
+
 async function defaultResolvePds(did: string, opts: VerifyOptions): Promise<string | null> {
   const url = did.startsWith("did:web:")
     ? new URL(`https://${did.slice("did:web:".length)}/.well-known/did.json`)
