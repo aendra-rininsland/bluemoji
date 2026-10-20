@@ -1,6 +1,7 @@
 // Server-side lookups shared by the importers: what the viewer already has
 // (to flag duplicates) and which packs they could add to.
 import { resolvePds } from "../pds";
+import { pdsGet } from "./pds-get";
 
 /** rkeys already in the viewer's collection. Best-effort: empty on any failure. */
 export async function existingRkeys(
@@ -17,9 +18,9 @@ export async function existingRkeys(
       u.searchParams.set("collection", "blue.moji.collection.item");
       u.searchParams.set("limit", "100");
       if (cursor) u.searchParams.set("cursor", cursor);
-      const res = await fetch(u);
-      if (!res.ok) break;
-      const j = (await res.json()) as { records?: { uri: string }[]; cursor?: string };
+      const res = await pdsGet(u);
+      if (!res?.ok) break;
+      const j = await res.json<{ records?: { uri: string }[]; cursor?: string }>();
       for (const r of j.records ?? []) rkeys.add(r.uri.split("/").pop()!);
       if (!j.cursor || !j.records?.length) break;
       cursor = j.cursor;

@@ -1,6 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import { parseViewer } from "$hatk/client";
 import { resolvePds } from "$lib/pds";
+import { pdsGet } from "$lib/server/pds-get";
 import type { RequestHandler } from "./$types";
 
 // Which of the viewer's own pack entries (blue.moji.packs.packitem) point at
@@ -28,12 +29,12 @@ export const GET: RequestHandler = async ({ url, cookies, fetch }) => {
     u.searchParams.set("collection", "blue.moji.packs.packitem");
     u.searchParams.set("limit", "100");
     if (cursor) u.searchParams.set("cursor", cursor);
-    const res = await fetch(u).catch(() => null);
+    const res = await pdsGet(u);
     if (!res?.ok) error(502, "Could not check your packs");
-    const body = (await res.json()) as {
+    const body = await res.json<{
       records?: { uri: string; value?: { subject?: string } }[];
       cursor?: string;
-    };
+    }>();
     for (const r of body.records ?? []) {
       if (r.value?.subject === subject) packItems.push(r.uri.split("/").pop()!);
     }
