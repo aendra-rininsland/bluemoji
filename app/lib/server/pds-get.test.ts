@@ -68,6 +68,8 @@ const ALLOWED_WITHOUT_GUARD: Record<string, string> = {
   "app/lib/pds.ts": "builds blob URLs as strings; fetching goes through safeFetch elsewhere",
   "server/og/pack.ts": "builds blob URLs that fetchCardImage fetches through safeFetch",
   "app/routes/packs/[handle]/[rkey]/export/+server.ts": "calls bsky.social, a fixed host",
+  "app/routes/moderation/+page.server.ts":
+    "calls this AppView's own queryLabels by relative URL (same origin, not a PDS)",
 };
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 function walk(dir: string): string[] {
