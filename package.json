@@ -15,7 +15,7 @@
     "prepare": "vp config"
   },
   "dependencies": {
-    "@hatk/hatk": "^0.0.1-alpha.42",
+    "@hatk/hatk": "^0.0.1-alpha.85",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/adapter-node": "^5.5.4",
     "@sveltejs/kit": "^2.55.0",
