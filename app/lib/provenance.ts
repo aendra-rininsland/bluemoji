@@ -210,18 +210,64 @@ export function licenseLabel(expression: string): string {
  * Whether the reference UI offers "copy to my collection" for an item with
  * this license. Copying duplicates the work into another repo, so it needs a
  * grant: no license at all means no grant, and all-rights-reserved withholds
- * it. An `OR` expression is copyable (some alternative may grant it).
+ * it.
+ *
+ * The expression is evaluated rather than skimmed for an `OR`: `AND` needs
+ * every side to allow copying, `OR` needs one, and `WITH` is judged by the
+ * license it modifies. So `All-Rights-Reserved AND (MIT OR Apache-2.0)` is not
+ * copyable, while `All-Rights-Reserved OR MIT` is. An expression that does not
+ * parse is not copyable.
+ *
  * This is advisory UI behaviour — ATProto can't stop a client writing a record.
  */
 export function isCopyable(license: string | null | undefined): boolean {
   const l = license?.trim();
   if (!l) return false;
-  const tokens = l
+  const normalized = normalizeLicense(l);
+  if (!parseSpdx(normalized).ok) return false;
+
+  const tokens = normalized
     .replace(/([()])/g, " $1 ")
     .split(/\s+/)
     .filter(Boolean);
-  if (tokens.includes("OR")) return true;
-  return !tokens.some((t) => t.toLowerCase() === ALL_RIGHTS_RESERVED.toLowerCase());
+  let pos = 0;
+
+  // or := and ("OR" and)*   and := primary ("AND" primary)*
+  // primary := "(" or ")" | id ["WITH" exception]
+  // Every operand is evaluated (no short-circuit) so the cursor stays in step.
+  const or = (): boolean => {
+    let value = and();
+    while (tokens[pos] === "OR") {
+      pos++;
+      const right = and();
+      value = value || right;
+    }
+    return value;
+  };
+  const and = (): boolean => {
+    let value = primary();
+    while (tokens[pos] === "AND") {
+      pos++;
+      const right = primary();
+      value = value && right;
+    }
+    return value;
+  };
+  const primary = (): boolean => {
+    if (tokens[pos] === "(") {
+      pos++;
+      const value = or();
+      pos++; // ")"
+      return value;
+    }
+    const id = tokens[pos++];
+    if (tokens[pos] === "WITH") pos += 2; // the exception does not change the grant
+    const bare = id.endsWith("+") ? id.slice(0, -1) : id;
+    return bare.toLowerCase() !== ALL_RIGHTS_RESERVED.toLowerCase();
+  };
+
+  const result = or();
+  return pos === tokens.length && result;
 }
 
 /**
@@ -244,6 +290,12 @@ export function cleanProvenance(
   const err = licenseError(l) ?? sourceError(s);
   if (err) return { error: err };
   const href = s ? new URL(s).href : "";
+  // `href` is the stored form, and percent-encoding can make it much longer than
+  // what was typed. Check it too, or a value that passed above is later dropped
+  // by every reader.
+  if (bytes(href) > SOURCE_MAX_BYTES) {
+    return { error: `Source URL is too long once encoded (max ${SOURCE_MAX_BYTES} bytes)` };
+  }
   return { ...(l ? { license: normalizeLicense(l) } : {}), ...(href ? { source: href } : {}) };
 }
 

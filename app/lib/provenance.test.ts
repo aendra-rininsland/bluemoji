@@ -184,4 +184,38 @@ assert.equal(provenanceError("MIT", "https://example.com"), null);
 assert.match(provenanceError("MIT", "nope") ?? "", /full URL/);
 assert.match(provenanceError("Apache 2.0", "") ?? "", /identifier|Unexpected/);
 console.log("ok - viewProvenance drops invalid values independently");
+// --------------------------------------------------- compound licenses
+{
+  const ARR = "LicenseRef-All-Rights-Reserved";
+  assert.equal(isCopyable(`${ARR} AND (MIT OR Apache-2.0)`), false);
+  assert.equal(isCopyable(`(MIT OR Apache-2.0) AND ${ARR}`), false);
+  assert.equal(isCopyable(`${ARR} OR MIT`), true);
+  assert.equal(isCopyable(`(${ARR} OR MIT) AND CC-BY-4.0`), true);
+  assert.equal(isCopyable(`(${ARR} OR MIT) AND ${ARR}`), false);
+  assert.equal(isCopyable(`MIT AND (CC-BY-4.0 OR ${ARR})`), true);
+  assert.equal(isCopyable("Apache-2.0 WITH LLVM-exception"), true);
+  assert.equal(isCopyable(`${ARR} WITH LLVM-exception`), false);
+  // an expression that doesn't parse is not copyable
+  assert.equal(isCopyable("MIT OR"), false);
+  assert.equal(isCopyable("(MIT"), false);
+  assert.equal(isCopyable("not a license!"), false);
+  console.log("ok - isCopyable evaluates compound expressions");
+}
+
+// -------------------------------------- source length after encoding
+{
+  // under 2048 bytes as typed, but each "é" is "%C3%A9" (6 bytes) once stored
+  const typed = "https://example.com/" + "é".repeat(340);
+  assert.ok(new TextEncoder().encode(typed).length < SOURCE_MAX_BYTES);
+  assert.equal(sourceError(typed), null);
+  assert.ok("error" in cleanProvenance(undefined, typed));
+  // one that still fits once encoded round-trips through the read-side check
+  const fits = cleanProvenance(undefined, "https://example.com/" + "é".repeat(100));
+  assert.ok("source" in fits);
+  const stored = (fits as { source: string }).source;
+  assert.equal(safeHref(stored), stored);
+  assert.equal(viewProvenance(undefined, stored).source, stored);
+  console.log("ok - cleanProvenance checks the encoded source length");
+}
+
 console.log("provenance tests passed");
