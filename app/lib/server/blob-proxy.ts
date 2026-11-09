@@ -2,62 +2,33 @@
 // CDN in front of moji.blue. Blobs are CID-addressed, hence immutable.
 // Served by app/routes/img/[did]/[cid]/+server.ts.
 //
-// The PDS endpoint comes from a DID document anyone can write, so it is only
-// ever fetched through `safeFetch` (https, public addresses, re-checked on
-// redirects, body capped while it streams).
-import { createHash } from "node:crypto";
-import { error } from "@sveltejs/kit";
-import { BLOB_SECURITY_HEADERS, isServableBlobType } from "../blob-policy";
-import { resolvePds } from "../pds";
-import { SafeFetchError, safeFetch, type Lookup } from "./safe-fetch";
+// The behaviour lives in `@aendra/bluemoji/img-proxy` (lib/src/img-proxy), a
+// Web-API-only core that other AppViews run on Workers, Deno or Bun. This file
+// plugs in the Node-only hardening moji.blue adds on top: PDS endpoints come
+// from a DID document anyone can write, so they are resolved with `resolvePds`
+// and fetched through `safeFetch` (https, public addresses pinned at connect
+// time, re-checked on redirects, body capped while it streams).
+import {
+  BlobFetchError,
+  MAX_BLOB_BYTES,
+  blobCidDigest as coreDigest,
+  createBlobProxy,
+  type Authorize,
+} from "../../../lib/src/img-proxy/index.ts";
+import { resolvePds } from "../pds.ts";
+import { SafeFetchError, safeFetch, type Lookup } from "./safe-fetch.ts";
 
-const DID_RE = /^did:(plc:[a-z2-7]{24}|web:[a-z0-9.-]+)$/i;
-const CID_RE = /^[a-z2-7]{10,120}$/i;
-export const MAX_BLOB_BYTES = 1_500_000;
+export { MAX_BLOB_BYTES };
 
-const B32 = "abcdefghijklmnopqrstuvwxyz234567";
-
-/**
- * The SHA-256 digest inside an ATProto blob CID, or null if it isn't one.
- * Blob CIDs are fixed by the spec: CIDv1, `raw` codec (0x55), sha2-256, in
- * lower-case base32 multibase (`bafkrei…`), i.e. bytes 01 55 12 20 <32 bytes>.
- */
+/** The SHA-256 digest inside an ATProto blob CID, or null if it isn't one. */
 export function blobCidDigest(cid: string): Buffer | null {
-  const c = cid.toLowerCase();
-  if (c[0] !== "b") return null;
-  let bits = 0;
-  let acc = 0;
-  const out: number[] = [];
-  for (const ch of c.slice(1)) {
-    const v = B32.indexOf(ch);
-    if (v < 0) return null;
-    acc = (acc << 5) | v;
-    bits += 5;
-    if (bits >= 8) {
-      bits -= 8;
-      out.push((acc >> bits) & 0xff);
-    }
-  }
-  const b = Buffer.from(out);
-  if (b.length !== 36 || b[0] !== 0x01 || b[1] !== 0x55 || b[2] !== 0x12 || b[3] !== 0x20)
-    return null;
-  return b.subarray(4);
+  const d = coreDigest(cid);
+  return d ? Buffer.from(d) : null;
 }
 
 export interface BlobProxyOptions {
-  /**
-   * Decide whether this host is willing to serve `did`'s blob `cid`. Without
-   * it the proxy serves any blob from any repo, which makes the host a free
-   * image CDN; a Bluemoji AppView would typically allow only CIDs referenced
-   * by an indexed `blue.moji.collection.item`.
-   *
-   * `true` serves it publicly (immutable, CDN-cacheable). `"private"` serves it
-   * to this requester only and must not be cached by anything shared: use it
-   * for a blob that isn't allowed publicly but that this viewer owns (an upload
-   * the index hasn't caught up with). `false` is a definitive no. Throwing
-   * means "couldn't tell", answered 503 so nothing caches a wrong refusal.
-   */
-  authorize?: (did: string, cid: string) => boolean | "private" | Promise<boolean | "private">;
+  /** See `Authorize` in the core: true | "private" | false, or throw for "couldn't tell". */
+  authorize?: Authorize;
   maxBytes?: number;
   /** Injectable DNS resolver, for tests. */
   lookup?: Lookup;
@@ -65,89 +36,34 @@ export interface BlobProxyOptions {
   guardedFetch?: typeof globalThis.fetch;
 }
 
-/** A refusal that no cache may keep: a wrong "no" must not outlive the reason for it. */
-function refusal(status: number, message: string, headers: Record<string, string> = {}) {
-  return new Response(JSON.stringify({ error: message }), {
-    status,
-    headers: { "content-type": "application/json", "cache-control": "no-store", ...headers },
-  });
-}
-
-export async function proxyBlob(
+export function proxyBlob(
   did: string,
   cid: string,
   fetch: typeof globalThis.fetch,
   request: Request,
   opts: BlobProxyOptions = {},
 ): Promise<Response> {
-  if (!DID_RE.test(did) || !CID_RE.test(cid)) error(400, "Invalid did or cid");
-  // Only content we can verify against its address (every ATProto blob qualifies)
-  const digest = blobCidDigest(cid);
-  if (!digest) error(400, "Invalid did or cid");
-
-  // Ask before anything else, including the 304 below: a CDN revalidating an
-  // entry must not have its life extended for a blob we would now refuse (a
-  // taken-down account's, say).
-  let access: boolean | "private" = true;
-  if (opts.authorize) {
-    try {
-      access = await opts.authorize(did, cid);
-    } catch {
-      return refusal(503, "Could not check this blob", { "retry-after": "5" });
-    }
-    if (!access) return refusal(404, "Blob not available here");
-  }
-
-  // CID-addressed content never changes: any revalidation is a 304.
-  if (access === true && request.headers.get("if-none-match")?.includes(cid)) {
-    return new Response(null, { status: 304 });
-  }
-
-  const maxBytes = opts.maxBytes ?? MAX_BLOB_BYTES;
-  const pds = await resolvePds(did, fetch, {
-    lookup: opts.lookup,
-    guardedFetch: opts.guardedFetch,
-  }).catch(() => null);
-  if (!pds) error(404, "Could not resolve PDS");
-
-  let upstream: Response;
-  let bytes: Uint8Array;
-  try {
-    ({ res: upstream, body: bytes } = await safeFetch(
-      `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`,
-      {},
-      {
-        maxBytes,
-        fetch: opts.guardedFetch,
-        lookup: opts.lookup,
-        allowLocal: process.env.NODE_ENV !== "production",
-      },
-    ));
-  } catch (e) {
-    error(e instanceof SafeFetchError && e.status === 413 ? 413 : 502, "Blob unavailable");
-  }
-  if (!upstream.ok) error(upstream.status === 404 ? 404 : 502, "Blob unavailable");
-
-  // The response is cached as immutable for a year under this CID, so the
-  // bytes must be the ones it names: a PDS can't serve something else under it.
-  if (!createHash("sha256").update(bytes).digest().equals(digest)) error(502, "Blob unavailable");
-
-  const contentType = upstream.headers.get("content-type") ?? "application/octet-stream";
-  // Refuses SVG and other active document types (see $lib/blob-policy)
-  if (!isServableBlobType(contentType)) error(415, "Unsupported blob type");
-
-  // The body was read in full and capped, so the length is what we send, not
-  // whatever the PDS claimed.
-  return new Response(bytes as BodyInit, {
-    headers: {
-      "content-type": contentType,
-      "cache-control":
-        access === "private" ? "private, no-store" : "public, max-age=31536000, immutable",
-      ...(access === "private" ? {} : { etag: `"${cid}"` }),
-      ...BLOB_SECURITY_HEADERS,
-      "content-disposition": "inline",
-      "access-control-allow-origin": "*",
-      "content-length": String(bytes.length),
+  return createBlobProxy({
+    authorize: opts.authorize,
+    maxBytes: opts.maxBytes,
+    resolvePds: (d) =>
+      resolvePds(d, fetch, { lookup: opts.lookup, guardedFetch: opts.guardedFetch }),
+    fetchBlob: async (url, { maxBytes }) => {
+      try {
+        const { res, body } = await safeFetch(
+          url,
+          {},
+          {
+            maxBytes,
+            fetch: opts.guardedFetch,
+            lookup: opts.lookup,
+            allowLocal: process.env.NODE_ENV !== "production",
+          },
+        );
+        return { status: res.status, headers: res.headers, body };
+      } catch (e) {
+        throw new BlobFetchError("Blob unavailable", e instanceof SafeFetchError ? e.status : 502);
+      }
     },
-  });
+  }).handle(did, cid, request);
 }
