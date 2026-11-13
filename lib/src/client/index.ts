@@ -45,6 +45,7 @@ import * as BlueMojiPacksPack from "./types/blue/moji/packs/pack.js";
 import * as BlueMojiPacksPackitem from "./types/blue/moji/packs/packitem.js";
 import * as BlueMojiRichtextFacet from "./types/blue/moji/richtext/facet.js";
 import * as ComAtprotoLabelDefs from "./types/com/atproto/label/defs.js";
+import * as ComAtprotoLabelQueryLabels from "./types/com/atproto/label/queryLabels.js";
 import * as ComAtprotoModerationDefs from "./types/com/atproto/moderation/defs.js";
 import * as ComAtprotoRepoStrongRef from "./types/com/atproto/repo/strongRef.js";
 
@@ -88,6 +89,7 @@ export * as BlueMojiPacksPack from "./types/blue/moji/packs/pack.js";
 export * as BlueMojiPacksPackitem from "./types/blue/moji/packs/packitem.js";
 export * as BlueMojiRichtextFacet from "./types/blue/moji/richtext/facet.js";
 export * as ComAtprotoLabelDefs from "./types/com/atproto/label/defs.js";
+export * as ComAtprotoLabelQueryLabels from "./types/com/atproto/label/queryLabels.js";
 export * as ComAtprotoModerationDefs from "./types/com/atproto/moderation/defs.js";
 export * as ComAtprotoRepoStrongRef from "./types/com/atproto/repo/strongRef.js";
 
@@ -904,11 +906,28 @@ export class ComNS {
 
 export class ComAtprotoNS {
   _client: XrpcClient;
+  label: ComAtprotoLabelNS;
   repo: ComAtprotoRepoNS;
 
   constructor(client: XrpcClient) {
     this._client = client;
+    this.label = new ComAtprotoLabelNS(client);
     this.repo = new ComAtprotoRepoNS(client);
+  }
+}
+
+export class ComAtprotoLabelNS {
+  _client: XrpcClient;
+
+  constructor(client: XrpcClient) {
+    this._client = client;
+  }
+
+  queryLabels(
+    params?: ComAtprotoLabelQueryLabels.QueryParams,
+    opts?: ComAtprotoLabelQueryLabels.CallOptions,
+  ): Promise<ComAtprotoLabelQueryLabels.Response> {
+    return this._client.call("com.atproto.label.queryLabels", params, undefined, opts);
   }
 }
 
