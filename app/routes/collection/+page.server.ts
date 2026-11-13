@@ -1,6 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import { parseViewer } from "$hatk/client";
 import { resolvePds, imgUrl, animatedImgUrl } from "$lib/pds";
+import { pdsGet } from "$lib/server/pds-get";
 import type { PageServerLoad } from "./$types";
 
 const MAX_PAGES = 20; // 2,000 emoji
@@ -23,12 +24,12 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
     url.searchParams.set("limit", "100");
     if (cursor) url.searchParams.set("cursor", cursor);
 
-    const res = await fetch(url);
-    if (!res.ok) {
+    const res = await pdsGet(url);
+    if (!res?.ok) {
       if (page === 0) return { items: [], truncated: false };
       break;
     }
-    const body = (await res.json()) as { records?: any[]; cursor?: string };
+    const body = await res.json<{ records?: any[]; cursor?: string }>();
     records.push(...(body.records ?? []));
     cursor = body.cursor;
     if (!cursor || !body.records?.length) break;

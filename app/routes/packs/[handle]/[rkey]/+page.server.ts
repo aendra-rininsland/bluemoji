@@ -1,6 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { parseViewer } from "$hatk/client";
 import { resolvePds, imgUrl, animatedImgUrl } from "$lib/pds";
+import { pdsGet } from "$lib/server/pds-get";
 import type { PageServerLoad } from "./$types";
 
 interface ItemView {
@@ -66,9 +67,9 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
       url.searchParams.set("repo", viewer.did);
       url.searchParams.set("collection", "blue.moji.collection.item");
       url.searchParams.set("limit", "100");
-      const colRes = await fetch(url);
-      if (colRes.ok) {
-        const { records } = (await colRes.json()) as { records: any[] };
+      const colRes = await pdsGet(url);
+      if (colRes?.ok) {
+        const { records } = await colRes.json<{ records: any[] }>();
         collection = (records ?? []).map((r) => ({
           uri: r.uri as string,
           name: (r.value?.name as string) ?? "",
@@ -90,9 +91,8 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
       recUrl.searchParams.set("repo", viewer.did);
       recUrl.searchParams.set("collection", "blue.moji.packs.pack");
       recUrl.searchParams.set("rkey", rkey);
-      const recRes = await fetch(recUrl).catch(() => null);
-      if (recRes?.ok)
-        packRecord = ((await recRes.json()) as { value: Record<string, unknown> }).value;
+      const recRes = await pdsGet(recUrl);
+      if (recRes?.ok) packRecord = (await recRes.json<{ value: Record<string, unknown> }>()).value;
     }
   }
 
