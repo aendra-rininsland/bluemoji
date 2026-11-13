@@ -236,6 +236,19 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
     `app/` is compiled by Vite and is exempt, but if a `server/` file starts
     importing it, it is no longer exempt.
 
+13. **Classify uploads by their bytes, and remember ffmpeg can't decode
+    animated WebP.** A browser's MIME type and a file extension can't tell an
+    animated file from a still: an APNG saved as `.png` is reported as
+    `image/png`, and a GIF as `image/gif`. The upload page decides with
+    `classifyUpload()` (`app/lib/upload-kind.ts`) and the importers with
+    `sniffImage`/`isAnimated` (`app/lib/image.ts`), never `file.type`. Animation is converted server-side by
+    `blue.moji.collection.transcodeAnimation`: GIF and APNG through ffmpeg,
+    animated WebP through sharp (`server/_transcode-webp.ts`), because ffmpeg's
+    WebP decoder rejects animated files ("image data not found"). Re-encoding an
+    animated image through a canvas keeps only its first frame, so never do that
+    for anything `classifyUpload` calls `animated`. sharp can't read APNG
+    animation either, so keep each format on its own path.
+
 ## Verification workflow
 
 - `vp check` (0 errors expected; warnings in generated lib code are normal),

@@ -107,9 +107,6 @@ export async function importEmoji(o: ImportOptions): Promise<ImportResult> {
   let warning: string | undefined;
   if (animated && source.size > MAX_TRANSCODE_INPUT) {
     warning = "animation skipped: file too large to convert";
-  } else if (animated && source.type === "image/webp") {
-    // The server-side ffmpeg can't decode animated WebP, so don't pretend to try
-    warning = "animation skipped: animated WebP files can't be converted yet";
   } else if (animated) {
     try {
       const data = toBase64(await source.arrayBuffer());
