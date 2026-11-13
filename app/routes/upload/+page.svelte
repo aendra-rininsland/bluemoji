@@ -2,6 +2,7 @@
   import { callXrpc, getViewer } from '$hatk/client'
   import { aliasToRkey, normalizeAlias } from '$lib/alias'
   import { provenanceError } from '$lib/provenance'
+  import { classifyUpload, rawAnimationSlot } from '$lib/upload-kind'
   import ProvenanceFields from '$lib/components/ProvenanceFields.svelte'
 
   let { data } = $props()
@@ -30,19 +31,6 @@
       return { alias: '', rkey: '', error: e.message as string }
     }
   })
-
-  function detectKind(f: File): 'png' | 'apng' | 'webp' | 'lottie' {
-    if (f.type === 'image/apng' || f.name.endsWith('.apng')) return 'apng'
-    if (f.type === 'image/webp') return 'webp'
-    if (
-      f.type === 'application/json' ||
-      f.type === 'application/lottie+zip' ||
-      f.name.endsWith('.lottie') ||
-      f.name.endsWith('.json')
-    )
-      return 'lottie'
-    return 'png'
-  }
 
   function onFileChange(e: Event) {
     const f = (e.target as HTMLInputElement).files?.[0]
@@ -105,7 +93,10 @@
     successUri = ''
 
     try {
-      const kind = detectKind(file)
+      // Decide from the bytes: a browser's MIME type and the extension can't tell
+      // an animated PNG, GIF or WebP from a still (an APNG saved as .png is
+      // reported as image/png).
+      const { kind, type } = classifyUpload(new Uint8Array(await file.arrayBuffer()), file.name, file.type)
       const { blob: original } = await callXrpc('dev.hatk.uploadBlob', file)
 
       const formats: Record<string, unknown> = {
@@ -126,8 +117,9 @@
         const { blob: png128 } = await callXrpc('dev.hatk.uploadBlob', pngBlob)
         formats.png_128 = png128
 
-        if (kind === 'apng') {
-          // Transcode to properly-sized animated WebP server-side (ffmpeg)
+        if (kind === 'animated') {
+          // Transcode (GIF, APNG or animated WebP) to properly-sized animated WebP
+          // server-side (ffmpeg, or sharp for WebP)
           // rather than storing the raw, unresized original — imgproxy
           // can't resize APNG on demand (RFC 0001 / imgproxy#1222), and the
           // old behaviour uploaded the source file byte-for-byte regardless
@@ -150,21 +142,23 @@
           } catch (transcodeErr) {
             // Fall back to the old raw-upload behaviour rather than hard-
             // failing the whole upload if the transcode pipeline is down.
-            console.error('Animation transcode failed, falling back to raw APNG upload', transcodeErr)
-            const apngBlob = new Blob([await file.arrayBuffer()], { type: 'image/apng' })
-            const { blob: apng128 } = await callXrpc('dev.hatk.uploadBlob', apngBlob)
-            formats.apng_128 = apng128
+            console.error('Animation transcode failed, falling back to the raw animated upload', transcodeErr)
+            const rawType = type === 'image/png' ? 'image/apng' : (type ?? 'image/apng')
+            const rawBlob = new Blob([await file.arrayBuffer()], { type: rawType })
+            const { blob: rawAnimation } = await callXrpc('dev.hatk.uploadBlob', rawBlob)
+            formats[rawAnimationSlot(type)] = rawAnimation
           }
-        } else if (kind === 'webp') {
+        } else if (type === 'image/webp') {
           const webpBlob = await canvasToBlob(canvas, 'image/webp')
           const { blob: webp128 } = await callXrpc('dev.hatk.uploadBlob', webpBlob)
           formats.webp_128 = webp128
         }
       }
 
-      // Static raster sticker rendition (skipped for apng, which already
-      // produces its own animated stickerFormats above when successful)
-      if (asSticker && !stickerFormats && (kind === 'png' || kind === 'webp')) {
+      // Static raster sticker rendition (skipped when the animated transcode
+      // already produced the sticker; an animation whose 512px version was too
+      // big still gets a still sticker from its first frame)
+      if (asSticker && !stickerFormats && kind !== 'lottie') {
         const canvas512 = await resizeCanvas(file, 512)
         const sticker = await canvasToBlob(canvas512, 'image/png')
         if (sticker.size <= 512_000) {
@@ -231,7 +225,7 @@
         bind:this={fileInput}
         id="file"
         type="file"
-        accept="image/png,image/apng,image/webp,application/json,.lottie"
+        accept="image/png,image/apng,image/gif,image/webp,application/json,.lottie"
         onchange={onFileChange}
         required
         style="display: block; width: 100%;"

@@ -5,6 +5,8 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
+import { sniffImage } from "../app/lib/image.ts";
+import { transcodeAnimatedWebp } from "./_transcode-webp.ts";
 
 const execFileAsync = promisify(execFile);
 
@@ -48,7 +50,7 @@ async function transcodeToWebp(inputPath: string, size: number, workdir: string)
   return readFile(outputPath);
 }
 
-// Never store raw APNG going forward (RFC 0001 / imgproxy#1222: imgproxy
+// Accepts GIF, APNG and animated WebP. Never store raw APNG going forward (RFC 0001 / imgproxy#1222: imgproxy
 // can't resize APNG on demand) — transcode to animated WebP once here at
 // upload time instead, so the CDN never needs to touch APNG at all. Pure
 // transcode utility: doesn't write any record or touch the PDS itself: the
@@ -68,6 +70,28 @@ export default defineProcedure("blue.moji.collection.transcodeAnimation", async 
   }
   if (input.length === 0) throw new InvalidRequestError("data must be non-empty");
   if (input.length > MAX_INPUT_BYTES) throw new InvalidRequestError("Input too large");
+
+  // Decide by the bytes, never a filename. ffmpeg handles GIF and APNG; it
+  // can't decode animated WebP, which goes through sharp instead.
+  const type = sniffImage(input);
+  if (!type) throw new InvalidRequestError("Unsupported image type");
+
+  if (type === "image/webp") {
+    try {
+      const [webp128, webp512] = await Promise.all([
+        transcodeAnimatedWebp(input, 128),
+        transcodeAnimatedWebp(input, 512),
+      ]);
+      return ctx.ok({
+        webp128: webp128.toString("base64"),
+        webp512: webp512.toString("base64"),
+      });
+    } catch (e) {
+      throw new InvalidRequestError(
+        `Could not convert the animated WebP: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  }
 
   const workdir = await mkdtemp(join(tmpdir(), "bluemoji-transcode-"));
   try {
