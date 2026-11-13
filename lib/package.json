@@ -33,6 +33,10 @@
     "./verify": {
       "types": "./dist/verify/index.d.ts",
       "import": "./dist/verify.js"
+    },
+    "./img-proxy": {
+      "types": "./dist/img-proxy/index.d.ts",
+      "import": "./dist/img-proxy.js"
     }
   },
   "scripts": {
