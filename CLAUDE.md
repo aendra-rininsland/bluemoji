@@ -182,7 +182,9 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
    string by hand; standard ATProto client libraries will still only see
    the last URI's results until hatk's dispatch is patched upstream. POST
    procedures are unaffected (JSON bodies have real arrays, no repeated-key
-   ambiguity).
+   ambiguity)
+   Still present in hatk alpha.85 (checked: the custom-handler param builder
+   still does `params[key] = value`), so the comma workaround has to stay.
 9. **Custom `/xrpc/{nsid}` procedures always get a JSON-parsed request
    body** (`server.js`: `input = JSON.parse(await request.text())`, falling
    back to `{}` on parse failure) — a lexicon's `input.encoding` field is
@@ -248,6 +250,15 @@ localhost:3000 PORT=3000 ...` for this reason — any `hatk start` run
     animated image through a canvas keeps only its first frame, so never do that
     for anything `classifyUpload` calls `animated`. sharp can't read APNG
     animation either, so keep each format on its own path.
+
+14. **hatk is pinned to an exact version, and bumping it can collide with
+    sharp.** `package.json` has `"@hatk/hatk": "0.0.1-alpha.85"` with no caret:
+    a caret range on a prerelease floats to the newest alpha on any lockfile
+    regeneration, and from alpha.100 hatk declares an optional peer
+    `sharp@^0.35.4`, which conflicts with our direct `sharp@^0.34.5` (used for
+    animated WebP, gotcha #13) and makes `npm install` fail with ERESOLVE. To
+    move hatk past alpha.99, bump `sharp` to a matching version in the same
+    change and re-run the animated WebP test (`server/_transcode-webp.test.ts`).
 
 ## Verification workflow
 
