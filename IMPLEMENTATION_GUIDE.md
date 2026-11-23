@@ -378,6 +378,12 @@ Before shipping any of the above, confirm:
       will silently only get results for the last URI until that's patched
       upstream. Not your bug to fix, but worth knowing if a batch call
       looks like it's dropping results.
+      The comma-joined single value (`uris=a,b`) that moji.blue also accepts
+      is a **workaround for that bug, not part of the standard**. The lexicons
+      declare ordinary array parameters, so an AppView you build should accept
+      the repeated form (`uris=a&uris=b`) and clients you write should send it.
+      Don't depend on the comma form in anything meant to work against other
+      AppViews.
 
 ### 2.7 Fork maintenance considerations
 

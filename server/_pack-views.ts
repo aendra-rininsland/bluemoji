@@ -62,6 +62,33 @@ export function normalizeFormats(formats: unknown): Record<string, unknown> | un
   return out;
 }
 
+const EMOJI_REF_SLOTS = ["png_128", "webp_128", "gif_128", "apng_128", "lottie"] as const;
+// An ATProto blob CID is always CIDv1 + raw + sha2-256 in base32: `bafkrei` + 52 characters.
+const BLOB_CID_RE = /^bafkrei[a-z2-7]{52}$/;
+
+/**
+ * An item's formats in the shape `blue.moji.feed.reaction#emojiRef` declares:
+ * `blue.moji.richtext.facet#formats_v1`, i.e. one CID string per slot. The
+ * stored item holds blob objects (`{ $type: "blob", ref: { $link }, mimeType,
+ * size }`, plus a 1 MB `original`), which is a different type that happens to
+ * share the name `formats_v1`; returning it from an emojiRef broke the lexicon
+ * for anyone implementing against it. Clients build URLs from `did` + CID.
+ *
+ * Slots that hold no blob (a legacy `formats_v0` item's raw-bytes `apng_128` or
+ * `lottie`) are left out: there is no CID to give.
+ */
+export function emojiRefFormats(formats: unknown): Record<string, unknown> {
+  const out: Record<string, unknown> = { $type: "blue.moji.richtext.facet#formats_v1" };
+  const normalized = normalizeFormats(formats);
+  if (!normalized) return out;
+  for (const slot of EMOJI_REF_SLOTS) {
+    const value = normalized[slot] as { ref?: { $link?: unknown } } | string | undefined;
+    const cid = typeof value === "string" ? value : value?.ref?.$link;
+    if (typeof cid === "string" && BLOB_CID_RE.test(cid)) out[slot] = cid;
+  }
+  return out;
+}
+
 export async function handlesForDids(
   ctx: Pick<XrpcContext, "db">,
   dids: string[],
@@ -163,7 +190,7 @@ export function verifiedEmojiRef(
     name: record.value.name,
     alt: record.value.alt,
     adultOnly: Boolean(record.value.adultOnly),
-    formats: normalizeFormats(record.value.formats),
+    formats: emojiRefFormats(record.value.formats),
   };
 }
 
