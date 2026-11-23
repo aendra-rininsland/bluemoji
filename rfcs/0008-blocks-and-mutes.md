@@ -29,7 +29,7 @@ Concrete harms:
    reacts with it, and you see their image on a post you are reading.
 2. **A blocked account reacts to your posts.** Their reaction chip and their
    entry in the reactor list appear under your post. On Bluesky a blocked
-   account cannot interact with your posts; here they can.
+   account cannot interact with your posts _(to verify)_; here they can.
 3. **Emoji owners cannot keep people away from their emoji.** Someone an owner
    has blocked can still use that owner's emoji.
 
