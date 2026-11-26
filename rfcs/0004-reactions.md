@@ -45,6 +45,15 @@ onto any post view — making it a lower-friction adoption path than facets.
   can render the glyph from firehose data alone with zero round-trips. The
   owning DID is derived from the URI. Reacting with _someone else's_ emoji is
   allowed by design — the ref points wherever the item lives.
+- **Amendment (2026-11): `emojiRef.formats` is CID-only.** The lexicon types
+  it as `blue.moji.richtext.facet#formats_v0` / `#formats_v1`: one CID string
+  per slot, with no blob metadata and no `original`. An AppView MUST return
+  that shape from `getReactions`, `getReactionCounts` and `getTrending`, and
+  MUST NOT pass through the source item's own `blue.moji.collection.item#formats_v1`
+  (blob objects with `mimeType`, `size` and a 1 MB `original`), which shares the
+  name but is a different type. Clients build an image URL from the DID in
+  `emoji.uri` plus the CID, and infer the type from the slot name. The reference
+  AppView did return the blob form until this was fixed (issue #30).
 - **Dedup rule:** AppViews ignore duplicate (actor, subject, emoji URI)
   triples, mirroring the packitem rule.
 - **Query** `blue.moji.feed.getReactions(uri)` returns aggregated
