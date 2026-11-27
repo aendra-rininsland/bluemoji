@@ -113,6 +113,11 @@ URL construction (see this repo's `/img/{did}/{cid}` proxy in
 example) rather than hot-linking PDS `getBlob` URLs from rendered content —
 PDSes aren't CDNs and don't expect client-scale traffic.
 
+You don't have to write that proxy: `@aendra/bluemoji/img-proxy` is the same
+hardened core moji.blue runs, with a ready Cloudflare Worker in
+`lib/examples/cloudflare-worker`. Point its `authorize` at an AppView's
+`blue.moji.collection.checkBlob` so it isn't an open image CDN.
+
 ---
 
 ## Track A: Forking `bluesky-social/social-app`

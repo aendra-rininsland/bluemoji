@@ -90,6 +90,30 @@ assert.ok(
 );
 ```
 
+### Image proxy
+
+`@aendra/bluemoji/img-proxy` is the hardened `/img/{did}/{cid}` proxy that
+moji.blue runs, as a framework-agnostic core built only on Web APIs (`fetch`,
+`Request`/`Response`, Web Crypto), so an AppView can serve emoji pixels from its
+own domain on Cloudflare Workers, Deno, Bun or Node.
+
+```ts
+import { createBlobProxy, checkBlobAuthorizer } from "@aendra/bluemoji/img-proxy";
+
+const proxy = createBlobProxy({
+  // Serve only blobs this AppView indexes as Bluemoji assets. Without it the
+  // proxy serves any blob from any repo.
+  authorize: checkBlobAuthorizer("https://moji.blue"),
+});
+export default { fetch: (request: Request) => proxy.fetch(request) };
+```
+
+It resolves the owner's PDS, refuses SVG/XML/HTML (stored XSS), checks the bytes
+hash to the CID, caps the size while streaming, validates every redirect hop, and
+sends a sandboxing CSP with immutable caching. Hostnames are checked by name; on
+Node, pass `resolvePds` and `fetchBlob` hooks that pin addresses at connect time.
+A ready Worker is in [`examples/cloudflare-worker`](examples/cloudflare-worker).
+
 ### Emoji picker
 
 `<blue-moji-picker>` is a drop-in Custom Element backed by an AppView's

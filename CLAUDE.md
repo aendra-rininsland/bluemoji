@@ -110,6 +110,12 @@ link that instead of this file for adopters past the RENDERING.md stage.
   fresh upload previews before the firehose catches up and no shared cache keeps
   it. Refusals are `no-store` 404s and "couldn't check" is a 503. Set
   `IMG_AUTHORIZE=off` to disable the check if it misbehaves in production.
+  The proxy's logic lives in `lib/src/img-proxy/` (`@aendra/bluemoji/img-proxy`,
+  Web APIs only, no Node builtins: other AppViews run it on Workers/Deno/Bun, with a
+  Worker template in `lib/examples/cloudflare-worker`). `app/lib/server/blob-proxy.ts`
+  is a thin adapter adding `resolvePds`/`safeFetch` (connect-time address pinning,
+  which the core can't do). Change behaviour in the core, and keep it free of
+  `node:` imports; the app's `blob-proxy.test.ts` is the regression oracle.
 - **Facet/sticker/reaction claims are self-attested and must be verified**
   (RFC 0001 self-attestation amendment): `did`, `formats`, `alt`, `adultOnly`,
   `labels` on a `blue.moji.richtext.facet`, `blue.moji.embed.sticker#sticker`,

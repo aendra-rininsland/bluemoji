@@ -1,0 +1,10 @@
+name = "bluemoji-img"
+main = "worker.ts"
+compatibility_date = "2025-01-01"
+
+# Route /img/* on your own domain to this Worker:
+# routes = [{ pattern = "example.com/img/*", zone_name = "example.com" }]
+
+[vars]
+# An AppView that answers blue.moji.collection.checkBlob. Required for a public deployment.
+APPVIEW_URL = "https://moji.blue"
