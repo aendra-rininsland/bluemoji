@@ -73,6 +73,12 @@ link that instead of this file for adopters past the RENDERING.md stage.
   sticker / reaction claim via a local index, listed AppViews, then the owner's
   PDS — **no default AppView**; an AppView's "not found" is final so a
   takedown isn't undone by the PDS.
+- `server/_labeler.ts`, `query-labels.ts`, `setup-labeler.ts` — the moderation
+  labeler (RFC 0007): signed `bluemoji-*` labels (not the `!` system values) from
+  `com.atproto.label.queryLabels`, with account takedowns published
+  automatically from `_repos.status`. Needs env `LABELER_DID` and
+  `LABELER_SIGNING_KEY` (generate with `scripts/labeler-keygen.mjs`; never commit
+  or log the key); without them it is disabled and `queryLabels` returns 404.
 - `hatk.config.ts` — relay, DB, OAuth scopes, and the **collections
   allowlist** (see gotcha #1 below).
 - `hatk.generated.ts` / `hatk.generated.client.ts` — regenerated artifacts;
