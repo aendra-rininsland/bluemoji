@@ -6,11 +6,13 @@
  * what to do with that (typically: insert ":alias:" into a composer).
  *
  * Attributes:
- *   api-base     AppView origin to query and load blob images from.
- *                Defaults to https://moji.blue. Must expose
- *                blue.moji.collection.searchItems and an /img/{did}/{cid}
- *                blob proxy (or override via the `img-url` property with a
- *                custom (did, cid) => string function).
+ *   api-base     REQUIRED. AppView origin to query and load blob images from,
+ *                e.g. https://moji.blue. There is no default: which AppView
+ *                you rely on is your choice. Must be https (or http://localhost)
+ *                and expose blue.moji.collection.searchItems and an
+ *                /img/{did}/{cid} blob proxy (or override the `imgUrl`
+ *                property with a custom (did, cid) => string function).
+ *                Without a valid one the picker makes no requests and says so.
  *   repo         Optional at-identifier. When set, searches substring-match
  *                within that repo's own collection (suited to "my collection"
  *                composer autocomplete). Omit for network-wide whole-word
@@ -18,6 +20,27 @@
  *   placeholder  Input placeholder text.
  *   limit        Max results per search (default 24).
  */
+/**
+ * The AppView origin from an `api-base` attribute, or null if it is missing or
+ * unusable (not a URL, credentials in it, or http other than localhost).
+ */
+export function resolveApiBase(value: string | null | undefined): string | null {
+  if (!value) return null;
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return null;
+  }
+  if (url.username || url.password) return null;
+  const localhost = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && localhost)) return null;
+  return url.origin;
+}
+
+export const NO_APPVIEW_MESSAGE =
+  "No AppView configured: set the api-base attribute (for example https://moji.blue).";
+
 export class BluemojiPicker extends HTMLElement {
   static observedAttributes = ["api-base", "repo", "placeholder", "limit"];
 
@@ -29,10 +52,19 @@ export class BluemojiPicker extends HTMLElement {
 
   /** Override to customise how a (did, cid) pair becomes an image URL. */
   imgUrl: (did: string, cid: string) => string = (did, cid) =>
-    `${this.apiBase}/img/${encodeURIComponent(did)}/${encodeURIComponent(cid)}`;
+    `${this.apiBase ?? ""}/img/${encodeURIComponent(did)}/${encodeURIComponent(cid)}`;
 
-  get apiBase(): string {
-    return this.getAttribute("api-base") || "https://moji.blue";
+  /** The configured AppView origin, or null: there is deliberately no default. */
+  get apiBase(): string | null {
+    return resolveApiBase(this.getAttribute("api-base"));
+  }
+
+  attributeChangedCallback(name: string) {
+    if (name === "api-base" && this.#status) this.#showConfigProblem();
+  }
+
+  #showConfigProblem() {
+    this.#status!.textContent = this.apiBase ? "" : NO_APPVIEW_MESSAGE;
   }
 
   connectedCallback() {
@@ -76,6 +108,7 @@ export class BluemojiPicker extends HTMLElement {
     this.#results = document.createElement("div");
     this.#results.className = "results";
     this.shadowRoot!.appendChild(this.#results);
+    this.#showConfigProblem();
   }
 
   disconnectedCallback() {
@@ -94,12 +127,18 @@ export class BluemojiPicker extends HTMLElement {
   }
 
   async #search(q: string) {
+    const base = this.apiBase;
+    if (!base) {
+      this.#status!.textContent = NO_APPVIEW_MESSAGE;
+      this.dispatchEvent(new CustomEvent("moji-error", { detail: new Error(NO_APPVIEW_MESSAGE) }));
+      return; // never guess an AppView to send the user's queries to
+    }
     const seq = ++this.#requestSeq;
     this.#status!.textContent = "Searching…";
 
     const repo = this.getAttribute("repo");
     const limit = this.getAttribute("limit") || "24";
-    const url = new URL("/xrpc/blue.moji.collection.searchItems", this.apiBase);
+    const url = new URL("/xrpc/blue.moji.collection.searchItems", base);
     url.searchParams.set("q", q);
     url.searchParams.set("limit", limit);
     if (repo) url.searchParams.set("repo", repo);

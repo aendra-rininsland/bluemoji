@@ -114,9 +114,12 @@ BluemojiPicker.register();
 </script>
 ```
 
-`api-base` defaults to `https://moji.blue`; point it at any AppView exposing
+`api-base` is required and has no default: which AppView you send your users'
+searches to is your decision. Point it at any AppView exposing
 `blue.moji.collection.searchItems` and an `/img/{did}/{cid}` blob proxy (or
-override the `imgUrl` property with a custom resolver).
+override the `imgUrl` property with a custom resolver). Without a valid one
+(https, or http on localhost) the picker makes no requests, shows a message, and
+fires `moji-error`.
 
 ### Components
 
