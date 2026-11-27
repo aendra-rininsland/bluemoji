@@ -71,24 +71,41 @@ private addresses. See [RENDERING.md](../RENDERING.md#where-to-do-the-lookup).
 
 ### Render
 
-Once facets are attached to a record, you can render them using the helper libraries in `render/`:
+Once facets are attached to a record, `render()` turns one into an element. It
+never draws from the facet itself: it verifies the emoji first (see
+[Verify](#verify)) and renders what the real item record says, so a forged
+`formats`, `alt` or `adultOnly` on a facet has no effect.
 
 ```typescript
 import { render } from "@aendra/bluemoji/render";
-import { AtpAgent } from "@atproto/api";
-import { record, credentials } from "./fixtures";
 
-const agent = new AtpAgent({ service: "https://api.bsky.social" });
-await agent.login({ ...credentials });
+const feature = post.facets
+  ?.flatMap((f) => f.features)
+  .find((f) => f.$type === "blue.moji.richtext.facet");
 
-const [bluemojiFacet] = record.facets;
-const element = render(bluemojiFacet, agent);
+const element = await render(null, feature, {
+  // How to look the emoji up. Defaults to the owner's PDS; list AppViews you
+  // trust, or pass your own index. There is no default AppView.
+  verify: { appviews: ["https://moji.blue"] },
+  // Optional: route images through your own proxy/CDN instead of the PDS
+  // blobUrl: (did, cid) => `https://img.example.com/${did}/${cid}`,
+  adult: "show", // or "hide"; adult-only emoji get data-adult-only="true"
+});
 
-assert.ok(
-  element instanceof HTMLCanvasElement || element instanceof HTMLImageElement,
-  "Render returns either <img> (PNG, APNG) or <canvas> (dotLottie)",
-);
+if (!element) {
+  // Missing, taken down, or unreachable: show the ":name:" text instead
+}
 ```
+
+It returns an `<img>` (PNG, GIF, WebP, APNG) or a `<canvas>` (dotLottie), or
+`undefined` when the emoji can't be verified. The first argument is the old
+`agent` parameter, kept for compatibility and no longer used. Pass `raw: true` to
+get a Lottie file's bytes instead of a canvas (React Native), or `player: true`
+for `{ canvas, player }`.
+
+On a server, give `verify.fetch` one that refuses private addresses (see Verify).
+The old `renderBlobAsImg` helper in `render/renderers/blob` pointed at a Bluesky
+avatar CDN that doesn't serve these blobs and is no longer used by `render()`.
 
 ### Emoji picker
 
